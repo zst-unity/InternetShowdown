@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -13,20 +14,21 @@ public class ItemsReader : NetworkBehaviour
     [Header("Other")]
     [SerializeField] private byte _luckModifier = 0;
     [SerializeField] private Transform _itemHolder;
-    private List<UsableItem> _registeredItems = new List<UsableItem>();
 
     public bool HasItem { get => _currentItem != null; }
 
     private UsableItem _currentItem;
     private NetworkPlayer _player;
 
-    public List<Mutation> ActiveMutations = new List<Mutation>();
+    public List<Mutation> ActiveMutations = new();
 
     private int _itemsUsed;
 
+    public static List<UsableItem> RegisteredItems { get; private set; } = new();
+
     private void Awake()
     {
-        _registeredItems = Resources.LoadAll<UsableItem>("Items").ToList();
+        RegisteredItems = Resources.LoadAll<UsableItem>("Items").ToList();
     }
 
     private void Start()
@@ -39,9 +41,9 @@ public class ItemsReader : NetworkBehaviour
 
     private void OnTriggerStay(Collider other)
     {
-        if (!isLocalPlayer) return; // выходим из метода если игрок не локальный
+        if (!isLocalPlayer) return;
 
-        if (other.GetComponent<PickableItem>())
+        if (other.TryGetComponent(out PickableItem pickedItem))
         {
             if (!HasItem)
             {
@@ -56,7 +58,11 @@ public class ItemsReader : NetworkBehaviour
                     _pickupSound.Volume
                 );
 
-                GetItem();
+                if (pickedItem.ContainedItem)
+                    SetCurrentItem(pickedItem.ContainedItem);
+                else
+                    GetItem();
+
             }
         }
     }
@@ -72,14 +78,22 @@ public class ItemsReader : NetworkBehaviour
 
     private void Update()
     {
-        if (!isLocalPlayer) return; // выходим из метода если игрок не локальный
+        if (!isLocalPlayer) return;
+
+        if (Input.GetKeyDown(KeyCode.T) && HasItem)
+        {
+            Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 500f, LayerMask.NameToLayer("Map"));
+            Vector3 targetPosition = hit.point + Vector3.up * 1.5f;
+
+            PickableItem.Spawn(targetPosition, _currentItem);
+        }
 
         CheckForItem();
     }
 
     private void CheckForItem()
     {
-        if (!HasItem) return; // если у игрока нету предмета в руках, то выходим из метода
+        if (!HasItem) return;
 
         if (!_player.AllowMovement || PauseMenu.Singleton.PauseMenuOpened) return;
 
@@ -92,21 +106,18 @@ public class ItemsReader : NetworkBehaviour
                 float useTime = _currentItem.UseTime;
 
                 Invoke(nameof(UseItem), useTime);
-                EverywhereCanvas.Singleton.StartUseTimer(useTime);
+                Hud.Singleton.StartInteraction(useTime);
             }
 
             if (Input.GetMouseButtonUp(0))
             {
                 CancelInvoke(nameof(UseItem));
-                EverywhereCanvas.Singleton.CancelUseTimer();
+                Hud.Singleton.StopInteraction();
             }
         }
         else
         {
-            if (Input.GetMouseButtonDown(0)) // 0 - лкм (на случай альгеймера у паши или у никиты)
-            {
-                UseItem();
-            }
+            if (Input.GetMouseButtonDown(0)) UseItem();
         }
     }
 
@@ -120,11 +131,11 @@ public class ItemsReader : NetworkBehaviour
 
         if (!_player.AllowMovement) return;
 
-        foreach (InspectorMutation insMutation in _currentItem.Mutations) // проходим по каждой инспекторной мутации
+        foreach (InspectorMutation insMutation in _currentItem.Mutations)
         {
-            Mutation mutation = MutationJobs.InspectorToMutation(insMutation); // преобразуем её в нормальную
+            Mutation mutation = MutationJobs.InspectorToMutation(insMutation);
 
-            mutation.Execute(); // запускаем мутацию на время
+            mutation.Mutate();
             ActiveMutations.Add(mutation);
 
             StartCoroutine(nameof(CancelMutationFromList), mutation);
@@ -136,16 +147,11 @@ public class ItemsReader : NetworkBehaviour
         }
 
         if (_currentItem.HealAmount > 0)
-        {
             _player.Heal(_currentItem.HealAmount);
-        }
         else if (_currentItem.HealAmount < 0)
-        {
             _player.TakeDamage(Mathf.Abs(_currentItem.HealAmount));
-        }
 
-        LoseItem(); // теряем предмет из рук
-
+        LoseItem();
         _player.OnItemUsed();
     }
 
@@ -184,46 +190,42 @@ public class ItemsReader : NetworkBehaviour
         SetCurrentItem(null);
     }
 
-    public void GetItem() // меня касирша послала нахуй // да пошёл ты нахуй
+    public void GetItem()
     {
         PlayerCurrentStats.Singleton.Luck = _luckModifier;
 
-        int choice;
-        List<UsableItem> sortedItems = new List<UsableItem>();
+        List<UsableItem> sortedItems;
         Rarity closestRarity;
 
-        (choice, sortedItems, closestRarity) = Generate();
+        (sortedItems, closestRarity) = Generate();
 
-        while (RarityJobs.ItemRaritySortHelper(sortedItems, closestRarity).Count == 0)
+        while (RarityJobs.GetAllWithRarity(sortedItems, closestRarity).Count == 0)
         {
-            (choice, sortedItems, closestRarity) = Generate();
+            (sortedItems, closestRarity) = Generate();
         }
 
-        List<UsableItem> choosedCategory = new List<UsableItem>();
+        List<UsableItem> chosenCategory = new();
 
         foreach (var item in sortedItems)
         {
-            if (item.ItemRarity == closestRarity)
-            {
-                choosedCategory.Add(item);
-            }
+            if (item.ItemRarity == closestRarity) chosenCategory.Add(item);
         }
 
-        SetCurrentItem(choosedCategory[UnityEngine.Random.Range(0, choosedCategory.Count)]);
+        SetCurrentItem(chosenCategory[UnityEngine.Random.Range(0, chosenCategory.Count)]);
     }
 
-    private (int choice, List<UsableItem> sortedItems, Rarity closestRarity) Generate()
+    private (List<UsableItem> sortedItems, Rarity closestRarity) Generate()
     {
-        byte choice = RarityJobs.ChoicRandomizer((byte)(PlayerCurrentStats.Singleton.Luck + PlayerMutationStats.Singleton.Luck));
+        byte choice = RarityJobs.Select((byte)(PlayerCurrentStats.Singleton.Luck + PlayerMutationStats.Singleton.Luck));
 
-        List<UsableItem> sortedItems = RarityJobs.SortAllItems(_registeredItems).ToList();
+        List<UsableItem> sortedItems = RarityJobs.Sort(RegisteredItems).ToList();
 
-        var closestRarity = RarityJobs.Rarities.ToList<KeyValuePair<string, byte>>();
+        var closestRarity = RarityJobs.Rarities.ToList();
         closestRarity.Sort((first, second) => second.Value > choice ? 1 : -1);
 
-        Rarity convertedClosestRarity = RarityJobs.KeyValueRarityToRarity(closestRarity.First());
+        Rarity convertedClosestRarity = RarityJobs.KeyValuePairToRarity(closestRarity.First());
 
-        return (choice, sortedItems, convertedClosestRarity);
+        return (sortedItems, convertedClosestRarity);
     }
 
     private void MakeVisual(GameObject visual, float zOffset = 0)
@@ -281,76 +283,41 @@ public class ItemsReader : NetworkBehaviour
 
     private void SetCurrentItem(UsableItem target)
     {
-        _registeredItems.Sort((first, second) => (byte)first.ItemRarity < (byte)second.ItemRarity ? -1 : 1);
+        RegisteredItems.Sort((first, second) => (byte)first.ItemRarity < (byte)second.ItemRarity ? -1 : 1);
 
         _currentItem = target;
 
         if (target == null)
-        {
             CmdSetCurrentItem(null);
-        }
         else
-        {
-            CmdSetCurrentItem(_registeredItems.IndexOf(target));
-        }
+            CmdSetCurrentItem(RegisteredItems.IndexOf(target));
     }
 
     [Command]
     private void CmdSetCurrentItem(int? idx)
     {
-        _registeredItems.Sort((first, second) => (byte)first.ItemRarity < (byte)second.ItemRarity ? -1 : 1);
+        RegisteredItems.Sort((first, second) => (byte)first.ItemRarity < (byte)second.ItemRarity ? -1 : 1);
 
-        if (idx == null)
-        {
-            _currentItem = null;
-        }
-        else
-        {
-            _currentItem = _registeredItems[idx.Value];
-        }
-
+        SetItemOnClient(idx);
         RpcSetCurrentItem(idx);
     }
 
     [ClientRpc]
     private void RpcSetCurrentItem(int? idx)
     {
-        _registeredItems.Sort((first, second) => (byte)first.ItemRarity < (byte)second.ItemRarity ? -1 : 1);
+        RegisteredItems.Sort((first, second) => (byte)first.ItemRarity < (byte)second.ItemRarity ? -1 : 1);
 
-        if (idx == null)
-        {
-            _currentItem = null;
-        }
-        else
-        {
-            _currentItem = _registeredItems[idx.Value];
-        }
-
+        SetItemOnClient(idx);
         OnCurrentItemChange();
     }
 
-    #endregion
-}
-
-public static class MutationJobs // этот класс нужен для работ с классами мутаций
-{
-    public static Mutation InspectorToMutation(InspectorMutation input) // этот метод способен преобразовать инспекторную мутацию в настоящую
+    private void SetItemOnClient(int? idx)
     {
-        switch (input.Type)
-        {
-            case MutationType.Speed:
-                return new SpeedMutation(input.ChangeAs, input.Amount, input.Time);
-
-            case MutationType.Bounce:
-                return new BounceMutation(input.ChangeAs, input.Amount, input.Time);
-
-            case MutationType.Luck:
-                return new LuckMutation(input.ChangeAs, input.Amount, input.Time);
-
-            case MutationType.Damage:
-                return new DamageMutation(input.ChangeAs, input.Amount, input.Time);
-        }
-
-        return null;
+        if (idx == null)
+            _currentItem = null;
+        else
+            _currentItem = RegisteredItems[idx.Value];
     }
+
+    #endregion
 }

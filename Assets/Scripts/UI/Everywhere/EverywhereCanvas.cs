@@ -37,9 +37,6 @@ public class EverywhereCanvas : MonoBehaviour, IEverywhereCanvas // юи кот�
     [SerializeField] private TMP_Text OthersNickname;
     [field: SerializeField] public TMP_Text Timer { get; private set; }
 
-    [SerializeField] private Slider UseTimer;
-    [SerializeField] private Image UseTimerFill;
-
     [SerializeField] private GameObject _playerDebugPanel;
     [SerializeField] private TMP_Text[] _playerDebugStats;
 
@@ -65,17 +62,6 @@ public class EverywhereCanvas : MonoBehaviour, IEverywhereCanvas // юи кот�
     [Space(9)]
 
     [SerializeField] private List<AudioClip> _keyboardTyping = new List<AudioClip>();
-
-    [Header("Health Slider")]
-    [SerializeField] private Slider Health;
-    [SerializeField] private Image HealthFill;
-
-    [Space(9)]
-
-    [SerializeField] private float _healthBarAniamtionSpeed = 5;
-
-    [SerializeField] private Color _healthMaxColor;
-    [SerializeField] private Color _healthMinColor;
 
     private float _targetHealth;
 
@@ -128,8 +114,6 @@ public class EverywhereCanvas : MonoBehaviour, IEverywhereCanvas // юи кот�
     {
         Singleton = this;
 
-        EnableUseTimer(false);
-
         _killLog.alpha = 0;
         _kafifEasterEgg.alpha = 0;
         _mapVoting.alpha = 0;
@@ -149,8 +133,6 @@ public class EverywhereCanvas : MonoBehaviour, IEverywhereCanvas // юи кот�
         _playerDebugPanel.SetActive(true);
         DebugStats();
 #endif
-
-        UpdateHealthDisplay();
     }
 
     public void QuitAction()
@@ -394,41 +376,6 @@ public class EverywhereCanvas : MonoBehaviour, IEverywhereCanvas // юи кот�
         }
     }
 
-    private void UpdateHealthDisplay()
-    {
-        Health.value = Mathf.Lerp(Health.value, _targetHealth, Time.deltaTime * _healthBarAniamtionSpeed);
-        HealthFill.color = Color.Lerp(_healthMinColor, _healthMaxColor, Health.value / Health.maxValue);
-    }
-
-    public void CancelUseTimer()
-    {
-        EnableUseTimer(false);
-
-        StopCoroutine(nameof(LerpUseTimer));
-    }
-
-    public void StartUseTimer(float time)
-    {
-        EnableUseTimer(true);
-
-        StartCoroutine(nameof(LerpUseTimer), time);
-    }
-
-    private void EnableUseTimer(bool enable)
-    {
-        UseTimer.gameObject.SetActive(enable);
-    }
-
-    public void SetMaxHealth(float value)
-    {
-        Health.maxValue = value;
-    }
-
-    public void SetDisplayHealth(float value)
-    {
-        _targetHealth = value;
-    }
-
     public void LogKill()
     {
         StartCoroutine(LogKillCoroutine(2, 0.65f));
@@ -494,24 +441,6 @@ public class EverywhereCanvas : MonoBehaviour, IEverywhereCanvas // юи кот�
             FadeDuration = fadeDuration;
             Target = target;
         }
-    }
-
-    private IEnumerator LerpUseTimer(float duration)
-    {
-        float elapsed = 0.0f;
-
-        while (elapsed < duration)
-        {
-            UseTimer.value = Mathf.Lerp(0, 1, elapsed / duration);
-            UseTimerFill.color = new Color(1, 1 - UseTimer.value, 1 - UseTimer.value / 3, Mathf.Sin(1 - UseTimer.value));
-
-            elapsed += Time.deltaTime;
-            yield return null;
-        }
-
-        UseTimer.value = 1;
-
-        EnableUseTimer(false);
     }
 
     private void ClearSelections()

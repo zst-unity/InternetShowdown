@@ -24,12 +24,11 @@ public class CustomNetworkManager : NetworkManager
         }
 
         List<GameObject> projectiles = Resources.LoadAll<GameObject>("Items/Projectiles").ToList();
-        List<GameObject> netPrefs = Resources.LoadAll<GameObject>("NetworkedPrefabs").ToList();
-        netPrefs.AddRange(projectiles);
-        spawnPrefabs = netPrefs;
+        List<GameObject> netPrefabs = Resources.LoadAll<GameObject>("NetworkedPrefabs").ToList();
+        netPrefabs.AddRange(projectiles);
+        spawnPrefabs = netPrefabs;
 
         _transition = Transition.Singleton();
-
         SceneManager.activeSceneChanged += (Scene a, Scene b) => _sceneChanged = true;
     }
 
@@ -97,9 +96,9 @@ public class CustomNetworkManager : NetworkManager
         NetworkPlayer player = conn.identity.GetComponent<NetworkPlayer>();
         GameLoop gameLoop = GameLoop.Singleton();
 
-        if (!gameLoop.LeftedPlayers.ContainsKey(player.Nickname))
+        if (!gameLoop.ExitedPlayers.ContainsKey(player.Nickname))
         {
-            gameLoop.LeftedPlayers.Add(player.Nickname, (player.Score, player.Activity));
+            gameLoop.ExitedPlayers.Add(player.Nickname, (player.Score, player.Activity));
         }
 
         base.OnServerDisconnect(conn);
@@ -123,13 +122,13 @@ public class CustomNetworkManager : NetworkManager
 
         yield return new WaitUntil(() => player.Initialized);
 
-        if (gameLoop.LeftedPlayers.ContainsKey(player.Nickname))
+        if (gameLoop.ExitedPlayers.ContainsKey(player.Nickname))
         {
-            (int score, int activity) value = gameLoop.LeftedPlayers[player.Nickname];
+            (int score, int activity) value = gameLoop.ExitedPlayers[player.Nickname];
 
             player.SetLeaderboardStats(value.score, value.activity);
 
-            gameLoop.LeftedPlayers.Remove(player.Nickname);
+            gameLoop.ExitedPlayers.Remove(player.Nickname);
         }
 
         SceneGameManager.Singleton.RpcForceClientsForLeaderboardUpdate();

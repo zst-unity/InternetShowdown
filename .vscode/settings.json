@@ -34,5 +34,17 @@
     "**/*.tiff": true,
     "**/*.unity": true,
     "**/*.wav": true
-  }
+  },
+  "dotnet.defaultSolution": "InternetShowdown.sln",
+  "cSpell.words": [
+    "Behaviour",
+    "Dont",
+    "Leaderboard",
+    "Mathf",
+    "Pickable",
+    "Raycast",
+    "Rigidbody",
+    "Scriptable",
+    "Tweening"
+  ]
 }

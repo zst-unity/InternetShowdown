@@ -3,47 +3,54 @@ using System.Threading;
 using System.Threading.Tasks;
 using UnityEngine;
 
+public static class MutationJobs
+{
+    public static Mutation InspectorToMutation(InspectorMutation input)
+    {
+        return input.Type switch
+        {
+            MutationType.Speed => new SpeedMutation(input.ChangeAs, input.Amount, input.Time),
+            MutationType.Bounce => new BounceMutation(input.ChangeAs, input.Amount, input.Time),
+            MutationType.Luck => new LuckMutation(input.ChangeAs, input.Amount, input.Time),
+            MutationType.Damage => new DamageMutation(input.ChangeAs, input.Amount, input.Time),
+            _ => throw new Exception("invalid mutation type"),
+        };
+    }
+}
+
 [Serializable]
-public abstract class Mutation // базовый класс мутации
+public abstract class Mutation
 {
     public ChangeType ChangeAs { get; protected set; }
     public float Amount { get; protected set; }
     public float Time { get; protected set; }
 
-    public CancellationTokenSource Source { get; protected set; }
+    public CancellationTokenSource Source { get; protected set; } = new();
 
-    protected abstract void OnAdd(); // вызывается когда надо сложить стату
-    protected abstract void OnMultiply(); // вызывается когда надо умножить стату
+    protected abstract void OnAdd();
+    protected abstract void OnMultiply();
 
-    protected abstract void OnDecrease(); // вызывается когда надо убавить стату
-    protected abstract void OnDivide(); // вызывается когда надо разделить стату стату
+    protected abstract void OnDecrease();
+    protected abstract void OnDivide();
 
     protected bool _isCanceled;
-
     protected float _changedStats;
 
-    protected float MultiplyTool(float s) // метод для удобности умножения и деления стат
+    protected float MultiplyTool(float s) => (s * Amount) - s;
+
+    public void Mutate()
     {
-        return (s * Amount) - s;
-    }
+        int milliseconds = (int)TimeSpan.FromSeconds(Time).TotalMilliseconds;
 
-    public void Execute() // корутины идут нахуй
-    {
-        int mili = (int)TimeSpan.FromSeconds(Time).TotalMilliseconds;
+        if (ChangeAs == ChangeType.Add) OnAdd();
+        else if (ChangeAs == ChangeType.Multiply) OnMultiply();
 
-        if (ChangeAs == ChangeType.Add)
+        Task.Delay(milliseconds, Source.Token).ContinueWith(o =>
         {
-            OnAdd();
-
-            Task.Delay(mili, Source.Token).ContinueWith(o => { OnDecrease(); });
-        }
-
-        else if (ChangeAs == ChangeType.Multiply)
-        {
-            OnMultiply();
-
-            Task.Delay(mili, Source.Token).ContinueWith(o => { OnDivide(); });
-        }
+            if (_isCanceled) return;
+            if (ChangeAs == ChangeType.Add) OnDecrease();
+            else if (ChangeAs == ChangeType.Multiply) OnDivide();
+        });
     }
 
     public void CancelMutation()
@@ -52,13 +59,11 @@ public abstract class Mutation // базовый класс мутации
         Source.Cancel();
     }
 
-    public Mutation(ChangeType change, float amount, float time) // конструктор
+    public Mutation(ChangeType change, float amount, float time)
     {
         ChangeAs = change;
         Amount = amount;
         Time = time;
-
-        Source = new CancellationTokenSource();
     }
 
     ~Mutation()
@@ -68,7 +73,7 @@ public abstract class Mutation // базовый класс мутации
 }
 
 [Serializable]
-public class SpeedMutation : Mutation // мутация скорости
+public class SpeedMutation : Mutation
 {
     public SpeedMutation(ChangeType change, float amount, float time) : base(change, amount, time) { }
 
@@ -88,21 +93,17 @@ public class SpeedMutation : Mutation // мутация скорости
 
     protected override void OnDecrease()
     {
-        if (_isCanceled) return;
-
         PlayerMutationStats.Singleton.Speed -= _changedStats;
     }
 
     protected override void OnDivide()
     {
-        if (_isCanceled) return;
-
         PlayerMutationStats.Singleton.Speed -= _changedStats;
     }
 }
 
 [Serializable]
-public class BounceMutation : Mutation // мутация прыгучести
+public class BounceMutation : Mutation
 {
     public BounceMutation(ChangeType change, float amount, float time) : base(change, amount, time) { }
 
@@ -122,21 +123,17 @@ public class BounceMutation : Mutation // мутация прыгучести
 
     protected override void OnDecrease()
     {
-        if (_isCanceled) return;
-
         PlayerMutationStats.Singleton.Bounce -= _changedStats;
     }
 
     protected override void OnDivide()
     {
-        if (_isCanceled) return;
-
         PlayerMutationStats.Singleton.Bounce -= _changedStats;
     }
 }
 
 [Serializable]
-public class LuckMutation : Mutation // мутация удачи
+public class LuckMutation : Mutation
 {
     public LuckMutation(ChangeType change, float amount, float time) : base(change, amount, time) { }
 
@@ -144,33 +141,29 @@ public class LuckMutation : Mutation // мутация удачи
     {
         _changedStats = Amount;
 
-        PlayerMutationStats.Singleton.Luck += ((byte)_changedStats);
+        PlayerMutationStats.Singleton.Luck += (byte)_changedStats;
     }
 
     protected override void OnMultiply()
     {
         _changedStats = MultiplyTool(PlayerCurrentStats.Singleton.Luck);
 
-        PlayerMutationStats.Singleton.Luck += ((byte)_changedStats);
+        PlayerMutationStats.Singleton.Luck += (byte)_changedStats;
     }
 
     protected override void OnDecrease()
     {
-        if (_isCanceled) return;
-
-        PlayerMutationStats.Singleton.Luck -= ((byte)_changedStats);
+        PlayerMutationStats.Singleton.Luck -= (byte)_changedStats;
     }
 
     protected override void OnDivide()
     {
-        if (_isCanceled) return;
-
-        PlayerMutationStats.Singleton.Luck -= ((byte)_changedStats);
+        PlayerMutationStats.Singleton.Luck -= (byte)_changedStats;
     }
 }
 
 [Serializable]
-public class DamageMutation : Mutation // мутация удачи
+public class DamageMutation : Mutation
 {
     public DamageMutation(ChangeType change, float amount, float time) : base(change, amount, time) { }
 
@@ -178,27 +171,23 @@ public class DamageMutation : Mutation // мутация удачи
     {
         _changedStats = Amount;
 
-        PlayerMutationStats.Singleton.Damage += (_changedStats);
+        PlayerMutationStats.Singleton.Damage += _changedStats;
     }
 
     protected override void OnMultiply()
     {
         _changedStats = MultiplyTool(PlayerCurrentStats.Singleton.Damage);
 
-        PlayerMutationStats.Singleton.Damage += (_changedStats);
+        PlayerMutationStats.Singleton.Damage += _changedStats;
     }
 
     protected override void OnDecrease()
     {
-        if (_isCanceled) return;
-
-        PlayerMutationStats.Singleton.Damage -= (_changedStats);
+        PlayerMutationStats.Singleton.Damage -= _changedStats;
     }
 
     protected override void OnDivide()
     {
-        if (_isCanceled) return;
-
-        PlayerMutationStats.Singleton.Damage -= (_changedStats);
+        PlayerMutationStats.Singleton.Damage -= _changedStats;
     }
 }

@@ -17,7 +17,6 @@ GameObject:
   - component: {fileID: 8348873482465104885}
   - component: {fileID: 2202756226007548306}
   - component: {fileID: 5229603516334713150}
-  - component: {fileID: 3606753378075625921}
   m_Layer: 11
   m_Name: Player
   m_TagString: Player
@@ -103,9 +102,12 @@ MonoBehaviour:
   _availableAirJumps: 1
   _coyoteTime: 0.2
   _jumpBuffer: 0.25
-  _dashGroundedForce: 55
-  _dashAirForce: 11.25
+  _dashForce: 55
+  _dashDrag: 6
+  _dashTime: 0.15
   _dashTimeout: 0.4
+  _dashesAvailable: 4
+  _dashReloadTime: 1
   _groundDashForce: 17.5
   _mapLayers:
     serializedVersion: 2
@@ -119,6 +121,8 @@ MonoBehaviour:
   - {fileID: 275408662450266087, guid: 6586a4f2637b65f4898bb7c01e5b5571, type: 3}
   _jumpSound: {fileID: 8300000, guid: f785b3f95b3712c479e5b4cf5cac59c9, type: 3}
   _dashSound: {fileID: 8300000, guid: 410ff9ab2e57b2247bbd31425f0608a4, type: 3}
+  _dashFailedSound: {fileID: 8300000, guid: 2803c2f8f14358844aabfc4b7b2cf112, type: 3}
+  _dashReadySound: {fileID: 8300000, guid: c55646f01508c4040bd090bfad93857f, type: 3}
   _groundSlamSounds:
   - {fileID: 8300000, guid: c72a4e0cb87ffce4bad94d41ce3d39f4, type: 3}
   - {fileID: 8300000, guid: 1b87ce49fc630a848bc69acb5959314f, type: 3}
@@ -126,8 +130,24 @@ MonoBehaviour:
   _localDamageSound: {fileID: 8300000, guid: 23d00c411cfe6f545a09e791570c1f87, type: 3}
   _hitLogSound: {fileID: 8300000, guid: c4426c3389b8cf14fab0610dbb79f591, type: 3}
   _killLogSound: {fileID: 8300000, guid: 7534e8f706616374ab5df6fbfdb4b728, type: 3}
+  _normalMaterials:
+  - {fileID: 2100000, guid: e94811a87fd017242835c8471ab29390, type: 2}
+  - {fileID: 2100000, guid: 3f58b53fff84efd4da3620e07db0624c, type: 2}
+  - {fileID: 2100000, guid: e6b473e057bfeb94ea21c52295689c08, type: 2}
+  - {fileID: 2100000, guid: 78761de13bc07274fa97a2ce863e12b9, type: 2}
+  - {fileID: 2100000, guid: c39a6b4a16ab26049be4c7d3d59c7b80, type: 2}
+  - {fileID: 2100000, guid: aa29d8f64910a0a4193bbe491fa02021, type: 2}
+  - {fileID: 2100000, guid: 8d41f5bd3a5d3e14d9803efd68af9c18, type: 2}
+  _invincibleMaterials:
+  - {fileID: 2100000, guid: edfc71954dbb16548863d82aed93b012, type: 2}
+  - {fileID: 2100000, guid: edfc71954dbb16548863d82aed93b012, type: 2}
+  - {fileID: 2100000, guid: edfc71954dbb16548863d82aed93b012, type: 2}
+  - {fileID: 2100000, guid: edfc71954dbb16548863d82aed93b012, type: 2}
+  - {fileID: 2100000, guid: edfc71954dbb16548863d82aed93b012, type: 2}
+  - {fileID: 2100000, guid: edfc71954dbb16548863d82aed93b012, type: 2}
+  - {fileID: 2100000, guid: edfc71954dbb16548863d82aed93b012, type: 2}
   _orientation: {fileID: 5613802264008730177}
-  _body: {fileID: 9188342894300109131}
+  _body: {fileID: 3291134265114765407}
   PlayerCamera: {fileID: 0}
   PlayerMoveCamera: {fileID: 0}
   AllowMovement: 0
@@ -140,6 +160,7 @@ MonoBehaviour:
   <Traumas>k__BackingField: 0
   _nickname: 
   _initialized: 0
+  _invincible: 0
   _health: 0
 --- !u!114 &6314750545462305294
 MonoBehaviour:
@@ -194,8 +215,8 @@ MonoBehaviour:
   clientAuthority: 1
   syncVelocity: 1
   clearVelocity: 0
-  velocitySensitivity: 0.1
-  syncAngularVelocity: 1
+  velocitySensitivity: 0.05
+  syncAngularVelocity: 0
   clearAngularVelocity: 0
   angularVelocitySensitivity: 0.1
 --- !u!114 &8348873482465104885
@@ -270,29 +291,6 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: -868376542522870355, guid: c26eb7f71ef488648bf49c38b52eed99, type: 3}
---- !u!114 &3606753378075625921
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3602822793115751588}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 5ea8f32fa68e9d34dbe3216ae6b077b0, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  syncDirection: 0
-  syncMode: 0
-  syncInterval: 0
-  _orientation: {fileID: 5613802264008730177}
-  _rb: {fileID: 3602822793115751591}
-  _targetLayers:
-    serializedVersion: 2
-    m_Bits: 64
-  _minStepHeight: -0.85
-  _maxStepHeight: 0.25
-  _stepSpeed: 10
 --- !u!1 &4215120267258587616
 GameObject:
   m_ObjectHideFlags: 0

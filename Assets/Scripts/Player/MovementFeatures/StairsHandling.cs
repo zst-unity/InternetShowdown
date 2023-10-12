@@ -29,7 +29,7 @@ public class StairsHandling : NetworkBehaviour
 
     private void OnValidate()
     {
-        TryGetComponent<Rigidbody>(out _rb);
+        TryGetComponent(out _rb);
     }
 
     private void FixedUpdate()

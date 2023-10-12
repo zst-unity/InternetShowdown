@@ -2,12 +2,8 @@ using Mirror;
 using UnityEngine;
 using UnityEngine.AI;
 
-public class ItemSpawner : NetworkBehaviour // спавнер предметов юзает навмеш.
+public class ItemSpawner : NetworkBehaviour
 {
-    [SerializeField] private GameObject _itemPrefab;
-
-    [Space(9)]
-
     [SerializeField, Min(0)] private int _maxSpawnAmount = 50;
     [SerializeField, Min(0.1f)] private float _spawnRate = 4f;
 
@@ -15,19 +11,19 @@ public class ItemSpawner : NetworkBehaviour // спавнер предметов
 
     [SerializeField] private Vector3 _bounds = new Vector3(1, 1, 1);
 
-    [ServerCallback] // этот атрибут запрещает вызывать метод всем клиентам кроме сервера
-    public void StartSpawnProcces()
+    [ServerCallback]
+    public void StartSpawnProcess()
     {
-        InvokeRepeating(nameof(SpawnItem), 0f, _spawnRate); // постояно вызывает SpawnItem
+        InvokeRepeating(nameof(SpawnItem), 0f, _spawnRate);
     }
 
-    [ServerCallback] // этот атрибут запрещает вызывать метод всем клиентам кроме сервера
-    public void StopSpawnProcces()
+    [ServerCallback]
+    public void StopSpawnProcess()
     {
-        CancelInvoke(nameof(SpawnItem)); // отменяет постоянный вызов метода
+        CancelInvoke(nameof(SpawnItem));
     }
 
-    [ServerCallback] // этот атрибут запрещает вызывать метод всем клиентам кроме сервера
+    [ServerCallback]
     public void DestroyAll()
     {
         PickableItem[] all = FindObjectsOfType<PickableItem>(true);
@@ -42,20 +38,17 @@ public class ItemSpawner : NetworkBehaviour // спавнер предметов
     {
         PickableItem[] allSpawned = FindObjectsOfType<PickableItem>();
 
-        if (allSpawned.Length >= _maxSpawnAmount) return; // тут же выходит их метода если мы достигли лимита
+        if (allSpawned.Length >= _maxSpawnAmount) return;
 
-        Vector3 randomPlace = new Vector3
-        (
+        Vector3 randomPlace = new(
             Random.Range(-(_bounds.x / 2), _bounds.x / 2),
             Random.Range(-(_bounds.y / 2), _bounds.y / 2),
             Random.Range(-(_bounds.z / 2), _bounds.z / 2)
         );
 
-        NavMeshHit hit;
-        NavMesh.SamplePosition(randomPlace, out hit, randomPlace.magnitude, 1);
+        NavMesh.SamplePosition(randomPlace, out NavMeshHit hit, randomPlace.magnitude, 1);
 
-        GameObject spawnedItem = Instantiate(_itemPrefab, hit.position + (Vector3.up * 1.5f), Quaternion.identity);
-
+        GameObject spawnedItem = PickableItem.Spawn(hit.position + Vector3.up * 1.5f).gameObject;
         NetworkServer.Spawn(spawnedItem);
     }
 

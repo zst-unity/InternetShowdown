@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 
@@ -13,50 +14,37 @@ public static class RarityJobs
         { "Common", 255 },
     };
 
-    public static Rarity RarityFromName(this string value) => (Rarity)Rarity.Parse(typeof(Rarity), value, true); // конвертирует имя категории редкости в энам редкости
+    public static Rarity RarityFromName(this string value) => (Rarity)Enum.Parse(typeof(Rarity), value, true);
 
-    public static List<UsableItem> ItemRaritySortHelper(List<UsableItem> input, Rarity sortBy) // возвращает все UsableItem из input, у которых ItemRarity равно sortBy
+    public static List<UsableItem> GetAllWithRarity(List<UsableItem> input, Rarity rarity)
     {
-        List<UsableItem> toReturn = new List<UsableItem>();
-
+        List<UsableItem> output = new();
         foreach (UsableItem item in input)
         {
-            if (item.ItemRarity == sortBy)
-            {
-                toReturn.Add(item);
-            }
+            if (item.ItemRarity == rarity) output.Add(item);
         }
 
-        return toReturn;
+        return output;
     }
 
-    public static List<UsableItem> SortAllItems(List<UsableItem> input) // сортирует каждый UsableItem из input по уровню редкости в порядке возрастания
+    public static List<UsableItem> Sort(List<UsableItem> input)
     {
-        List<UsableItem> toReturn = input;
+        List<UsableItem> output = input;
+        output.Sort((first, second) => (byte)first.ItemRarity < (byte)second.ItemRarity ? -1 : 1);
 
-        toReturn.Sort((first, second) => (byte)first.ItemRarity < (byte)second.ItemRarity ? -1 : 1);
-
-        return toReturn;
+        return output;
     }
 
-    public static Rarity KeyValueRarityToRarity(KeyValuePair<string, byte> input) // конвертирует категорию редкости в энам редкости
-    {
-        return RarityFromName(input.Key);
-    }
+    public static Rarity KeyValuePairToRarity(KeyValuePair<string, byte> input) => RarityFromName(input.Key);
 
-    public static byte ChoicRandomizer(byte modifier)
+    public static byte Select(byte modifier)
     {
         bool isPositive = modifier > 0;
-
-        byte absoluteModifier = (byte)Mathf.Abs(modifier);
+        byte absoluteModifier = (byte)Math.Abs(modifier);
 
         if (isPositive)
-        {
             return (byte)UnityEngine.Random.Range(0, 255 - absoluteModifier);
-        }
         else
-        {
             return (byte)UnityEngine.Random.Range(absoluteModifier, 255);
-        }
     }
 }

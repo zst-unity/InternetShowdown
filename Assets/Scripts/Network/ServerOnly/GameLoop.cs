@@ -10,40 +10,31 @@ public class GameLoop : NetworkBehaviour
 {
     [SerializeField] private GameInfo _gameInfo;
 
-    [Header("Break")]
-    [SerializeField, Min(10), Tooltip("Долгота перерыва между раундами в секундах")] private int _breakLength = 60;
+    [Header("Length")]
+    [SerializeField, Min(10), Tooltip("Break time length in seconds")] private int _breakLength = 60;
+    [SerializeField, Min(20), Tooltip("Large break time length in seconds")] private int _largeBreakLength = 180;
+    [SerializeField, Min(30), Tooltip("Preparation length in seconds")] private int _prepareLength = 10;
+    [SerializeField, Min(30), Tooltip("Round length in seconds")] private int _roundLength = 340;
 
-    [Space(9)]
-
-    [SerializeField, Min(2), Tooltip("Каждые _roundsToLagreBreak раундов будет наступать большой перерыв")] private int _roundsToLagreBreak = 5;
-    [SerializeField, Min(20), Tooltip("Долгота большого перерыва в секундах")] private int _largeBreakLength = 180;
-
-    [Header("Match")]
-    [SerializeField, Min(30), Tooltip("Долгота подготовки перед раундом в секундах")] private int _prepareLength = 10;
-    [SerializeField, Min(30), Tooltip("Долгота раунда в секундах")] private int _roundLength = 340;
-
-    [Space(9)]
-
-    [SerializeField, Min(10), Tooltip("Время в секундах, когда счетчик времени станет желтым")] private int _attentionTimeYellow = 60;
-    [SerializeField, Min(10), Tooltip("Время в секундах, когда счетчик времени станет красным")] private int _attentionTimeRed = 10;
+    [Header("Other")]
+    [SerializeField, Min(2), Tooltip("How many rounds does the large break time come after?")] private int _roundsToLargeBreak = 5;
+    [SerializeField, Min(10), Tooltip("Seconds when counter turns yellow")] private int _attentionTimeYellow = 60;
+    [SerializeField, Min(10), Tooltip("Seconds when counter turns red")] private int _attentionTimeRed = 10;
 
     [Header("Voting")]
-    [SerializeField, Scene] private List<string> _maps;
-    [SerializeField, Min(5), Tooltip("Время перед голосованием в секундах")] private int _preVotingTime = 10;
-    [SerializeField, Min(5), Tooltip("Долгота голосования в секундах")] private int _votingTime = 15;
+    [SerializeField, Scene] private List<string> _maps = new();
+    [SerializeField, Min(5), Tooltip("Time before the voting starts")] private int _preVotingTime = 10;
+    [SerializeField, Min(5), Tooltip("Voting length in seconds")] private int _votingTime = 15;
 
-    private int _currentGamesPlayed;
-
-    private Dictionary<string, int> _votes = new Dictionary<string, int>();
+    private Dictionary<string, int> _votes = new();
     private string _votedMap;
-
     private bool _isSceneLoaded;
     private bool _isSkipNeeded;
-
     private int _timeCounter;
     private int _repeatSeconds;
+    private int _currentGamesPlayed;
 
-    public Dictionary<string, (int score, int activity)> LeftedPlayers = new Dictionary<string, (int score, int activity)>();
+    public Dictionary<string, (int score, int activity)> ExitedPlayers = new();
 
     public void SetSceneLoaded(bool loaded) => _isSceneLoaded = loaded;
 
@@ -58,7 +49,7 @@ public class GameLoop : NetworkBehaviour
 
     private void Awake()
     {
-        if (FindObjectsOfType<GameLoop>(true).Length > 1) // в случае если на сцене уже есть геймлуп он удалит себя нахуй чтоб не было приколов
+        if (FindObjectsOfType<GameLoop>(true).Length > 1)
             Destroy(gameObject);
         else
             DontDestroyOnLoad(transform);
@@ -120,7 +111,7 @@ public class GameLoop : NetworkBehaviour
         SceneGameManager.Singleton.RpcOnVotingEnd(votingEndMessage);
     }
 
-    private void CancelVoiting()
+    private void CancelVoting()
     {
         StopCoroutine(nameof(HandleMapVoting));
 
@@ -130,7 +121,7 @@ public class GameLoop : NetworkBehaviour
         OnVotingEnd();
     }
 
-    private record ColorFrom
+    private struct ColorFrom
     {
         public Color Color;
         public int From;
@@ -155,7 +146,7 @@ public class GameLoop : NetworkBehaviour
                 _isSkipNeeded = false;
 
                 if (GameInfo.Singleton.IsVotingTime)
-                    CancelVoiting();
+                    CancelVoting();
                 else
                     StopCoroutine(nameof(HandleMapVoting));
 
@@ -182,7 +173,7 @@ public class GameLoop : NetworkBehaviour
             _timeCounter--;
 
             yield return new WaitForSecondsRealtime(1f);
-            yield return new WaitForFixedUpdate();
+
         }
 
         OnTimeCounterUpdate(_timeCounter, targetColor, playSound);
@@ -190,7 +181,7 @@ public class GameLoop : NetworkBehaviour
         yield return new WaitForSecondsRealtime(1f);
     }
 
-    private IEnumerator Loop() // ебанутый цикл я в ахуе
+    private IEnumerator Loop()
     {
         WaitUntil _waitForSceneLoaded = new WaitUntil(() => _isSceneLoaded);
 
@@ -206,11 +197,8 @@ public class GameLoop : NetworkBehaviour
             GameInfo.Singleton.CurrentMusicIndex = MusicSystem.GetIndex(MusicGameState.Lobby);
             GameInfo.Singleton.StartMusicOffset();
 
-            // ПЕРЕРЫВ
-            if (_currentGamesPlayed % _roundsToLagreBreak == 0)
-            {
+            if (_currentGamesPlayed % _roundsToLargeBreak == 0)
                 SetGameState(GameState.LargeBreak, CanvasGameState.Lobby, MusicGameState.Lobby, _largeBreakLength);
-            }
             else
             {
                 SetGameState(GameState.Break, CanvasGameState.Lobby, MusicGameState.Lobby, _breakLength);
@@ -233,26 +221,23 @@ public class GameLoop : NetworkBehaviour
             GameInfo.Singleton.CurrentMusicIndex = MusicSystem.GetIndex(MusicGameState.Match);
             GameInfo.Singleton.StartMusicOffset();
 
-            // ПОДГОТОВКА
             SetGameState(GameState.Prepare, CanvasGameState.Lobby, MusicGameState.Match, _prepareLength);
 
-            yield return new WaitForSeconds(0.75f); // хуета чтоб всинковать сонг
+            yield return new WaitForSeconds(0.75f);
+            yield return StartCoroutine(Timer(new List<ColorFrom>() { new(Color.gray, _repeatSeconds) }, _repeatSeconds, 3));
 
-            yield return StartCoroutine(Timer(new List<ColorFrom>() { new ColorFrom(Color.gray, _repeatSeconds) }, _repeatSeconds, 3));
-
-            // МАТЧ
             StartMatch();
             SetGameState(GameState.Match, CanvasGameState.Game, MusicGameState.Match, _roundLength);
 
             SceneGameManager.Singleton.RpcOnMatchStarted();
 
-            List<ColorFrom> colorFroms = new List<ColorFrom>()
+            List<ColorFrom> colorsFrom = new()
             {
-                new ColorFrom(ColorISH.Red, _attentionTimeRed),
-                new ColorFrom(ColorISH.Yellow, _attentionTimeYellow)
+                new(ColorISH.Red, _attentionTimeRed),
+                new(ColorISH.Yellow, _attentionTimeYellow)
             };
 
-            yield return StartCoroutine(Timer(colorFroms, 60));
+            yield return StartCoroutine(Timer(colorsFrom, 60));
 
             StopMatch();
             SetGameState(GameState.MatchEnded, CanvasGameState.Game, MusicGameState.Match);
@@ -286,7 +271,7 @@ public class GameLoop : NetworkBehaviour
         {
             Debug.LogWarning($"Voted Map is empty, loading random map instead");
 
-            string randomMap = _maps[UnityEngine.Random.Range(0, _maps.Count)];
+            string randomMap = _maps[Random.Range(0, _maps.Count)];
             NetworkManager.singleton.ServerChangeScene(randomMap);
 
             return;
@@ -297,14 +282,14 @@ public class GameLoop : NetworkBehaviour
 
     private void StartMatch()
     {
-        FindObjectOfType<ItemSpawner>().StartSpawnProcces();
+        FindObjectOfType<ItemSpawner>().StartSpawnProcess();
     }
 
     private void StopMatch()
     {
         ItemSpawner itemSpawner = FindObjectOfType<ItemSpawner>();
 
-        itemSpawner.StopSpawnProcces();
+        itemSpawner.StopSpawnProcess();
         itemSpawner.DestroyAll();
 
         ProjectileBase[] allProjectiles = FindObjectsOfType<ProjectileBase>();
@@ -315,7 +300,7 @@ public class GameLoop : NetworkBehaviour
         SceneGameManager.Singleton.RpcAllowMovement(false);
         SceneGameManager.Singleton.RpcOnMatchEnd();
 
-        LeftedPlayers.Clear();
+        ExitedPlayers.Clear();
     }
 
     private void TimeToBreak()

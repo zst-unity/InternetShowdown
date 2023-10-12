@@ -6,7 +6,11 @@ using UnityEngine.SceneManagement;
 public class GameInfo : NetworkBehaviour
 {
     public static GameInfo Singleton;
-    private void Awake() { DontDestroyOnLoad(gameObject.transform); Singleton = this; }
+    private void Awake()
+    {
+        DontDestroyOnLoad(gameObject.transform);
+        Singleton = this;
+    }
 
     [SyncVar, ReadOnly] public GameState CurrentGameState;
     [SyncVar, ReadOnly] public CanvasGameState CurrentCanvasGameState;
@@ -43,7 +47,6 @@ public class GameInfo : NetworkBehaviour
         {
             CurrentMusicOffset += 0.1f;
             yield return new WaitForSeconds(0.1f);
-            yield return new WaitForFixedUpdate();
         }
     }
 }

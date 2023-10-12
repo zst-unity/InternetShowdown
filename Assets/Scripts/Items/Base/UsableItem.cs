@@ -7,20 +7,29 @@ using UnityEngine;
 public class UsableItem : ScriptableObject
 {
     [Header("Base Settings")]
-    [Tooltip("Моделька предмета")] public GameObject ItemVisual;
-    [Tooltip("От редкости предмета зависит шанс выпадания")] public Rarity ItemRarity = Rarity.Common;
+    public GameObject ItemVisual;
+    public Rarity ItemRarity = Rarity.Common;
 
     [Header("Use Settings")]
-    [Tooltip("Надо ли зажимать чтоб использовать предмет")] public bool HoldToUse = false;
-    [ShowIf(nameof(HoldToUse)), AllowNesting(), Min(0), Tooltip("На сколько секунд надо зажать, чтоб предмет использовался")] public float UseTime = 1;
+    [Tooltip("Should player hold to use the item?")] public bool HoldToUse = false;
+    [ShowIf(nameof(HoldToUse)), AllowNesting(), Min(0), Tooltip("Hold to use time")] public float UseTime = 1;
 
     [Header("On Use")]
-    [Tooltip("Игроку дадут эти мутации при использовании")] public List<InspectorMutation> Mutations = new List<InspectorMutation>();
-    [Tooltip("Игроку дадут эти мутации при использовании")] public List<ProjectileBase> Projectiles = new List<ProjectileBase>();
-    [Tooltip("На сколько игрок отхилится при использовании")] public float HealAmount;
+    [Tooltip("Player will get these mutations when item is used")] public List<InspectorMutation> Mutations = new();
+    [Tooltip("These projectiles will spawn when item is used")] public List<ProjectileBase> Projectiles = new();
+    [Tooltip("How much health would player gain when item is used")] public float HealAmount;
 }
 
-public enum Rarity : byte
+[Serializable]
+public class InspectorMutation
+{
+    [Tooltip("What to mutate?")] public MutationType Type = MutationType.Speed;
+    [Tooltip("How to mutate?")] public ChangeType ChangeAs = ChangeType.Add;
+    [Tooltip("How many to mutate?")] public float Amount = 10;
+    [Tooltip("Mutation duration")] public float Time = 5;
+}
+
+public enum Rarity
 {
     Legendary,
     Epic,
@@ -28,15 +37,6 @@ public enum Rarity : byte
     Rare,
     Quaint,
     Common
-}
-
-[Serializable]
-public class InspectorMutation // этот класс нужен чтоб отоброжать параметры мутации в инспекторе
-{
-    [Tooltip("Какую стату надо мутировать?")] public MutationType Type = MutationType.Speed;
-    [Tooltip("Что надо сделать со статой игрока? Сложить, или умножить?")] public ChangeType ChangeAs = ChangeType.Add;
-    [Tooltip("На сколько или во сколько раз надо увеличить стату игрока?")] public float Amount = 10;
-    [Tooltip("Сколько секунд бафф будет действовать")] public float Time = 5;
 }
 
 public enum MutationType

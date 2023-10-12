@@ -1,3 +1,4 @@
+using System;
 using DG.Tweening;
 using UnityEngine;
 
@@ -20,7 +21,6 @@ public class CameraMovement : MonoBehaviour
     [Header("Bobbing")]
     [SerializeField] private float _bobbingAmount = 2.5f;
     [SerializeField] private float _bobbingSpeed = 15.0f;
-    private float _tiltDampVelocity = 0.0f; // я в душе не ебу нахуя оно нужно но оно нужно
 
     [Header("Focus")]
     [SerializeField] private float _fov = 75;
@@ -36,16 +36,12 @@ public class CameraMovement : MonoBehaviour
     private float _rotX;
     private float _rotY;
     private float _rotZ;
-    private Vector3 _inputVector;
-    private Vector3 _startPos;
+    private float _tiltDampVelocity = 0.0f;
     [HideInInspector] public bool BlockMovement;
-
-    private Vector3 _initPosition;
 
     private void Start()
     {
         _camera = GetComponent<Camera>();
-        _initPosition = transform.localPosition;
     }
 
     private void Update()
@@ -57,7 +53,7 @@ public class CameraMovement : MonoBehaviour
 
         _rotY += mouseX;
         _rotX -= mouseY;
-        _rotX = Mathf.Clamp(_rotX, _topClamp, _bottomClamp);
+        _rotX = Math.Clamp(_rotX, _topClamp, _bottomClamp);
 
         Tilt();
 
@@ -71,13 +67,18 @@ public class CameraMovement : MonoBehaviour
     private void Tilt()
     {
         float grounded = Player.IsGrounded ? 1.0f : 0.3f;
-        _rotZ = Mathf.SmoothDamp(_rotZ, (Player.GetAxisInputs().x * -_tiltAmount) + ((Player.GetAxisInputs().y * (Mathf.Cos((Time.time * _bobbingSpeed)) * _bobbingAmount) * grounded)), ref _tiltDampVelocity, _tiltSmoothing);
+        _rotZ = Mathf.SmoothDamp
+        (
+            current: _rotZ,
+            target: (Player.GetAxisInputs().x * -_tiltAmount) + (Player.GetAxisInputs().y * (Mathf.Cos(Time.time * _bobbingSpeed) * _bobbingAmount) * grounded),
+            currentVelocity: ref _tiltDampVelocity,
+            smoothTime: _tiltSmoothing
+        );
     }
 
-    private void Focus() // паша я переебашил эту хуйню на чтото нормальное
+    private void Focus()
     {
         float targetFov = Player.GetAxisInputs().y > 0 ? _fov + 16.5f : _fov;
-
         _camera.fieldOfView = Mathf.SmoothDamp(_camera.fieldOfView, targetFov, ref _fovDampVelocity, _fovSmoothing);
     }
 

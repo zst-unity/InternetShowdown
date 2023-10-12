@@ -7,19 +7,18 @@ using UnityEngine;
 [RequireComponent(typeof(Rigidbody))]
 public class NetworkPlayer : NetworkBehaviour
 {
-    // тут константы на случай если одни и те же значения будут использоваться несколько раз в коде
     private const string HORIZONTAL = "Horizontal";
     private const string VERTICAL = "Vertical";
 
-    [Header("Components")] // лукашенко ебаный гит я тебя взорву говно хуйни
+    [Header("Components")]
     [SerializeField] private Rigidbody _rb;
     [SerializeField] private ItemsReader _ir;
 
     [Header("Player")]
-    [SerializeField, Tooltip("Максимальное хп игрока, выше этого значения выйти невозможно")] private float _maxHealth = 100;
+    [SerializeField] private float _maxHealth = 100;
 
     [Header("Movement Control")]
-    [SerializeField, Tooltip("Стартовая скорость игрока без акселерации")] private float _startSpeed = 50f;
+    [SerializeField, Tooltip("Base speed of the player")] private float _startSpeed = 50f;
 
     [Space(9)]
 
@@ -55,9 +54,17 @@ public class NetworkPlayer : NetworkBehaviour
     private float _jumpBufferCounter;
 
     [Header("Dashing Control")]
-    [SerializeField, Tooltip("Сила рывка пока игрок на земле"), Min(0)] private float _dashGroundedForce = 50f;
-    [SerializeField, Tooltip("Сила рывка пока игрок в воздухе"), Min(0)] private float _dashAirForce = 15f;
+    [SerializeField, Tooltip("Сила рывка"), Min(0)] private float _dashForce = 50f;
+    [SerializeField, Tooltip("Драг рывка"), Min(0)] private float _dashDrag = 6f;
+    [SerializeField, Tooltip("Сколько длится деш"), Min(0)] private float _dashTime = 0.05f;
     [SerializeField, Tooltip("На сколько секунд игрок не сможет делать рывок после совершеного рывка"), Min(0)] private float _dashTimeout = 0.25f;
+    [SerializeField, Tooltip("Сколько дешей доступно"), Min(0)] private int _dashesAvailable = 4;
+    [SerializeField, Tooltip("Время перезарядки деша"), Min(0)] private float _dashReloadTime = 3f;
+
+    private bool _isDashing;
+    private bool _readyToDash;
+    private bool _isDashReloading;
+    private int _dashesRemaining;
 
     [Header("Ground Dashing Control")]
     [SerializeField, Tooltip("Сила рывка вниз"), Min(0)] private float _groundDashForce = 5f;
@@ -83,10 +90,8 @@ public class NetworkPlayer : NetworkBehaviour
     [HideInInspector] public bool IsGrounded { get; private set; }
 
     private bool _wantToJump;
-
     private bool _wantToDash;
     private bool _wantToGroundDash;
-    private bool _readyToDash;
 
     private Vector3 _playerSlopeDirection;
 
@@ -98,7 +103,9 @@ public class NetworkPlayer : NetworkBehaviour
     [Header("Sounds")]
     [SerializeField, Tooltip("Звук прыжка")] private AudioClip _jumpSound;
     [SerializeField, Tooltip("Звук рывка")] private AudioClip _dashSound;
-    [SerializeField, Tooltip("Звук рывка")] private List<AudioClip> _groundSlamSounds = new List<AudioClip>();
+    [SerializeField, Tooltip("Звук провального рывка")] private AudioClip _dashFailedSound;
+    [SerializeField, Tooltip("Звук конца перезарядки рывка")] private AudioClip _dashReadySound;
+    [SerializeField, Tooltip("Звук удара в землю")] private List<AudioClip> _groundSlamSounds = new List<AudioClip>();
 
     [Space(9)]
 
@@ -107,9 +114,13 @@ public class NetworkPlayer : NetworkBehaviour
     [SerializeField, Tooltip("Звук уведомления о том что игрок ударил кого то")] private AudioClip _hitLogSound;
     [SerializeField, Tooltip("Звук уведомления о том что игрок убил кого то")] private AudioClip _killLogSound;
 
+    [Header("Materials")]
+    [SerializeField, Tooltip("Не меняй")] private Material[] _normalMaterials = new Material[7];
+    [SerializeField, Tooltip("Не меняй")] private Material[] _invincibleMaterials = new Material[7];
+
     [Header("Objects")]
     [SerializeField, Tooltip("Не меняй")] private Transform _orientation;
-    [SerializeField, Tooltip("Не меняй")] private GameObject _body;
+    [SerializeField, Tooltip("Не меняй")] private MeshRenderer _body;
 
     private GameLoop _gameLoop;
 
@@ -140,6 +151,9 @@ public class NetworkPlayer : NetworkBehaviour
     [SyncVar, SerializeField, ReadOnly] private bool _initialized;
     public bool Initialized { get => _initialized; }
 
+    [SyncVar, SerializeField, ReadOnly] private bool _invincible;
+    public bool Invincible { get => _invincible; }
+
     [Command]
     public void CmdInitialize(string nickname)
     {
@@ -147,6 +161,8 @@ public class NetworkPlayer : NetworkBehaviour
         _initialized = true;
 
         _gameLoop = GameLoop.Singleton();
+
+        BodyToNormal();
     }
 
     #region HealthSystem
@@ -155,6 +171,15 @@ public class NetworkPlayer : NetworkBehaviour
     public float Health { get => _health; }
 
     private int _itemsUsed;
+
+    private void BodyTo(Material[] mats)
+    {
+        if (isLocalPlayer) return;
+        _body.materials = mats;
+    }
+
+    [ClientRpc] private void BodyToNormal() => BodyTo(_normalMaterials);
+    [ClientRpc] private void BodyToInvincible() => BodyTo(_invincibleMaterials);
 
     public void Heal(float amount)
     {
@@ -165,7 +190,7 @@ public class NetworkPlayer : NetworkBehaviour
 
     public void TakeDamage(float amount)
     {
-        if (!isLocalPlayer) return;
+        if (!isLocalPlayer || _invincible) return;
 
         SoundSystem.Singleton.PlaySFX(new SoundTransporter(_damageSound), new SoundPositioner(transform.position), 0.95f, 1.05f, 1f);
         SoundSystem.PlayInterfaceSound(new SoundTransporter(_localDamageSound));
@@ -204,7 +229,7 @@ public class NetworkPlayer : NetworkBehaviour
     {
         yield return new WaitUntil(() => _health == amount); // на случай задержки синхронизации поля Health
 
-        EverywhereCanvas.Singleton.SetDisplayHealth(amount);
+        Hud.Singleton.TweenHealthToAmount(amount);
 
         if (_health <= 0)
         {
@@ -228,6 +253,8 @@ public class NetworkPlayer : NetworkBehaviour
 
         EverywhereCanvas.Singleton.StartDeathScreen(ref respawn);
         Deaths++;
+
+        Hud.Singleton.SetDashes(0);
     }
 
     private void OnRespawn()
@@ -240,6 +267,11 @@ public class NetworkPlayer : NetworkBehaviour
         DisablePlayer(true);
 
         transform.position = NetworkManager.startPositions[UnityEngine.Random.Range(0, NetworkManager.startPositions.Count)].position;
+
+        ActivateInvincible(5f);
+
+        _dashesRemaining = _dashesAvailable;
+        Hud.Singleton.SetDashes(_dashesAvailable);
     }
 
     [Command]
@@ -271,6 +303,12 @@ public class NetworkPlayer : NetworkBehaviour
         if (_health <= 0)
         {
             Debug.LogWarning("Can't hit a dead player");
+            return;
+        }
+
+        if (_invincible)
+        {
+            Debug.LogWarning("Can't hit invincible player");
             return;
         }
 
@@ -327,7 +365,9 @@ public class NetworkPlayer : NetworkBehaviour
     private void InitializeVariables()
     {
         ResetDash();
+        AllowDash();
         AllowMovement = true;
+        _dashesRemaining = _dashesAvailable;
     }
 
     public override void OnStartLocalPlayer() // то же самое что и старт, только для локального игрока
@@ -342,7 +382,8 @@ public class NetworkPlayer : NetworkBehaviour
 
         SetupPlayerAndGameObject();
 
-        EverywhereCanvas.Singleton.SetMaxHealth(_maxHealth);
+        Hud.Singleton.HealthSlider().maxValue = _maxHealth;
+        Hud.Singleton.SetDashes(_dashesAvailable);
         Leaderboard.Singleton.StartLeaderboard();
 
         DestroyCameras();
@@ -358,7 +399,7 @@ public class NetworkPlayer : NetworkBehaviour
     {
         SetHealth(_maxHealth);
 
-        _body.SetActive(false);
+        _body.gameObject.SetActive(false);
         gameObject.layer = 12;
     }
 
@@ -441,7 +482,12 @@ public class NetworkPlayer : NetworkBehaviour
 
         if (_wantToDash && _readyToDash)
         {
-            Dash();
+            if (_isDashReloading)
+            {
+                SoundSystem.PlayInterfaceSound(new SoundTransporter(_dashFailedSound), volume: 0.65f);
+                Hud.Singleton.Shake(new ShakeEffect(0.2f, 15f));
+            }
+            else Dash();
         }
 
         if (_wantToGroundDash)
@@ -516,11 +562,9 @@ public class NetworkPlayer : NetworkBehaviour
 
     private void HandleNicknameDisplay()
     {
-        RaycastHit hit;
-
         Transform cameraTransform = PlayerCamera.transform;
 
-        if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, out hit, 1500f, LayerMask.GetMask("Player", "Map")))
+        if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, out RaycastHit hit, 1500f, LayerMask.GetMask("Player", "Map")))
         {
             NetworkPlayer player;
 
@@ -648,8 +692,7 @@ public class NetworkPlayer : NetworkBehaviour
     {
         if (!IsGrounded) return false;
 
-        RaycastHit hit;
-        Physics.Raycast(_groundChecking.center, Vector3.down, out hit, 1f, _mapLayers.value, QueryTriggerInteraction.Ignore);
+        Physics.Raycast(_groundChecking.center, Vector3.down, out RaycastHit hit, 1f, _mapLayers.value, QueryTriggerInteraction.Ignore);
         _slopeNormal = hit.normal;
 
         return _slopeNormal != Vector3.up;
@@ -672,7 +715,7 @@ public class NetworkPlayer : NetworkBehaviour
             _accel = Mathf.Clamp(_accel, 0, _maximumAcceleration);
         }
 
-        _rb.drag = IsGrounded ? _dragOnGround : 0;
+        HandleDrag();
 
         float angleBoost = Mathf.Abs
         (
@@ -690,18 +733,54 @@ public class NetworkPlayer : NetworkBehaviour
         _rb.AddForce(targetDirection * (PlayerCurrentStats.Singleton.Speed + PlayerMutationStats.Singleton.Speed));
     }
 
+    private void HandleDrag()
+    {
+        if (_isDashing)
+        {
+            _rb.drag = _dashDrag;
+            return;
+        }
+
+        _rb.drag = IsGrounded ? _dragOnGround : 0;
+    }
+
     private void Dash()
     {
         if (!AllowMovement || PauseMenu.Singleton.PauseMenuOpened) return;
 
-        float targetForce = IsGrounded ? _dashGroundedForce : _dashAirForce;
+        _dashesRemaining--;
+        Hud.Singleton.RemoveLastDashDot();
+
+        if (_dashesRemaining == 0) StartCoroutine(nameof(DashReloadLogic));
+
+        _isDashing = true;
+        Invoke(nameof(ResetDash), _dashTime);
+
         Vector3 targetDirection = IsMoving ? _playerDirection : new Vector3(_orientation.forward.x, 0, _orientation.forward.z);
 
-        _rb.AddForce(targetDirection * targetForce, ForceMode.Impulse);
+        _rb.AddForce(targetDirection * _dashForce, ForceMode.Impulse);
         TimeoutDash(_dashTimeout);
 
         SoundSystem.Singleton.PlaySFX(new SoundTransporter(_dashSound), new SoundPositioner(transform.position), 0.85f, 1f, 0.6f);
         CmdSpawnParticle(1);
+    }
+
+    private IEnumerator DashReloadLogic()
+    {
+        float elapsed = 0.0f;
+
+        _isDashReloading = true;
+
+        while (elapsed < _dashReloadTime && !IsGrounded)
+        {
+            elapsed += Time.deltaTime;
+            yield return null;
+        }
+
+        _dashesRemaining = _dashesAvailable;
+        _isDashReloading = false;
+        Hud.Singleton.SetDashes(_dashesAvailable);
+        SoundSystem.PlayInterfaceSound(new SoundTransporter(_dashReadySound), volume: 0.65f);
     }
 
     private void GroundDash()
@@ -758,26 +837,40 @@ public class NetworkPlayer : NetworkBehaviour
         }
     }
 
+    private void ActivateInvincible(float time)
+    {
+        CmdSetInvincible(true);
+        Overlays.Singleton.BeginInvincibleOverlay();
+
+        Invoke(nameof(ResetInvincible), time);
+    }
+
+    private void ResetInvincible()
+    {
+        CmdSetInvincible(false);
+        Overlays.Singleton.EndInvincibleOverlay();
+    }
+
+    [Command]
+    private void CmdSetInvincible(bool invincible)
+    {
+        _invincible = invincible;
+
+        if (invincible) BodyToInvincible();
+        else BodyToNormal();
+    }
+
     private void TimeoutDash(float time)
     {
         _readyToDash = false;
-        Invoke(nameof(ResetDash), time);
+        Invoke(nameof(AllowDash), time);
     }
 
-    private void ResetDash()
-    {
-        _readyToDash = true;
-    }
+    private void ResetDash() => _isDashing = false;
+    private void AllowDash() => _readyToDash = true;
 
-    private void OnCollisionStay(Collision other)
-    {
-        _isColliding = true;
-    }
-
-    private void OnCollisionExit(Collision other)
-    {
-        _isColliding = false;
-    }
+    private void OnCollisionStay(Collision other) => _isColliding = true;
+    private void OnCollisionExit(Collision other) => _isColliding = false;
 
     private void OnDrawGizmosSelected()
     {

@@ -1,8 +1,6 @@
 using System;
-using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using DG.Tweening;
 using Mirror;
 using UnityEngine;
@@ -11,7 +9,7 @@ public class SceneGameManager : NetworkBehaviour
 {
     public static SceneGameManager Singleton { get; private set; }
 
-    [SerializeField] private List<AudioClip> _clockTicks = new List<AudioClip>();
+    [SerializeField] private List<AudioClip> _clockTicks = new();
 
     [Space(9)]
 
@@ -20,8 +18,8 @@ public class SceneGameManager : NetworkBehaviour
 
     private void Awake() => Singleton = this;
 
-    [ClientRpc] // методы с этим атрибутом будут вызываться на всех клиентах (работает только тогда если вызывается с класса который наследует NetworkBehaviour)
-    public void RpcOnTimeCounterUpdate(int? counter, Color color, bool playSound) // так надо было сделать ибо срало ошибками и нихуя не работало (мы с войдом решали это час)
+    [ClientRpc]
+    public void RpcOnTimeCounterUpdate(int? counter, Color color, bool playSound)
     {
         string exposedTimeCounter = "";
 
@@ -35,9 +33,8 @@ public class SceneGameManager : NetworkBehaviour
             exposedTimeCounter = $"{minutes}:{exposedSeconds}";
         }
 
-        EverywhereCanvas.Singleton.Timer.text = exposedTimeCounter; // текст таймера
-        EverywhereCanvas.Singleton.Timer.color = color; // цвет текста таймера
-
+        EverywhereCanvas.Singleton.Timer.text = exposedTimeCounter;
+        EverywhereCanvas.Singleton.Timer.color = color;
         EverywhereCanvas.Singleton.Timer.transform.localScale = Vector2.one * 1.075f;
         EverywhereCanvas.Singleton.Timer.transform.DOScale(Vector2.one, 0.5f).SetEase(Ease.OutElastic);
 
@@ -52,31 +49,31 @@ public class SceneGameManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void RpcAllowMovement(bool allow) // запрещает или разрешает всем игрокам двигаться
+    public void RpcAllowMovement(bool allow)
     {
         NetworkClient.localPlayer.GetComponent<NetworkPlayer>().AllowMovement = allow;
     }
 
     [ClientRpc]
-    public void RpcRemoveMutations() // убирает все мутации с каждого игрока
+    public void RpcRemoveMutations()
     {
         NetworkClient.localPlayer.GetComponent<ItemsReader>().RemoveAllMutations();
     }
 
     [ClientRpc]
-    public void RpcShakeAll(float duration, float time) // трясет экраны у игроков
+    public void RpcShakeAll(float duration, float time)
     {
         NetworkClient.localPlayer.GetComponent<NetworkPlayer>().PlayerMoveCamera.Shake(duration, time);
     }
 
     [ClientRpc]
-    public void RpcTransition(TransitionMode mode) // вызывает эффект перехода на всех клиентах
+    public void RpcTransition(TransitionMode mode)
     {
         Transition.Singleton().AwakeTransition(mode);
     }
 
     [ClientRpc]
-    public void RpcHideDeathScreen() // на всякий случай, прячет экраны смерти у игроков
+    public void RpcHideDeathScreen()
     {
         EverywhereCanvas.Singleton.HideDeathScreen();
     }
@@ -134,7 +131,7 @@ public class SceneGameManager : NetworkBehaviour
         ResultsStatsJobs.StatsToDisplay["Deaths"].Value = player.Deaths;
         ResultsStatsJobs.StatsToDisplay["Traumas"].Value = player.Traumas;
 
-        int total = Mathf.Clamp((player.Score * 3) + (player.Activity) + (player.Kills * 6) + (player.Hits * 3) - (player.Deaths * 2) - (player.Traumas) - (player.Place * 5), 0, 1000);
+        int total = Math.Clamp((player.Score * 3) + player.Activity + (player.Kills * 6) + (player.Hits * 3) - (player.Deaths * 2) - (player.Traumas) - (player.Place * 5), 0, 1000);
 
         for (int i = RankStat.Rankings.Count - 1; i >= 0; i--)
         {
