@@ -49,7 +49,7 @@ public class MenuManager : MonoBehaviour
         Button[] menuButtons = GetComponentsInChildren<Button>(true);
         foreach (var button in menuButtons) { button.onClick.AddListener(ClearSelections); }
 
-        if (GameLoop.Singleton() != null) Destroy(GameLoop.Singleton().gameObject);
+        if (GameLoop.Singleton != null) Destroy(GameLoop.Singleton.gameObject);
 
         _onStart.Invoke();
 

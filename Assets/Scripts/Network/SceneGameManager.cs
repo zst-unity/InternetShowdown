@@ -103,7 +103,7 @@ public class SceneGameManager : NetworkBehaviour
     {
         Debug.Log($"Someone voted for {mapName}");
 
-        GameLoop.Singleton().AddMapVote(mapName);
+        GameLoop.Singleton.AddMapVote(mapName);
     }
 
     [ClientRpc]

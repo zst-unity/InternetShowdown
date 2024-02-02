@@ -122,8 +122,6 @@ public class NetworkPlayer : NetworkBehaviour
     [SerializeField, Tooltip("Не меняй")] private Transform _orientation;
     [SerializeField, Tooltip("Не меняй")] private MeshRenderer _body;
 
-    private GameLoop _gameLoop;
-
     [HideInInspector] public Camera PlayerCamera;
     [HideInInspector] public CameraMovement PlayerMoveCamera;
 
@@ -159,8 +157,6 @@ public class NetworkPlayer : NetworkBehaviour
     {
         _nickname = nickname;
         _initialized = true;
-
-        _gameLoop = GameLoop.Singleton();
 
         BodyToNormal();
     }

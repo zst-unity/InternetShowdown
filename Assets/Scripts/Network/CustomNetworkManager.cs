@@ -94,7 +94,7 @@ public class CustomNetworkManager : NetworkManager
     public override void OnServerDisconnect(NetworkConnectionToClient conn)
     {
         NetworkPlayer player = conn.identity.GetComponent<NetworkPlayer>();
-        GameLoop gameLoop = GameLoop.Singleton();
+        GameLoop gameLoop = GameLoop.Singleton;
 
         if (!gameLoop.ExitedPlayers.ContainsKey(player.Nickname))
         {
@@ -118,7 +118,7 @@ public class CustomNetworkManager : NetworkManager
         yield return new WaitUntil(() => conn.identity != null);
 
         NetworkPlayer player = conn.identity.GetComponent<NetworkPlayer>();
-        GameLoop gameLoop = GameLoop.Singleton();
+        GameLoop gameLoop = GameLoop.Singleton;
 
         yield return new WaitUntil(() => player.Initialized);
 
@@ -150,14 +150,14 @@ public class CustomNetworkManager : NetworkManager
     {
         base.OnServerSceneChanged(sceneName);
 
-        GameLoop.Singleton()?.SetSceneLoaded(true);
+        if (GameLoop.Singleton != null) GameLoop.Singleton.SetSceneLoaded(true);
     }
 
     public override void OnServerChangeScene(string newSceneName)
     {
         base.OnServerChangeScene(newSceneName);
 
-        GameLoop.Singleton()?.SetSceneLoaded(false);
+        if (GameLoop.Singleton != null) GameLoop.Singleton.SetSceneLoaded(false);
     }
 
     public override void OnClientSceneChanged()
@@ -190,8 +190,8 @@ public class CustomNetworkManager : NetworkManager
 
     private IEnumerator WaitForGameLoop()
     {
-        yield return new WaitUntil(() => GameLoop.Singleton());
+        yield return new WaitUntil(() => GameLoop.Singleton);
 
-        GameLoop.Singleton().StartLoop();
+        GameLoop.Singleton.StartLoop();
     }
 }

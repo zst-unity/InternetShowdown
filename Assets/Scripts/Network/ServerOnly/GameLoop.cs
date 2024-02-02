@@ -8,6 +8,7 @@ using UnityEngine.SceneManagement;
 
 public class GameLoop : NetworkBehaviour
 {
+    public static GameLoop Singleton { get; private set; }
     [SerializeField] private GameInfo _gameInfo;
 
     [Header("Length")]
@@ -50,9 +51,14 @@ public class GameLoop : NetworkBehaviour
     private void Awake()
     {
         if (FindObjectsOfType<GameLoop>(true).Length > 1)
+        {
             Destroy(gameObject);
+        }
         else
+        {
+            Singleton = this;
             DontDestroyOnLoad(transform);
+        }
     }
 
     [ServerCallback]
@@ -311,11 +317,6 @@ public class GameLoop : NetworkBehaviour
         if (SceneGameManager.Singleton == null) return;
 
         SceneGameManager.Singleton.RpcOnTimeCounterUpdate(counter, color, playSound);
-    }
-
-    public static GameLoop Singleton()
-    {
-        return FindObjectOfType<GameLoop>(true);
     }
 }
 
