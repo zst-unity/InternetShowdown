@@ -11,12 +11,5 @@ public class GameEnter : MonoBehaviour
     private void LoadLobby()
     {
         SceneManager.LoadScene("Menu", LoadSceneMode.Single);
-        // сиськи
-        // сиськи
-        // сиськи
-        // сиськи
-        // сиськи
-        // сиськи
-        // сиськи
     }
 }
