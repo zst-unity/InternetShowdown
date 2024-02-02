@@ -22,7 +22,7 @@ public class NetworkPlayer : NetworkBehaviour
 
     [Space(9)]
 
-    [SerializeField, Tooltip("Каждые 20 милисекунд акселерация будет увеличиваться на (0.02 * значение этого поля)")] private float _accelerationFactor = 10f;
+    [SerializeField, Tooltip("Каждые 20 миллисекунд акселерация будет увеличиваться на (0.02 * значение этого поля)")] private float _accelerationFactor = 10f;
     [SerializeField, Tooltip("Максимальное значение акселерации")] private float _maximumAcceleration = 30f;
 
     [Space(9)]
@@ -57,7 +57,7 @@ public class NetworkPlayer : NetworkBehaviour
     [SerializeField, Tooltip("Сила рывка"), Min(0)] private float _dashForce = 50f;
     [SerializeField, Tooltip("Драг рывка"), Min(0)] private float _dashDrag = 6f;
     [SerializeField, Tooltip("Сколько длится деш"), Min(0)] private float _dashTime = 0.05f;
-    [SerializeField, Tooltip("На сколько секунд игрок не сможет делать рывок после совершеного рывка"), Min(0)] private float _dashTimeout = 0.25f;
+    [SerializeField, Tooltip("На сколько секунд игрок не сможет делать рывок после совершенного рывка"), Min(0)] private float _dashTimeout = 0.25f;
     [SerializeField, Tooltip("Сколько дешей доступно"), Min(0)] private int _dashesAvailable = 4;
     [SerializeField, Tooltip("Время перезарядки деша"), Min(0)] private float _dashReloadTime = 3f;
 
@@ -413,7 +413,7 @@ public class NetworkPlayer : NetworkBehaviour
         }
     }
 
-    private void InitializeCamera() // инициализируем камеру (задаем параметры по дефолту и добовляем нужные компоненты)
+    private void InitializeCamera() // инициализируем камеру (задаем параметры по дефолту и добавляем нужные компоненты)
     {
         PlayerCamera.fieldOfView = 80;
         PlayerCamera.nearClipPlane = 0.01f;
@@ -475,7 +475,7 @@ public class NetworkPlayer : NetworkBehaviour
         DebugKeys();
 #endif
 
-        RecieveInputs();
+        ReceiveInputs();
         SetVariables();
 
         JumpHandle();
@@ -566,9 +566,7 @@ public class NetworkPlayer : NetworkBehaviour
 
         if (Physics.Raycast(cameraTransform.position, cameraTransform.forward, out RaycastHit hit, 1500f, LayerMask.GetMask("Player", "Map")))
         {
-            NetworkPlayer player;
-
-            if (hit.transform.TryGetComponent<NetworkPlayer>(out player))
+            if (hit.transform.TryGetComponent(out NetworkPlayer player))
             {
                 EverywhereCanvas.Singleton.SwitchNicknameVisibility(true, player.Nickname);
             }
@@ -623,11 +621,11 @@ public class NetworkPlayer : NetworkBehaviour
     {
         if (_bhopTimer > 0) // если наш банихоп не в таймауте
         {
-            _bhop += _bunnyHopFactor; // то при прыжке добовляем скорости
+            _bhop += _bunnyHopFactor; // то при прыжке добавляем скорости
         }
         else
         {
-            _bhop = 0; // иначе сбрасываем скорсоть
+            _bhop = 0; // иначе сбрасываем скорость
         }
 
         _bhopTimer = _bunnyHopTimeout;
@@ -647,7 +645,7 @@ public class NetworkPlayer : NetworkBehaviour
         NetworkServer.Spawn(particle, gameObject);
     }
 
-    private void RecieveInputs() // ТУТ мы записываем значения в переменые связаные с инпутом, кнопками на клавиатуре, мышке и прочей хуйне
+    private void ReceiveInputs() // ТУТ мы записываем значения в переменные связанные с инпутом, кнопками на клавиатуре, мышке и прочей хуйне
     {
         _inputs = GetAxisInputs();
         IsMoving = _inputs.magnitude > 0;
@@ -724,7 +722,7 @@ public class NetworkPlayer : NetworkBehaviour
 
         Vector3 targetDirection = IsSloped() ? Vector3.ProjectOnPlane(_playerDirection, _slopeNormal) : _playerDirection;
 
-        PlayerCurrentStats.Singleton.Speed = (_startSpeed + _accel + _bhop + angleBoost);
+        PlayerCurrentStats.Singleton.Speed = _startSpeed + _accel + _bhop + angleBoost;
         if (!IsGrounded)
         {
             PlayerCurrentStats.Singleton.Speed /= _airSpeedDivider;
@@ -757,8 +755,7 @@ public class NetworkPlayer : NetworkBehaviour
         Invoke(nameof(ResetDash), _dashTime);
 
         Vector3 targetDirection = IsMoving ? _playerDirection : new Vector3(_orientation.forward.x, 0, _orientation.forward.z);
-
-        _rb.AddForce(targetDirection * _dashForce, ForceMode.Impulse);
+        _rb.velocity = new(_rb.velocity.x + targetDirection.x * _dashForce, _rb.velocity.y, _rb.velocity.z + targetDirection.z * _dashForce);
         TimeoutDash(_dashTimeout);
 
         SoundSystem.Singleton.PlaySFX(new SoundTransporter(_dashSound), new SoundPositioner(transform.position), 0.85f, 1f, 0.6f);

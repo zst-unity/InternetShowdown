@@ -93,5 +93,11 @@ public class CameraMovement : MonoBehaviour
         transform.DOComplete();
         transform.DOShakePosition(effect.Duration, effect.Strength + SHAKE_INCREASE);
     }
+
+    public void SetSensitivity(float value)
+    {
+        _sensitivityX = value;
+        _sensitivityY = value;
+    }
 }
 

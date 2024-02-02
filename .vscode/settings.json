@@ -38,11 +38,15 @@
   "dotnet.defaultSolution": "InternetShowdown.sln",
   "cSpell.words": [
     "Behaviour",
+    "Bhop",
     "Dont",
+    "Gameplay",
     "Leaderboard",
     "Mathf",
     "Pickable",
+    "Prefs",
     "Raycast",
+    "Respawn",
     "Rigidbody",
     "Scriptable",
     "Tweening"
