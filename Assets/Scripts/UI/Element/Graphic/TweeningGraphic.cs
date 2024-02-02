@@ -12,6 +12,7 @@ public class TweeningGraphic : MonoBehaviour, IPointerClickHandler, IPointerEnte
 {
     [Header("Components")]
     public MaskableGraphic ColorTarget;
+    
     public Transform SizeTarget;
 
     [Header("Tweens")]

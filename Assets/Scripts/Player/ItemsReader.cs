@@ -73,7 +73,7 @@ public class ItemsReader : NetworkBehaviour
         GameObject newPickupParticle = Instantiate(_pickupParticle, position, Quaternion.identity);
         NetworkServer.Spawn(newPickupParticle);
 
-        NetworkServer.Destroy(item);
+        ItemSpawner.Singleton.Destroy(item);
     }
 
     private void Update()

@@ -287,10 +287,8 @@ public class GameLoop : NetworkBehaviour
 
     private void StopMatch()
     {
-        ItemSpawner itemSpawner = FindObjectOfType<ItemSpawner>();
-
-        itemSpawner.StopSpawnProcess();
-        itemSpawner.DestroyAll();
+        ItemSpawner.Singleton.StopSpawnProcess();
+        ItemSpawner.Singleton.DestroyAll();
 
         ProjectileBase[] allProjectiles = FindObjectsOfType<ProjectileBase>();
         foreach (var projectile in allProjectiles) { NetworkServer.Destroy(projectile.gameObject); }
