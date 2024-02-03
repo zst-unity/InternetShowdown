@@ -18,18 +18,18 @@ jobs:
           - StandaloneLinux64 # Build a Linux 64-bit standalone.
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@main
         with:
           fetch-depth: 0
           lfs: true
       - name: Download cache
-        uses: actions/cache@v2
+        uses: actions/cache@main
         with:
           path: Library
           key: Library-${{ matrix.targetPlatform }}
           restore-keys: Library-
       - name: Build
-        uses: game-ci/unity-builder@v2
+        uses: game-ci/unity-builder@main
         env:
           UNITY_LICENSE: ${{ secrets.UNITY_LICENSE }}
         with:
@@ -38,7 +38,7 @@ jobs:
       - name: Zip artifacts for release
         run: zip ${{ matrix.targetPlatform }}.zip build/* -r
       - name: Upload artifact
-        uses: actions/upload-artifact@v2
+        uses: actions/upload-artifact@main
         with:
           name: Build-${{ matrix.targetPlatform }}
           path: ${{ matrix.targetPlatform }}.zip
@@ -50,23 +50,23 @@ jobs:
       contents: write
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v2
+        uses: actions/checkout@main
         with:
           fetch-depth: 0
           lfs: true
       - name: Download artifacts
-        uses: actions/download-artifact@v3
+        uses: actions/download-artifact@main
         with:
           path: artifacts
       - name: Debug lol
         run: find . | sed -e "s/[^-][^\/]*\// |/g" -e "s/|\([^ ]\)/|-\1/"
       - name: Release
-        uses: ncipollo/release-action@v1
+        uses: ncipollo/release-action@main
         with:
           artifacts: artifacts/**/*.zip
           makeLatest: true
           bodyFile: CHANGELOG.md
       - name: Delete artifacts
-        uses: geekyeggo/delete-artifact@v2
+        uses: geekyeggo/delete-artifact@main
         with:
           name: Build-*
