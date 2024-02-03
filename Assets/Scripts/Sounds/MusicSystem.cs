@@ -10,7 +10,7 @@ public class MusicSystem : MonoBehaviour
 
     public static MusicSystem Singleton()
     {
-        return FindObjectOfType<MusicSystem>(true);
+        return FindFirstObjectByType<MusicSystem>(FindObjectsInactive.Include);
     }
 
     public static int? GetIndex(MusicGameState state)

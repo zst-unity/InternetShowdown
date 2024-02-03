@@ -39,9 +39,9 @@ public class Leaderboard : MonoBehaviour, IEverywhereCanvas
 
     public void UpdateLeaderboard()
     {
-        List<(string nickname, int score, int activity)> newLeaderboardValue = new List<(string, int, int)>();
+        List<(string nickname, int score, int activity)> newLeaderboardValue = new();
 
-        List<NetworkPlayer> allPlayers = FindObjectsOfType<NetworkPlayer>().ToList();
+        List<NetworkPlayer> allPlayers = FindObjectsByType<NetworkPlayer>(FindObjectsInactive.Include, FindObjectsSortMode.None).ToList();
 
         allPlayers.Sort((first, second) =>
         {

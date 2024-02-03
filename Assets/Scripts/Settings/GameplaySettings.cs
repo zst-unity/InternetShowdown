@@ -18,7 +18,7 @@ public class GameplaySettings : MonoBehaviour
     public void SetSensitivity(float value)
     {
         PlayerPrefs.SetFloat("Sensitivity", value);
-        var camera = FindObjectOfType<CameraMovement>();
+        var camera = FindFirstObjectByType<CameraMovement>();
         if (camera) camera.SetSensitivity(value);
     }
 }

@@ -50,7 +50,7 @@ public class GameLoop : NetworkBehaviour
 
     private void Awake()
     {
-        if (FindObjectsOfType<GameLoop>(true).Length > 1)
+        if (FindObjectsByType<GameLoop>(FindObjectsInactive.Include, FindObjectsSortMode.None).Length > 1)
         {
             Destroy(gameObject);
         }
@@ -288,7 +288,7 @@ public class GameLoop : NetworkBehaviour
 
     private void StartMatch()
     {
-        FindObjectOfType<ItemSpawner>().StartSpawnProcess();
+        FindFirstObjectByType<ItemSpawner>().StartSpawnProcess();
     }
 
     private void StopMatch()
@@ -296,7 +296,7 @@ public class GameLoop : NetworkBehaviour
         ItemSpawner.Singleton.StopSpawnProcess();
         ItemSpawner.Singleton.DestroyAll();
 
-        ProjectileBase[] allProjectiles = FindObjectsOfType<ProjectileBase>();
+        ProjectileBase[] allProjectiles = FindObjectsByType<ProjectileBase>(FindObjectsSortMode.None);
         foreach (var projectile in allProjectiles) { NetworkServer.Destroy(projectile.gameObject); }
 
         SceneGameManager.Singleton.RpcHideDeathScreen();

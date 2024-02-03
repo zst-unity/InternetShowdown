@@ -401,7 +401,7 @@ public class NetworkPlayer : NetworkBehaviour
 
     private static void DestroyCameras()
     {
-        Camera[] otherCameras = FindObjectsOfType<Camera>(true);
+        Camera[] otherCameras = FindObjectsByType<Camera>(FindObjectsInactive.Include, FindObjectsSortMode.None);
 
         foreach (Camera camera in otherCameras)
         {

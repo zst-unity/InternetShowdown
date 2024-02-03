@@ -93,7 +93,7 @@ public class Transition : MonoBehaviour
 
     public static Transition Singleton()
     {
-        return FindObjectOfType<Transition>();
+        return FindFirstObjectByType<Transition>();
     }
 }
 

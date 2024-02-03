@@ -95,7 +95,7 @@ public class EverywhereCanvas : MonoBehaviour, IEverywhereCanvas // юи кот�
 
     private void Awake()
     {
-        if (FindObjectsOfType<EverywhereCanvas>(true).Length > 1)
+        if (FindObjectsByType<EverywhereCanvas>(FindObjectsInactive.Include, FindObjectsSortMode.None).Length > 1)
         {
             Destroy(gameObject);
         }

@@ -136,7 +136,7 @@ public class CustomNetworkManager : NetworkManager
 
     private static IEverywhereCanvas[] GetEverywhereCanvases()
     {
-        return FindObjectsOfType<MonoBehaviour>(true).OfType<IEverywhereCanvas>().ToArray();
+        return FindObjectsByType<MonoBehaviour>(FindObjectsInactive.Include, FindObjectsSortMode.None).OfType<IEverywhereCanvas>().ToArray();
     }
 
     public override void OnStartServer()
