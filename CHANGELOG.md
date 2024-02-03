@@ -8,7 +8,7 @@
 ### Changed
 - Reworked pillow
 - Ground dash now applies dynamic force
-- Dash now resets player's Y velocity
+- Dash now resets player's Y velocity if it is below 0
 - Increases dash reload time
 - Landmine now sticks to floor
 - Interaction slider animation
