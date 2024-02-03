@@ -11,5 +11,6 @@
 - Dash now resets player's Y velocity
 - Increases dash reload time
 - Landmine now sticks to floor
+- Interaction slider animation
 
 ### Other

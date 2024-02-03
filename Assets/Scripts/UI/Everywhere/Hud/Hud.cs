@@ -9,7 +9,7 @@ public class Hud : MonoBehaviour, IEverywhereCanvas
     public static Hud Singleton;
     public bool Active { get; set; }
 
-    [SerializeField] private Transform _hudTrnasform;
+    [SerializeField] private Transform _hudTransform;
 
     [Header("Health Slider")]
     [SerializeField] private Slider Health;
@@ -22,7 +22,7 @@ public class Hud : MonoBehaviour, IEverywhereCanvas
     [SerializeField] private Color _healthMaxColor;
 
     [Header("Interaction Slider")]
-    [SerializeField] private Transform _interactionTransform;
+    [SerializeField] private RectTransform _interactionTransform;
     [SerializeField] private Slider _interaction;
     [SerializeField] private Image _interactionFill;
 
@@ -40,7 +40,7 @@ public class Hud : MonoBehaviour, IEverywhereCanvas
     private TweenerCore<float, float, FloatOptions> _healthValueTween;
     private TweenerCore<Color, Color, ColorOptions> _healthColorTween;
 
-    private TweenerCore<Vector3, Vector3, VectorOptions> _interactionScaleTween;
+    private TweenerCore<Vector2, Vector2, VectorOptions> _interactionMoveTween;
     private TweenerCore<float, float, FloatOptions> _interactionValueTween;
     private TweenerCore<Color, Color, ColorOptions> _interactionColorTween;
 
@@ -52,7 +52,7 @@ public class Hud : MonoBehaviour, IEverywhereCanvas
     {
         Singleton = this;
 
-        _interactionTransform.localScale = Vector2.zero;
+        _interactionTransform.anchoredPosition = new Vector2(0, -30f);
     }
 
     public Slider HealthSlider() => Health;
@@ -61,7 +61,7 @@ public class Hud : MonoBehaviour, IEverywhereCanvas
     {
         _hudShakeTween.Complete();
 
-        _hudShakeTween = _hudTrnasform.DOShakePosition(shakeEffect.Duration, shakeEffect.Strength);
+        _hudShakeTween = _hudTransform.DOShakePosition(shakeEffect.Duration, shakeEffect.Strength);
     }
 
     public void RemoveLastDashDot()
@@ -99,10 +99,10 @@ public class Hud : MonoBehaviour, IEverywhereCanvas
         _interactionValueTween?.Kill();
         _interactionColorTween?.Kill();
 
-        _interactionScaleTween?.Complete();
+        _interactionMoveTween?.Complete();
 
         SoundSystem.PlayInterfaceSound(new SoundTransporter(_interactionShow), volume: 0.45f);
-        _interactionScaleTween = _interactionTransform.DOScale(1f, 0.1f).SetEase(Ease.OutSine);
+        _interactionMoveTween = _interactionTransform.DOAnchorPosY(66.8f, 0.1f).SetEase(Ease.OutSine);
 
         _interactionFill.color = _interactionMinColor;
         _interaction.value = 0f;
@@ -120,9 +120,9 @@ public class Hud : MonoBehaviour, IEverywhereCanvas
         _interactionValueTween?.Kill();
         _interactionColorTween?.Kill();
 
-        _interactionScaleTween?.Complete();
+        _interactionMoveTween?.Complete();
 
         SoundSystem.PlayInterfaceSound(new SoundTransporter(_interactionHide), volume: 0.45f);
-        _interactionScaleTween = _interactionTransform.DOScale(0f, 0.1f).SetEase(Ease.InSine);
+        _interactionMoveTween = _interactionTransform.DOAnchorPosY(30f, 0.1f).SetEase(Ease.InSine);
     }
 }
