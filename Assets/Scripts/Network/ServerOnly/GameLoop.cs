@@ -189,7 +189,7 @@ public class GameLoop : NetworkBehaviour
 
     private IEnumerator Loop()
     {
-        WaitUntil _waitForSceneLoaded = new WaitUntil(() => _isSceneLoaded);
+        WaitUntil _waitForSceneLoaded = new(() => _isSceneLoaded);
 
         _currentGamesPlayed = 1;
 
@@ -231,11 +231,7 @@ public class GameLoop : NetworkBehaviour
 
             yield return new WaitForSeconds(0.75f);
             yield return StartCoroutine(Timer(new List<ColorFrom>() { new(Color.gray, _repeatSeconds) }, _repeatSeconds, 3));
-
             StartMatch();
-            SetGameState(GameState.Match, CanvasGameState.Game, MusicGameState.Match, _roundLength);
-
-            SceneGameManager.Singleton.RpcOnMatchStarted();
 
             List<ColorFrom> colorsFrom = new()
             {
@@ -288,6 +284,9 @@ public class GameLoop : NetworkBehaviour
 
     private void StartMatch()
     {
+        SetGameState(GameState.Match, CanvasGameState.Game, MusicGameState.Match, _roundLength);
+        SceneGameManager.Singleton.RpcOnMatchStarted();
+
         FindFirstObjectByType<ItemSpawner>().StartSpawnProcess();
     }
 

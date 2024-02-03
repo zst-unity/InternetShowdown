@@ -47,8 +47,10 @@ public class ItemSpawner : NetworkBehaviour
     [ServerCallback]
     public void Destroy(GameObject item)
     {
+        if (item == null) return;
+
         _spawnedItems.Remove(item.transform.position);
-        NetworkServer.Destroy(item);
+        NetworkServer.Destroy(item); //f
     }
 
     private void SpawnItem()
@@ -67,11 +69,16 @@ public class ItemSpawner : NetworkBehaviour
 
             NavMesh.SamplePosition(randomPlace, out NavMeshHit hit, randomPlace.magnitude, 1);
             pos = hit.position + Vector3.up * 1.5f;
-        } while (_spawnedItems.ContainsKey(pos));
+        } while (_spawnedItems.ContainsKey(pos) || !IsVectorValid(pos));
 
         GameObject spawnedItem = PickableItem.Spawn(pos).gameObject;
         NetworkServer.Spawn(spawnedItem);
         _spawnedItems.Add(spawnedItem.transform.position, spawnedItem);
+    }
+
+    private bool IsVectorValid(Vector3 vector3)
+    {
+        return float.IsFinite(vector3.x) && float.IsFinite(vector3.y) && float.IsFinite(vector3.z);
     }
 
     private void OnDrawGizmosSelected()

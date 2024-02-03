@@ -1,6 +1,7 @@
 ### Added
 
 ### Fixed
+- Bug that kicks player for some reason
 
 ### Changed
 - Reworked pillow
