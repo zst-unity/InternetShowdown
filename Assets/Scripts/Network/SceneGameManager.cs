@@ -6,7 +6,7 @@ using Mirror;
 using UnityEngine;
 
 public class SceneGameManager : NetworkBehaviour
-{ //l;as
+{
     public static SceneGameManager Singleton { get; private set; }
 
     [SerializeField] private List<AudioClip> _clockTicks = new();
