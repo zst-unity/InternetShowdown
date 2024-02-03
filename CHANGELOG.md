@@ -1,15 +1,9 @@
 ### Added
-- Invincibility for 5 seconds after respawn
-- Mouse sensitivity setting
 
 ### Fixed
-- Nicknames and scope above results
 
 ### Changed
-- Overhauled dash
-- Overhauled HUD
-- Molotov now bounces from jump pads
+- Reworked pillow
+- Ground dash now applies dynamic force
 
 ### Other
-- Removed WaitForFixedUpdate() from all coroutines
-- Optimized markers and other UI by a bit

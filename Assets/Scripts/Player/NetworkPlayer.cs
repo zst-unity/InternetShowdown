@@ -781,8 +781,10 @@ public class NetworkPlayer : NetworkBehaviour
         if (!AllowMovement || PauseMenu.Singleton.PauseMenuOpened || IsGrounded) return;
 
         float targetForce = _rb.velocity.y <= -1f ? -_groundDashForce + (_rb.velocity.y * 3) : -_groundDashForce;
+        var wasHit = Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 1000f, _mapLayers);
+        if (!wasHit) return;
 
-        _rb.velocity = new Vector3(_rb.velocity.x, targetForce, _rb.velocity.z);
+        _rb.velocity = new Vector3(_rb.velocity.x, targetForce - hit.distance, _rb.velocity.z);
 
         StartCoroutine(nameof(EffectWhenLanded));
     }
