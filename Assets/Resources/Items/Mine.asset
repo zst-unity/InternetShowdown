@@ -18,4 +18,5 @@ MonoBehaviour:
   UseTime: 1
   Mutations: []
   Projectiles:
-  - {fileID: 1625833055714647400, guid: fc17c19c50bcd8d4bbd07b51b4552353, type: 3}
+  - {fileID: 7692618399606473094, guid: fc17c19c50bcd8d4bbd07b51b4552353, type: 3}
+  HealAmount: 0
