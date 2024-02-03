@@ -268,7 +268,6 @@ public enum ForceApplyMode
 [Flags]
 public enum HitDestroy
 {
-    Nothing = 0,
     OnPlayer = 1,
     OnMap = 2,
     OnCollide = 4,
@@ -278,7 +277,6 @@ public enum HitDestroy
 [Flags]
 public enum EffectModes
 {
-    None = 0,
     OnSpawn = 1,
     OnCollide = 2,
     OnDestroy = 4

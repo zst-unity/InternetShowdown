@@ -150,7 +150,7 @@ MonoBehaviour:
   _projectileDamage: 20
   _forceApplyMode: 0
   _continiousForceApply: 0
-  _soundEffects: 4
+  _soundEffects: 6
   _particleEffects: 4
   _shakeEffects: 4
   _spawnSound:
@@ -159,7 +159,8 @@ MonoBehaviour:
     Volume: 1
     Pitch: {x: 1, y: 1}
   _collideSound:
-    Sounds: []
+    Sounds:
+    - {fileID: 8300000, guid: 84b59db5a923eb741b2773ab3e1c3da5, type: 3}
     Lock: 0
     Volume: 1
     Pitch: {x: 1, y: 1}
