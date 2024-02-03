@@ -101,6 +101,8 @@ MonoBehaviour:
   syncInterval: 0
   _rb: {fileID: 3602822793115751591}
   _ir: {fileID: 2202756226007548306}
+  _netTrans: {fileID: 6314750545462305294}
+  _netRb: {fileID: 2616357165067855253}
   _maxHealth: 100
   _startSpeed: 95
   _accelerationFactor: 2

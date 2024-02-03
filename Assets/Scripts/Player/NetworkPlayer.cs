@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Mirror;
+using Mirror.Experimental;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -261,13 +262,20 @@ public class NetworkPlayer : NetworkBehaviour
         PlayerMoveCamera.BlockMovement = false;
 
         DisablePlayer(true);
-
-        transform.position = NetworkManager.startPositions[UnityEngine.Random.Range(0, NetworkManager.startPositions.Count)].position;
-
         ActivateInvincible(5f);
 
         _dashesRemaining = _dashesAvailable;
         Hud.Singleton.SetDashes(_dashesAvailable);
+
+        StartCoroutine(nameof(Respawn));
+    }
+
+    private IEnumerator Respawn()
+    {
+        yield return new WaitForFixedUpdate();
+        var pos = NetworkManager.startPositions[UnityEngine.Random.Range(0, NetworkManager.startPositions.Count)].position;
+        Debug.Log($"respawning player at {pos}");
+        transform.position = pos;
     }
 
     [Command]
