@@ -751,7 +751,7 @@ public class NetworkPlayer : NetworkBehaviour
         Invoke(nameof(ResetDash), _dashTime);
 
         Vector3 targetDirection = IsMoving ? _playerDirection : new Vector3(_orientation.forward.x, 0, _orientation.forward.z);
-        _rb.velocity = new(_rb.velocity.x + targetDirection.x * _dashForce, _rb.velocity.y, _rb.velocity.z + targetDirection.z * _dashForce);
+        _rb.velocity = new(_rb.velocity.x + targetDirection.x * _dashForce, 0, _rb.velocity.z + targetDirection.z * _dashForce);
         TimeoutDash(_dashTimeout);
 
         SoundSystem.Singleton.PlaySFX(new SoundTransporter(_dashSound), new SoundPositioner(transform.position), 0.85f, 1f, 0.6f);

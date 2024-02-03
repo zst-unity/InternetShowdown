@@ -118,7 +118,7 @@ MonoBehaviour:
   _dashTime: 0.15
   _dashTimeout: 0.4
   _dashesAvailable: 4
-  _dashReloadTime: 1
+  _dashReloadTime: 3
   _groundDashForce: 17.5
   _mapLayers:
     serializedVersion: 2
