@@ -22,3 +22,5 @@
 - Increased water balloon collider radius
 
 ### Other
+
+- Removed strange code from items reader
