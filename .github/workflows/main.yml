@@ -68,7 +68,3 @@ jobs:
           artifacts: artifacts/**/*.zip
           makeLatest: true
           bodyFile: CHANGELOG.md
-      - name: Delete artifacts
-        uses: geekyeggo/delete-artifact@main
-        with:
-          name: Build-*
