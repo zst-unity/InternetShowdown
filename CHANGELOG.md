@@ -10,7 +10,8 @@
 - Reworked landmine
 - Ground dash now applies dynamic force
 - Dash now resets player's Y velocity if it is below 0
-- Increases dash reload time
+- Increased dash reload time
 - Interaction slider animation
+- Increased water balloon collider radius
 
 ### Other
