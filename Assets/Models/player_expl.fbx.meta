@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: ed908ef63aff01841a4ecb357f1c18d4
+guid: 152f1897c2c80a74895f89748fc02e08
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -7,72 +7,37 @@ ModelImporter:
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: Body
+      name: Body.001
     second: {fileID: 2100000, guid: 3f58b53fff84efd4da3620e07db0624c, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: Body.002
-    second: {fileID: 2100000, guid: 3f58b53fff84efd4da3620e07db0624c, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: BodySecond
+      name: BodySecond.001
     second: {fileID: 2100000, guid: e6b473e057bfeb94ea21c52295689c08, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: BodySecond.002
-    second: {fileID: 2100000, guid: e6b473e057bfeb94ea21c52295689c08, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Ear
+      name: Ear.001
     second: {fileID: 2100000, guid: 78761de13bc07274fa97a2ce863e12b9, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: Ear.002
-    second: {fileID: 2100000, guid: 78761de13bc07274fa97a2ce863e12b9, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: EarOuter
+      name: EarOuter.001
     second: {fileID: 2100000, guid: e94811a87fd017242835c8471ab29390, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: EarOuter.002
-    second: {fileID: 2100000, guid: e94811a87fd017242835c8471ab29390, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Eye
+      name: Eye.001
     second: {fileID: 2100000, guid: aa29d8f64910a0a4193bbe491fa02021, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: Eye.002
-    second: {fileID: 2100000, guid: aa29d8f64910a0a4193bbe491fa02021, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: EyeOuter
+      name: EyeOuter.001
     second: {fileID: 2100000, guid: c39a6b4a16ab26049be4c7d3d59c7b80, type: 2}
   - first:
       type: UnityEngine:Material
       assembly: UnityEngine.CoreModule
-      name: EyeOuter.002
-    second: {fileID: 2100000, guid: c39a6b4a16ab26049be4c7d3d59c7b80, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Nose
-    second: {fileID: 2100000, guid: 8d41f5bd3a5d3e14d9803efd68af9c18, type: 2}
-  - first:
-      type: UnityEngine:Material
-      assembly: UnityEngine.CoreModule
-      name: Nose.002
+      name: Nose.001
     second: {fileID: 2100000, guid: 8d41f5bd3a5d3e14d9803efd68af9c18, type: 2}
   materials:
     materialImportMode: 2
@@ -84,7 +49,7 @@ ModelImporter:
     bakeSimulation: 0
     resampleCurves: 1
     optimizeGameObjects: 0
-    removeConstantScaleCurves: 1
+    removeConstantScaleCurves: 0
     motionNodeName: 
     animationImportErrors: 
     animationImportWarnings: 
@@ -169,7 +134,7 @@ ModelImporter:
   humanoidOversampling: 1
   avatarSetup: 0
   addHumanoidExtraRootOnlyWhenUsingAvatar: 1
-  importBlendShapeDeformPercent: 0
+  importBlendShapeDeformPercent: 1
   remapMaterialsIfMaterialImportModeIsNone: 0
   additionalBone: 0
   userData: 
