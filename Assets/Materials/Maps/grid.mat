@@ -22,6 +22,8 @@ Material:
   m_PrefabAsset: {fileID: 0}
   m_Name: grid
   m_Shader: {fileID: -6465566751694194690, guid: a0edf18c0b5edb14a9b8881b6809e478, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
   m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 4
@@ -30,6 +32,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -87,7 +90,7 @@ Material:
     - _GlossyReflections: 1
     - _InnerGridSmoothness: 0.75
     - _Metallic: 0
-    - _MetallicIntensity: 0.1
+    - _MetallicIntensity: 0.2
     - _Mode: 0
     - _NormalIntensity: 0.1
     - _OcclusionStrength: 1
@@ -101,7 +104,8 @@ Material:
     m_Colors:
     - _Color: {r: 0.1981132, g: 0.1981132, b: 0.1981132, a: 1}
     - _EmissionColor: {r: 0, g: 0, b: 0, a: 1}
-    - _GridSize: {r: 5.25, g: 5.25, b: 0, a: 0}
+    - _GridSize: {r: 40, g: 40, b: 0, a: 0}
     - _InnerGridColor: {r: 0.2830189, g: 0.2830189, b: 0.2830189, a: 0}
     - _OuterGridColor: {r: 0.11320752, g: 0.11320752, b: 0.11320752, a: 0}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1
