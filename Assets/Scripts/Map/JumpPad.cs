@@ -5,7 +5,7 @@ public class JumpPad : MonoBehaviour
     [SerializeField] private float _force;
     [SerializeField] private AudioClip _sound;
 
-    private void OnCollisionEnter(Collision other)
+    private void OnCollisionStay(Collision other)
     {
         if (other.gameObject.TryGetComponent(out Rigidbody hit))
         {
