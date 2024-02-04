@@ -8,7 +8,7 @@
 - Host often respawning at the same place where he died
 
 ### Changed
-- Map Prototype was reworked
+- Reworked map Prototype
 - Reworked pillow
 - Reworked landmine
 - Reworked jump pad
