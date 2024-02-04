@@ -187,9 +187,7 @@ public class ProjectileBase : NetworkBehaviour
 
     private void HitPlayer(GameObject player)
     {
-        NetworkPlayer toHit;
-
-        if (!player.TryGetComponent<NetworkPlayer>(out toHit))
+        if (!player.TryGetComponent(out NetworkPlayer toHit))
         {
             Debug.Log("The object you trying to hit isn't a player");
             return;
