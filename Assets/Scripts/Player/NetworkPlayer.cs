@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Mirror;
+using Mirror.Examples.Basic;
 using Mirror.Experimental;
 using UnityEngine;
 
@@ -147,6 +148,9 @@ public class NetworkPlayer : NetworkBehaviour
     [SyncVar, SerializeField, ReadOnly] private string _nickname;
     public string Nickname { get => _nickname; }
 
+    [SyncVar, SerializeField, ReadOnly] private Color _color;
+    public Color Color { get => _color; }
+
     [SyncVar, SerializeField, ReadOnly] private bool _initialized;
     public bool Initialized { get => _initialized; }
 
@@ -154,8 +158,9 @@ public class NetworkPlayer : NetworkBehaviour
     public bool Invincible { get => _invincible; }
 
     [Command]
-    public void CmdInitialize(string nickname)
+    public void CmdInitialize(string nickname, string color)
     {
+        ColorUtility.TryParseHtmlString($"#{color}", out _color);
         _nickname = nickname;
         _initialized = true;
 
@@ -382,7 +387,8 @@ public class NetworkPlayer : NetworkBehaviour
     private void Initialize() // уничтожаем другие камеры на сцене и создаем себе новую
     {
         string nickname = PlayerPrefs.GetString("PlayerNicknameValue");
-        CmdInitialize(nickname);
+        var color = PlayerPrefs.GetString("PlayerColorHEX", "FFFFFF");
+        CmdInitialize(nickname, color);
 
         SetupPlayerAndGameObject();
 
@@ -572,16 +578,16 @@ public class NetworkPlayer : NetworkBehaviour
         {
             if (hit.transform.TryGetComponent(out NetworkPlayer player))
             {
-                EverywhereCanvas.Singleton.SwitchNicknameVisibility(true, player.Nickname);
+                EverywhereCanvas.Singleton.SwitchNicknameVisibility(true, player.Color, player.Nickname);
             }
             else
             {
-                EverywhereCanvas.Singleton.SwitchNicknameVisibility(false);
+                EverywhereCanvas.Singleton.SwitchNicknameVisibility(false, Color.clear);
             }
         }
         else
         {
-            EverywhereCanvas.Singleton.SwitchNicknameVisibility(false);
+            EverywhereCanvas.Singleton.SwitchNicknameVisibility(false, Color.clear);
         }
     }
 

@@ -340,9 +340,10 @@ public class EverywhereCanvas : MonoBehaviour, IEverywhereCanvas // юи кот�
         }
     }
 
-    public void SwitchNicknameVisibility(bool show, string target = "")
+    public void SwitchNicknameVisibility(bool show, Color color, string target = "")
     {
         OthersNickname.text = target;
+        OthersNickname.color = color;
         OthersNickname.gameObject.SetActive(show);
     }
 
