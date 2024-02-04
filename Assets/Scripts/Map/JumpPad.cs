@@ -15,7 +15,13 @@ public class JumpPad : MonoBehaviour
                 y: transform.up.y * _force,
                 z: other.attachedRigidbody.velocity.z + (transform.up.z * _force)
             );
+        }
+    }
 
+    private void OnTriggerEnter(Collider other)
+    {
+        if (other.attachedRigidbody)
+        {
             SoundSystem.PlaySound(new SoundTransporter(_sound), new SoundPositioner(transform.position), SoundType.SFX, volume: 0.45f, pitchMin: 0.95f, pitchMax: 1.1f);
         }
     }

@@ -17,6 +17,8 @@
 - Increased dash reload time
 - Interaction slider animation
 - Increased water balloon collider radius
+- Decreased landmine explosion radius
+- Increased landmine damage
 
 ### Other
 - Removed strange code from items reader
