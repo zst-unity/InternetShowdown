@@ -8,9 +8,10 @@ Material:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_Name: jumppad_jumper
-  m_Shader: {fileID: 46, guid: 0000000000000000f000000000000000, type: 0}
-  m_ValidKeywords:
-  - _EMISSION
+  m_Shader: {fileID: -6465566751694194690, guid: 0a61bb5a2114b7b41b88a3c5d6d9e0ae, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
   m_InvalidKeywords: []
   m_LightmapFlags: 2
   m_EnableInstancingVariants: 0
@@ -18,6 +19,7 @@ Material:
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
@@ -83,10 +85,25 @@ Material:
     - _UVSec: 0
     - _ZWrite: 1
     m_Colors:
-    - _Color: {r: 0.3726415, g: 1, b: 0.5030981, a: 1}
+    - _Color: {r: 0.31719476, g: 0.8301887, b: 0.42299974, a: 1}
     - _EmissionColor: {r: 0.17254902, g: 1.4980392, b: 0.63529414, a: 1}
+    - _EnchantedColor: {r: 0.59059966, g: 3.0731993, b: 0.33341318, a: 1}
     - _Gradient1: {r: 0, g: 1, b: 0.9190807, a: 1}
     - _Gradient2: {r: 0.486979, g: 0, b: 1, a: 1}
     - _Pulse1: {r: 2, g: 0, b: 0, a: 1}
     - _Pulse2: {r: 2, g: 1.654902, b: 0, a: 1}
   m_BuildTextureStacks: []
+  m_AllowLocking: 1
+--- !u!114 &8061383352203809109
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 639247ca83abc874e893eb93af2b5e44, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 0
