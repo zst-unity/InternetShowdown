@@ -7,6 +7,7 @@ public class JumpPad : MonoBehaviour
 
     private void OnTriggerStay(Collider other)
     {
+        print("KAFOF");
         if (other.attachedRigidbody)
         {
             other.attachedRigidbody.velocity = new
