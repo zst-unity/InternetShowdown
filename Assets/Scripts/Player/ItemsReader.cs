@@ -79,15 +79,6 @@ public class ItemsReader : NetworkBehaviour
     private void Update()
     {
         if (!isLocalPlayer) return;
-
-        if (Input.GetKeyDown(KeyCode.T) && HasItem)
-        {
-            Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 500f, LayerMask.NameToLayer("Map"));
-            Vector3 targetPosition = hit.point + Vector3.up * 1.5f;
-
-            PickableItem.Spawn(targetPosition, _currentItem);
-        }
-
         CheckForItem();
     }
 
