@@ -15,18 +15,18 @@ public class SoundingElement : MonoBehaviour, IPointerClickHandler, IPointerEnte
     {
         if (_selectable) return;
 
-        SoundSystem.PlayInterfaceSound(new SoundTransporter(_clickSound), volume: 0.55f);
+        if (_clickSound) SoundSystem.PlayInterfaceSound(new SoundTransporter(_clickSound), volume: 0.55f);
     }
 
     public void OnPointerEnter(PointerEventData eventData)
     {
-        SoundSystem.PlayInterfaceSound(new SoundTransporter(_hoverSound), volume: 0.55f);
+        if (_hoverSound) SoundSystem.PlayInterfaceSound(new SoundTransporter(_hoverSound), volume: 0.55f);
     }
 
     public void OnSelect(BaseEventData eventData)
     {
         if (!_selectable) return;
 
-        SoundSystem.PlayInterfaceSound(new SoundTransporter(_clickSound), volume: 0.55f);
+        if (_clickSound) SoundSystem.PlayInterfaceSound(new SoundTransporter(_clickSound), volume: 0.55f);
     }
 }

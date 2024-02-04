@@ -3,10 +3,12 @@ using System.Linq;
 using DG.Tweening;
 using Mirror;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using ColorUtility = UnityEngine.ColorUtility;
 
 public class MenuManager : MonoBehaviour
 {
@@ -15,6 +17,8 @@ public class MenuManager : MonoBehaviour
 
     [SerializeField] private GroupsManager _groupsManager;
 
+    [SerializeField] private FlexibleColorPicker _colorPicker;
+    [SerializeField] private Image _playerColor;
     [SerializeField] private TMP_InputField _nickname;
     [SerializeField] private TMP_InputField _address;
 
@@ -36,6 +40,21 @@ public class MenuManager : MonoBehaviour
                 _groupsManager.WindowTweens[target].KillAll();
                 _groupsManager.WindowTweens.Remove(target);
             }
+        }
+    }
+
+    public void SetPlayerColor(Color color)
+    {
+        _playerColor.color = color;
+        PlayerPrefs.SetString("PlayerColorHEX", color.ToHexString());
+    }
+
+    private void Awake()
+    {
+        if (ColorUtility.TryParseHtmlString($"#{PlayerPrefs.GetString("PlayerColorHEX", "FFFFFF")}", out Color color))
+        {
+            _colorPicker.SetColor(color);
+            _playerColor.color = color;
         }
     }
 

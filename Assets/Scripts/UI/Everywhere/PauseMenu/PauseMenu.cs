@@ -55,9 +55,4 @@ public class PauseMenu : MonoBehaviour, IEverywhereCanvas
     {
         Pause(false, false);
     }
-
-    internal void Pause(bool v, object value)
-    {
-        throw new NotImplementedException();
-    }
 }
