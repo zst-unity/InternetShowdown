@@ -31,9 +31,7 @@ public class RadiusDamage : NetworkBehaviour
 
         foreach (Collider obj in all)
         {
-            NetworkPlayer outPlayer;
-
-            if (obj.TryGetComponent<NetworkPlayer>(out outPlayer))
+            if (obj.TryGetComponent(out NetworkPlayer outPlayer))
             {
                 PlayerCurrentStats.Singleton.Damage = _damage;
                 outPlayer.CmdHitPlayer(NetworkClient.localPlayer, _damage + PlayerMutationStats.Singleton.Damage);
