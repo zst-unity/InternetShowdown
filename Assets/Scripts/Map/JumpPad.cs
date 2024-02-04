@@ -1,7 +1,7 @@
 using UnityEngine;
 
 public class JumpPad : MonoBehaviour
-{
+{//d
     [SerializeField] private float _force;
     [SerializeField] private AudioClip _sound;
 
