@@ -123,6 +123,7 @@ public class NetworkPlayer : NetworkBehaviour
     [Header("Objects")]
     [SerializeField, Tooltip("Не меняй")] private Transform _orientation;
     [SerializeField, Tooltip("Не меняй")] private MeshRenderer _body;
+    [SerializeField, Tooltip("Не меняй")] private GameObject _deathEffect;
 
     [HideInInspector] public Camera PlayerCamera;
     [HideInInspector] public CameraMovement PlayerMoveCamera;
@@ -239,9 +240,12 @@ public class NetworkPlayer : NetworkBehaviour
         }
     }
 
+    private List<GameObject> _spawnedDeathEffects = new();
+
     private void OnDeath()
     {
         Action respawn = OnRespawn;
+        CmdDie();
 
         _ir.LoseItem();
         _ir.RemoveAllMutations();
@@ -259,6 +263,14 @@ public class NetworkPlayer : NetworkBehaviour
         Hud.Singleton.SetDashes(0);
     }
 
+    [Command]
+    private void CmdDie()
+    {
+        var newEffect = Instantiate(_deathEffect, transform.position - Vector3.up * 0.5f, _orientation.rotation);
+        NetworkServer.Spawn(newEffect);
+        _spawnedDeathEffects.Add(newEffect);
+    }
+
     private void OnRespawn()
     {
         SetHealth(100);
@@ -273,6 +285,16 @@ public class NetworkPlayer : NetworkBehaviour
         Hud.Singleton.SetDashes(_dashesAvailable);
 
         StartCoroutine(nameof(Respawn));
+        CmdRespawn();
+    }
+
+    [Command]
+    private void CmdRespawn()
+    {
+        foreach (var effect in _spawnedDeathEffects)
+        {
+            NetworkServer.Destroy(effect);
+        }
     }
 
     private IEnumerator Respawn()

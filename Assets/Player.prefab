@@ -101,8 +101,6 @@ MonoBehaviour:
   syncInterval: 0
   _rb: {fileID: 3602822793115751591}
   _ir: {fileID: 2202756226007548306}
-  _netTrans: {fileID: 6314750545462305294}
-  _netRb: {fileID: 2616357165067855253}
   _maxHealth: 100
   _startSpeed: 95
   _accelerationFactor: 2
@@ -161,6 +159,7 @@ MonoBehaviour:
   - {fileID: 2100000, guid: edfc71954dbb16548863d82aed93b012, type: 2}
   _orientation: {fileID: 5613802264008730177}
   _body: {fileID: 3291134265114765407}
+  _deathEffect: {fileID: 8480117098400520781, guid: 60d31db724c83574389132c9788f3a7f, type: 3}
   PlayerCamera: {fileID: 0}
   PlayerMoveCamera: {fileID: 0}
   AllowMovement: 0
@@ -172,6 +171,7 @@ MonoBehaviour:
   <Deaths>k__BackingField: 0
   <Traumas>k__BackingField: 0
   _nickname: 
+  _color: {r: 0, g: 0, b: 0, a: 0}
   _initialized: 0
   _invincible: 0
   _health: 0

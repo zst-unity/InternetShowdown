@@ -1,24 +1,13 @@
 # CHANGELOG
 
 ### Added
-- Player color customization
+- Player death effect
 
 ### Fixed
-- Bug that kicks player for some reason
-- Host often respawning at the same place where he died
 
 ### Changed
-- Reworked map Prototype
-- Reworked pillow
-- Reworked landmine
-- Reworked jump pad
-- Ground dash now applies dynamic force
-- Dash now resets player's Y velocity if it is below 0
-- Increased dash reload time
-- Interaction slider animation
-- Increased water balloon collider radius
-- Decreased landmine explosion radius
-- Increased landmine damage
+- Increased molotov fire radius
+- Buffed toilet
+- Finished best city map
 
 ### Other
-- Removed strange code from items reader
