@@ -120,9 +120,9 @@ MonoBehaviour:
   _dashesAvailable: 4
   _dashReloadTime: 3
   _groundDashForce: 17.5
-  _mapLayers:
+  <MapLayers>k__BackingField:
     serializedVersion: 2
-    m_Bits: 2112
+    m_Bits: 64
   JumpKey: 32
   DashKey: 304
   GroundDashKey: 306

@@ -71,8 +71,8 @@ public class NetworkPlayer : NetworkBehaviour
     [Header("Ground Dashing Control")]
     [SerializeField, Tooltip("Сила рывка вниз"), Min(0)] private float _groundDashForce = 5f;
 
-    [Header("Property Checking")]
-    [SerializeField] private LayerMask _mapLayers;
+    [field: Header("Property Checking")]
+    [field: SerializeField] public LayerMask MapLayers { get; private set; }
 
     [Header("Inputs")]
     public KeyCode JumpKey = KeyCode.Space;
@@ -713,7 +713,7 @@ public class NetworkPlayer : NetworkBehaviour
 
     private bool CheckForGrounded()
     {
-        bool grounded = Physics.CheckBox(_groundChecking.center, _groundChecking.extends / 2, Quaternion.identity, _mapLayers.value, QueryTriggerInteraction.Ignore);
+        bool grounded = Physics.CheckBox(_groundChecking.center, _groundChecking.extends / 2, Quaternion.identity, MapLayers.value, QueryTriggerInteraction.Ignore);
 
         return grounded;
     }
@@ -722,7 +722,7 @@ public class NetworkPlayer : NetworkBehaviour
     {
         if (!IsGrounded) return false;
 
-        Physics.Raycast(_groundChecking.center, Vector3.down, out RaycastHit hit, 1f, _mapLayers.value, QueryTriggerInteraction.Ignore);
+        Physics.Raycast(_groundChecking.center, Vector3.down, out RaycastHit hit, 1f, MapLayers.value, QueryTriggerInteraction.Ignore);
         _slopeNormal = hit.normal;
 
         return _slopeNormal != Vector3.up;
@@ -817,7 +817,7 @@ public class NetworkPlayer : NetworkBehaviour
         if (!AllowMovement || PauseMenu.Singleton.PauseMenuOpened || IsGrounded) return;
 
         float targetForce = _rb.velocity.y <= -1f ? -_groundDashForce + (_rb.velocity.y * 3) : -_groundDashForce;
-        var wasHit = Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 1000f, _mapLayers);
+        var wasHit = Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 1000f, MapLayers);
         if (!wasHit) return;
 
         _rb.velocity = new Vector3(_rb.velocity.x, targetForce - hit.distance, _rb.velocity.z);

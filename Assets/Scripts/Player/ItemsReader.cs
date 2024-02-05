@@ -247,7 +247,9 @@ public class ItemsReader : NetworkBehaviour
     {
         Transform cameraTransform = _player.PlayerCamera.transform;
 
-        CmdSpawnProjectile(_currentItem.Projectiles.IndexOf(proj), transform.position + cameraTransform.forward, cameraTransform.rotation, connectionToClient);
+        var wasHit = Physics.Raycast(transform.position, cameraTransform.forward, 1.1f, _player.MapLayers);
+        var dir = wasHit ? Vector3.zero : cameraTransform.forward;
+        CmdSpawnProjectile(_currentItem.Projectiles.IndexOf(proj), transform.position + dir, cameraTransform.rotation, connectionToClient);
     }
 
     #region NETWORK

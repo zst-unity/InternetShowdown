@@ -5,6 +5,7 @@
 
 ### Fixed
 - Pause menu incorrect resize
+- Projectiles falling through floor
 
 ### Changed
 - Increased molotov fire radius
