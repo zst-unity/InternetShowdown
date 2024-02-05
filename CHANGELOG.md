@@ -6,6 +6,7 @@
 ### Fixed
 - Pause menu incorrect resize
 - Projectiles falling through floor
+- Not restoring player score after multiple disconnects
 
 ### Changed
 - Increased molotov fire radius
@@ -15,3 +16,4 @@
 
 ### Other
 - Host now cant collide with dead players
+- Game now restarts when network manager crashes

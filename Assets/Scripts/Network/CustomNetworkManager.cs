@@ -93,12 +93,17 @@ public class CustomNetworkManager : NetworkManager
 
     public override void OnServerDisconnect(NetworkConnectionToClient conn)
     {
+        if (!conn.identity) return;
         NetworkPlayer player = conn.identity.GetComponent<NetworkPlayer>();
         GameLoop gameLoop = GameLoop.Singleton;
 
         if (!gameLoop.ExitedPlayers.ContainsKey(player.Nickname))
         {
             gameLoop.ExitedPlayers.Add(player.Nickname, (player.Score, player.Activity));
+        }
+        else
+        {
+            gameLoop.ExitedPlayers[player.Nickname] = (player.Score, player.Activity);
         }
 
         base.OnServerDisconnect(conn);
