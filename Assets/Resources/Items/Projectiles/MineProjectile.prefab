@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 1652992099963551617}
   - component: {fileID: 3231761565874047356}
   - component: {fileID: 7692618399606473094}
+  - component: {fileID: 1732438453316573688}
   m_Layer: 0
   m_Name: MineProjectile
   m_TagString: Untagged
@@ -143,6 +144,7 @@ MonoBehaviour:
   syncInterval: 0
   _rb: {fileID: 5003493469569953143}
   _nrb: {fileID: 3231761565874047356}
+  _nt: {fileID: 3231761565874047356}
   _destroyMode: 1
   _destroyTime: 3
   _destroyHits: 1
@@ -182,6 +184,40 @@ MonoBehaviour:
   _destroyShake:
     Duration: 0.15
     Strength: 0.25
+--- !u!114 &1732438453316573688
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 65915167034258208}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ff3ba0becae47b8b9381191598957c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 1
+  syncMode: 0
+  syncInterval: 0
+  target: {fileID: 838230085643495834}
+  clientAuthority: 0
+  syncPosition: 1
+  syncRotation: 1
+  syncScale: 0
+  interpolatePosition: 1
+  interpolateRotation: 1
+  interpolateScale: 1
+  showGizmos: 0
+  showOverlay: 0
+  overlayColor: {r: 0, g: 0, b: 0, a: 0.5}
+  onlySyncOnChange: 1
+  onlySyncOnChangeCorrectionMultiplier: 2
+  sendIntervalMultiplier: 3
+  rotationSensitivity: 0.01
+  compressRotation: 0
+  positionPrecision: 0.01
+  scalePrecision: 0.01
+  timelineOffset: 0
 --- !u!1 &1673695492733483630
 GameObject:
   m_ObjectHideFlags: 0

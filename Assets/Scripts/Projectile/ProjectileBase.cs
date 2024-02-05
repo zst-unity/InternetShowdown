@@ -26,11 +26,13 @@ public class MyProjectile : ProjectileBase
 
 */
 [RequireComponent(typeof(Rigidbody), typeof(Collider), typeof(NetworkRigidbody))]
+[RequireComponent(typeof(NetworkTransformReliable))]
 public class ProjectileBase : NetworkBehaviour
 {
     [Header("Components")]
     [SerializeField] protected Rigidbody _rb;
     [SerializeField] protected NetworkRigidbody _nrb;
+    [SerializeField] protected NetworkRigidbody _nt;
 
     [Header("Behaviour Settings")]
     [SerializeField, Tooltip("Из-за чего должен удалиться снаряд?"), EnumFlags] protected HitDestroy _destroyMode;
@@ -94,6 +96,11 @@ public class ProjectileBase : NetworkBehaviour
         {
             _nrb.syncDirection = SyncDirection.ClientToServer;
             _nrb.clientAuthority = true;
+        }
+
+        if (TryGetComponent(out _nt))
+        {
+            _nt.syncDirection = SyncDirection.ClientToServer;
         }
     }
 

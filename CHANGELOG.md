@@ -9,6 +9,7 @@
 - Projectiles falling through floor
 - Not restoring player score after multiple disconnects
 - Randomly voting for map with space bar
+- Invisible nicknames
 
 ### Changed
 - Increased molotov fire radius

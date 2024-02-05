@@ -16,6 +16,7 @@ GameObject:
   - component: {fileID: 1261220910534351140}
   - component: {fileID: 6615805736405829962}
   - component: {fileID: 4749229018956744087}
+  - component: {fileID: 4200945154285958762}
   m_Layer: 0
   m_Name: PillowProjectile
   m_TagString: Untagged
@@ -122,6 +123,7 @@ MonoBehaviour:
   syncInterval: 0
   _rb: {fileID: 2095939189038450475}
   _nrb: {fileID: 8798182013292799962}
+  _nt: {fileID: 8798182013292799962}
   _destroyMode: 5
   _destroyTime: 4
   _destroyHits: 3
@@ -235,3 +237,37 @@ MeshCollider:
   m_Convex: 1
   m_CookingOptions: 30
   m_Mesh: {fileID: 4747795219173961485, guid: 5a637704bd0ee304b80260763acaece1, type: 3}
+--- !u!114 &4200945154285958762
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 6373659485729176377}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8ff3ba0becae47b8b9381191598957c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 1
+  syncMode: 0
+  syncInterval: 0
+  target: {fileID: 8773957072355105310}
+  clientAuthority: 0
+  syncPosition: 1
+  syncRotation: 1
+  syncScale: 0
+  interpolatePosition: 1
+  interpolateRotation: 1
+  interpolateScale: 1
+  showGizmos: 0
+  showOverlay: 0
+  overlayColor: {r: 0, g: 0, b: 0, a: 0.5}
+  onlySyncOnChange: 1
+  onlySyncOnChangeCorrectionMultiplier: 2
+  sendIntervalMultiplier: 3
+  rotationSensitivity: 0.01
+  compressRotation: 0
+  positionPrecision: 0.01
+  scalePrecision: 0.01
+  timelineOffset: 0
