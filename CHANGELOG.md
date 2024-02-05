@@ -17,6 +17,7 @@
 - Buffed toilet
 - Finished best city map
 - Pickable item's animation
+- Buffed toilet
 
 ### Other
 - Host now cant collide with dead players

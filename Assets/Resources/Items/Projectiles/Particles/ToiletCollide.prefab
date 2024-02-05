@@ -4929,7 +4929,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   _radius: 15
-  _damage: 60
+  _damage: 70
   _castDamageOvertime: 0
   _lifetime: 5
   _interval: 0.5
