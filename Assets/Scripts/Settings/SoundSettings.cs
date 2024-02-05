@@ -26,42 +26,57 @@ public class SoundSettings : MonoBehaviour
 
     public void LoadMaster()
     {
-        _masterSlider.value = LoadMixerGroup(MASTER_NAME);
+        _masterSlider.value = DbToAmp(LoadMixerGroup(MASTER_NAME));
     }
 
     public void LoadSFX()
     {
-        _sfxSlider.value = LoadMixerGroup(SFX_NAME);
+        _sfxSlider.value = DbToAmp(LoadMixerGroup(SFX_NAME));
     }
 
     public void LoadUI()
     {
-        _uiSlider.value = LoadMixerGroup(UI_NAME);
+        _uiSlider.value = DbToAmp(LoadMixerGroup(UI_NAME));
     }
 
     public void LoadMusic()
     {
-        _musicSlider.value = LoadMixerGroup(MUSIC_NAME);
+        _musicSlider.value = DbToAmp(LoadMixerGroup(MUSIC_NAME));
+    }
+
+    private float AmpToDb(float amp)
+    {
+        if (amp <= 0.001f)
+        {
+            return -80f;
+        }
+
+        return 20 * Mathf.Log10(amp);
+    }
+
+    private float DbToAmp(float db)
+    {
+        return Mathf.Pow(10, db / 20);
     }
 
     public void SetMaster(float value)
     {
-        SetMixerGroup(MASTER_NAME, value);
+        SetMixerGroup(MASTER_NAME, AmpToDb(value));
     }
 
     public void SetSFX(float value)
     {
-        SetMixerGroup(SFX_NAME, value);
+        SetMixerGroup(SFX_NAME, AmpToDb(value));
     }
 
     public void SetUI(float value)
     {
-        SetMixerGroup(UI_NAME, value);
+        SetMixerGroup(UI_NAME, AmpToDb(value));
     }
 
     public void SetMusic(float value)
     {
-        SetMixerGroup(MUSIC_NAME, value);
+        SetMixerGroup(MUSIC_NAME, AmpToDb(value));
     }
 
     private void SetMixerGroup(string name, float value)

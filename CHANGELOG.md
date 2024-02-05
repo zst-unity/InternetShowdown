@@ -18,6 +18,7 @@
 - Finished best city map
 - Pickable item's animation
 - Buffed toilet
+- Audio sliders are now use amplitude values instead of dB
 
 ### Other
 - Host now cant collide with dead players
