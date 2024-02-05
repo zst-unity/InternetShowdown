@@ -4,6 +4,7 @@
 - Player death effect
 
 ### Fixed
+- Pause menu incorrect resize
 
 ### Changed
 - Increased molotov fire radius
