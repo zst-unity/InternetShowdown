@@ -26,7 +26,7 @@ public class ResultsWindow : MonoBehaviour, IEverywhereCanvas
     private TweenerCore<float, float, FloatOptions> _fadeTween;
     private TweenerCore<Vector3, Vector3, VectorOptions> _scaleTween;
 
-    public void Reset()
+    public void ResetCanvas()
     {
         Singleton = this;
 
@@ -53,7 +53,7 @@ public class ResultsWindow : MonoBehaviour, IEverywhereCanvas
         StartCoroutine(nameof(SetWindowCorourine), windowParams);
     }
 
-    private class WindowParams
+    private struct WindowParams
     {
         public bool Active;
         public bool ModifyCursor;

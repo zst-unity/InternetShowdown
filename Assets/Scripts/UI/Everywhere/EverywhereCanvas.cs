@@ -110,7 +110,7 @@ public class EverywhereCanvas : MonoBehaviour, IEverywhereCanvas // юи кот�
         }
     }
 
-    public void Reset()
+    public void ResetCanvas()
     {
         Singleton = this;
 
@@ -334,7 +334,7 @@ public class EverywhereCanvas : MonoBehaviour, IEverywhereCanvas // юи кот�
                 _mapVoting.alpha = 0;
             }
 
-            if (PauseMenu.Singleton.PauseMenuOpened || ResultsWindow.Singleton.IsEnabled) return;
+            if (PauseMenu.Singleton.PauseMenuOpened || ResultsWindow.Singleton.IsEnabled || Chat.Singleton.Enabled) return;
 
             Cursor.lockState = CursorLockMode.Locked;
         }

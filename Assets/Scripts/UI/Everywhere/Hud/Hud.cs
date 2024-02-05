@@ -48,7 +48,7 @@ public class Hud : MonoBehaviour, IEverywhereCanvas
 
     public void OnDisconnect() { }
 
-    public void Reset()
+    public void ResetCanvas()
     {
         Singleton = this;
 

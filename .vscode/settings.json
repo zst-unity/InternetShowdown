@@ -41,6 +41,7 @@
     "Bhop",
     "Dont",
     "Gameplay",
+    "interactable",
     "Leaderboard",
     "Lerp",
     "Mathf",
@@ -51,6 +52,7 @@
     "respawning",
     "Rigidbody",
     "Scriptable",
+    "Tweener",
     "Tweening",
     "Tweens"
   ],

@@ -15,7 +15,7 @@ public class Leaderboard : MonoBehaviour, IEverywhereCanvas
 
     public bool Active { get; set; }
 
-    public void Reset()
+    public void ResetCanvas()
     {
         Singleton = this;
 

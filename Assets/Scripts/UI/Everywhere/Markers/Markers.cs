@@ -15,7 +15,7 @@ public class Markers : MonoBehaviour, IEverywhereCanvas
 
     public bool Active { get; set; }
 
-    public void Reset()
+    public void ResetCanvas()
     {
         Singleton = this;
 

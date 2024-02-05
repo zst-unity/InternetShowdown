@@ -14,7 +14,7 @@ public class Overlays : MonoBehaviour, IEverywhereCanvas
 
     public void OnDisconnect() { }
 
-    public void Reset()
+    public void ResetCanvas()
     {
         Singleton = this;
 

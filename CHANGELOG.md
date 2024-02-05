@@ -2,11 +2,13 @@
 
 ### Added
 - Player death effect
+- Chat
 
 ### Fixed
 - Pause menu incorrect resize
 - Projectiles falling through floor
 - Not restoring player score after multiple disconnects
+- Randomly voting for map with space bar
 
 ### Changed
 - Increased molotov fire radius

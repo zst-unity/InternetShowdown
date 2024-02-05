@@ -46,7 +46,11 @@ public class CameraMovement : MonoBehaviour
 
     private void Update()
     {
-        bool isBlocked = BlockMovement || PauseMenu.Singleton.PauseMenuOpened || EverywhereCanvas.Singleton.IsVotingActive || ResultsWindow.Singleton.IsEnabled;
+        bool isBlocked = BlockMovement
+            || PauseMenu.Singleton.PauseMenuOpened
+            || EverywhereCanvas.Singleton.IsVotingActive
+            || ResultsWindow.Singleton.IsEnabled
+            || Chat.Singleton.Enabled;
 
         float mouseX = isBlocked ? 0 : Input.GetAxisRaw("Mouse X") * _sensitivityX;
         float mouseY = isBlocked ? 0 : Input.GetAxisRaw("Mouse Y") * _sensitivityY;

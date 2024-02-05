@@ -20,7 +20,7 @@ public class CustomNetworkManager : NetworkManager
         foreach (var canvas in GetEverywhereCanvases())
         {
             canvas.Active = false;
-            canvas.Reset();
+            canvas.ResetCanvas();
         }
 
         List<GameObject> projectiles = Resources.LoadAll<GameObject>("Items/Projectiles").ToList();
@@ -45,7 +45,7 @@ public class CustomNetworkManager : NetworkManager
 
         foreach (var canvas in GetEverywhereCanvases())
         {
-            canvas.Reset();
+            canvas.ResetCanvas();
             canvas.OnDisconnect();
 
             canvas.Active = false;
@@ -71,7 +71,7 @@ public class CustomNetworkManager : NetworkManager
 
         foreach (var canvas in GetEverywhereCanvases())
         {
-            canvas.Reset();
+            canvas.ResetCanvas();
             canvas.Active = true;
         }
 
@@ -93,8 +93,8 @@ public class CustomNetworkManager : NetworkManager
 
     public override void OnServerDisconnect(NetworkConnectionToClient conn)
     {
-        if (!conn.identity) return;
-        NetworkPlayer player = conn.identity.GetComponent<NetworkPlayer>();
+        if (!NetworkPlayer.LocalPlayer) return;
+        NetworkPlayer player = NetworkPlayer.LocalPlayer;
         GameLoop gameLoop = GameLoop.Singleton;
 
         if (!gameLoop.ExitedPlayers.ContainsKey(player.Nickname))
@@ -120,9 +120,9 @@ public class CustomNetworkManager : NetworkManager
 
     private IEnumerator RegisterNewClient(NetworkConnectionToClient conn)
     {
-        yield return new WaitUntil(() => conn.identity != null);
+        yield return new WaitUntil(() => NetworkPlayer.LocalPlayer != null);
 
-        NetworkPlayer player = conn.identity.GetComponent<NetworkPlayer>();
+        NetworkPlayer player = NetworkPlayer.LocalPlayer;
         GameLoop gameLoop = GameLoop.Singleton;
 
         yield return new WaitUntil(() => player.Initialized);

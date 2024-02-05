@@ -71,7 +71,7 @@ public class GameLoop : NetworkBehaviour
     private void Update()
     {
 #if DEVELOPMENT_BUILD || UNITY_EDITOR
-        if (Input.GetKeyDown(KeyCode.Backspace)) _isSkipNeeded = true;
+        if (!Chat.Singleton.Focused && Input.GetKeyDown(KeyCode.Backspace)) _isSkipNeeded = true;
 #endif
     }
 

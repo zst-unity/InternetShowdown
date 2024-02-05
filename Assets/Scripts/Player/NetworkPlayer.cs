@@ -158,10 +158,13 @@ public class NetworkPlayer : NetworkBehaviour
     [SyncVar, SerializeField, ReadOnly] private bool _invincible;
     public bool Invincible { get => _invincible; }
 
+    public static NetworkPlayer LocalPlayer { get; private set; }
+
     [Command]
     public void CmdInitialize(string nickname, string color)
     {
-        ColorUtility.TryParseHtmlString($"#{color}", out _color);
+        ColorUtility.TryParseHtmlString($"#{color}", out Color parsedColor);
+        _color = parsedColor;
         _nickname = nickname;
         _initialized = true;
 
@@ -356,7 +359,7 @@ public class NetworkPlayer : NetworkBehaviour
     [TargetRpc]
     private void TRpcLogHit(NetworkConnectionToClient target, bool gonnaDie)
     {
-        NetworkPlayer networkPlayer = target.identity.GetComponent<NetworkPlayer>();
+        NetworkPlayer networkPlayer = NetworkPlayer.LocalPlayer;
 
         if (networkPlayer == this)
         {
@@ -403,6 +406,7 @@ public class NetworkPlayer : NetworkBehaviour
 
     public override void OnStartLocalPlayer() // то же самое что и старт, только для локального игрока
     {
+        LocalPlayer = this;
         Initialize();
     }
 
@@ -419,7 +423,10 @@ public class NetworkPlayer : NetworkBehaviour
         Leaderboard.Singleton.StartLeaderboard();
 
         DestroyCameras();
-        GameObject newCamera = new GameObject("Player Camera", (typeof(CameraMovement)));
+        GameObject newCamera = new("Player Camera", typeof(CameraMovement))
+        {
+            tag = "MainCamera"
+        };
         PlayerCamera = newCamera.AddComponent<Camera>();
         InitializeCamera();
 
@@ -640,7 +647,7 @@ public class NetworkPlayer : NetworkBehaviour
 
     private void Jump()
     {
-        if (!AllowMovement || PauseMenu.Singleton.PauseMenuOpened) return;
+        if (!AllowMovement || Chat.Singleton.Focused || PauseMenu.Singleton.PauseMenuOpened) return;
 
         PlayerCurrentStats.Singleton.Bounce = _jumpForce;
         _rb.velocity = new Vector3(_rb.velocity.x, PlayerCurrentStats.Singleton.Bounce + PlayerMutationStats.Singleton.Bounce, _rb.velocity.z);
@@ -693,7 +700,7 @@ public class NetworkPlayer : NetworkBehaviour
 
     public Vector2 GetAxisInputs() // можно было и без этого метода но тут чисто ради выебонов
     {
-        if (!AllowMovement || PauseMenu.Singleton.PauseMenuOpened) return Vector2.zero;
+        if (!AllowMovement || Chat.Singleton.Focused || PauseMenu.Singleton.PauseMenuOpened) return Vector2.zero;
 
         return new Vector2(Input.GetAxisRaw(HORIZONTAL), Input.GetAxisRaw(VERTICAL));
     }
@@ -776,7 +783,7 @@ public class NetworkPlayer : NetworkBehaviour
 
     private void Dash()
     {
-        if (!AllowMovement || PauseMenu.Singleton.PauseMenuOpened) return;
+        if (!AllowMovement || Chat.Singleton.Focused || PauseMenu.Singleton.PauseMenuOpened) return;
 
         _dashesRemaining--;
         Hud.Singleton.RemoveLastDashDot();
@@ -814,7 +821,7 @@ public class NetworkPlayer : NetworkBehaviour
 
     private void GroundDash()
     {
-        if (!AllowMovement || PauseMenu.Singleton.PauseMenuOpened || IsGrounded) return;
+        if (!AllowMovement || Chat.Singleton.Focused || PauseMenu.Singleton.PauseMenuOpened || IsGrounded) return;
 
         float targetForce = _rb.velocity.y <= -1f ? -_groundDashForce + (_rb.velocity.y * 3) : -_groundDashForce;
         var wasHit = Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 1000f, MapLayers);

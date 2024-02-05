@@ -1,7 +1,5 @@
-using System.Collections;
 using System.Linq;
 using UnityEngine;
-using UnityEngine.SceneManagement;
 
 public class EverywhereUIController : MonoBehaviour
 {
@@ -24,6 +22,16 @@ public class EverywhereUIController : MonoBehaviour
                 _groupsManager.WindowTweens.Remove(target);
             }
         }
+
+        if (Chat.Singleton.Active && Input.GetKeyDown(KeyCode.T) && !Chat.Singleton.Focused && !PauseMenu.Singleton.PauseMenuOpened)
+        {
+            Chat.Singleton.SetChat(!Chat.Singleton.Enabled, !PauseMenu.Singleton.PauseMenuOpened && !EverywhereCanvas.Singleton.IsVotingActive && !ResultsWindow.Singleton.IsEnabled);
+        }
+
+        if (Chat.Singleton.Active && Chat.Singleton.Enabled && Input.GetMouseButtonDown(0) && !Chat.Singleton.IsPointerOverChat())
+        {
+            Chat.Singleton.SetChat(false, !PauseMenu.Singleton.PauseMenuOpened && !EverywhereCanvas.Singleton.IsVotingActive && !ResultsWindow.Singleton.IsEnabled, false);
+        }
     }
 
     private void PauseMenuCheck()
@@ -44,19 +52,19 @@ public class EverywhereUIController : MonoBehaviour
 
     public void Resume()
     {
-        PauseMenu.Singleton.Pause(false, !EverywhereCanvas.Singleton.IsVotingActive && !ResultsWindow.Singleton.IsEnabled);
+        PauseMenu.Singleton.Pause(false, !EverywhereCanvas.Singleton.IsVotingActive && !ResultsWindow.Singleton.IsEnabled && !Chat.Singleton.Enabled);
         _groupsManager.SetGroup(PauseMenu.Singleton.PauseMenuGroup, false, false, false);
     }
 
     public void ExposeResults()
     {
-        ResultsWindow.Singleton.SetWindow(true, !PauseMenu.Singleton.PauseMenuOpened && !EverywhereCanvas.Singleton.IsVotingActive);
+        ResultsWindow.Singleton.SetWindow(true, !PauseMenu.Singleton.PauseMenuOpened && !EverywhereCanvas.Singleton.IsVotingActive && !Chat.Singleton.Enabled);
         _groupsManager.SetGroup(ResultsWindow.Singleton.Window, true, false, false);
     }
 
     public void CloseResults()
     {
-        ResultsWindow.Singleton.SetWindow(false, !PauseMenu.Singleton.PauseMenuOpened && !EverywhereCanvas.Singleton.IsVotingActive);
+        ResultsWindow.Singleton.SetWindow(false, !PauseMenu.Singleton.PauseMenuOpened && !EverywhereCanvas.Singleton.IsVotingActive && !Chat.Singleton.Enabled);
         _groupsManager.SetGroup(ResultsWindow.Singleton.Window, false, false, false);
     }
 

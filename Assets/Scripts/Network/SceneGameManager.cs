@@ -51,7 +51,7 @@ public class SceneGameManager : NetworkBehaviour
     [ClientRpc]
     public void RpcAllowMovement(bool allow)
     {
-        NetworkClient.localPlayer.GetComponent<NetworkPlayer>().AllowMovement = allow;
+        NetworkPlayer.LocalPlayer.AllowMovement = allow;
     }
 
     [ClientRpc]
@@ -63,7 +63,7 @@ public class SceneGameManager : NetworkBehaviour
     [ClientRpc]
     public void RpcShakeAll(float duration, float time)
     {
-        NetworkClient.localPlayer.GetComponent<NetworkPlayer>().PlayerMoveCamera.Shake(duration, time);
+        NetworkPlayer.LocalPlayer.PlayerMoveCamera.Shake(duration, time);
     }
 
     [ClientRpc]
@@ -118,10 +118,22 @@ public class SceneGameManager : NetworkBehaviour
         EverywhereCanvas.Singleton.FadeUIGameState(CanvasGameState.Game);
     }
 
+    [Command(requiresAuthority = false)]
+    public void CmdSendChatMessage(string message)
+    {
+        RpcReceiveChatMessage(message);
+    }
+
+    [ClientRpc]
+    private void RpcReceiveChatMessage(string message)
+    {
+        Chat.Singleton.AddMessage(message);
+    }
+
     [ClientRpc]
     public void RpcOnMatchEnd()
     {
-        NetworkPlayer player = NetworkClient.localPlayer.GetComponent<NetworkPlayer>();
+        NetworkPlayer player = NetworkPlayer.LocalPlayer;
 
         ResultsStatsJobs.StatsToDisplay["Place"].Value = player.Place;
         ResultsStatsJobs.StatsToDisplay["Score"].Value = player.Score;
