@@ -18,6 +18,21 @@ public class SceneGameManager : NetworkBehaviour
 
     private void Awake() => Singleton = this;
 
+    [Command(requiresAuthority = false)]
+    public void CmdRequestChatHistory(NetworkConnectionToClient connectionToClient)
+    {
+        TRpcSetChatHistory(connectionToClient, Chat.Singleton.ChatHistory);
+    }
+
+    [TargetRpc]
+    private void TRpcSetChatHistory(NetworkConnectionToClient target, string[] history)
+    {
+        foreach (var message in history)
+        {
+            Chat.Singleton.AddMessage(message);
+        }
+    }
+
     [ClientRpc]
     public void RpcOnTimeCounterUpdate(int? counter, Color color, bool playSound)
     {

@@ -152,6 +152,9 @@ public class NetworkPlayer : NetworkBehaviour
     [SyncVar, SerializeField, ReadOnly] private Color _color;
     public Color Color { get => _color; }
 
+    [SyncVar, SerializeField, ReadOnly] private string _colorHex;
+    public string ColorHEX { get => _colorHex; }
+
     [SyncVar, SerializeField, ReadOnly] private bool _initialized;
     public bool Initialized { get => _initialized; }
 
@@ -164,6 +167,7 @@ public class NetworkPlayer : NetworkBehaviour
     public void CmdInitialize(string nickname, string color)
     {
         ColorUtility.TryParseHtmlString($"#{color}", out Color parsedColor);
+        _colorHex = $"#{color}";
         _color = parsedColor;
         _nickname = nickname;
         _initialized = true;

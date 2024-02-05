@@ -10,6 +10,7 @@
 - Not restoring player score after multiple disconnects
 - Randomly voting for map with space bar
 - Invisible nicknames
+- Projectile desync
 
 ### Changed
 - Increased molotov fire radius

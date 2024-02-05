@@ -85,10 +85,10 @@ public class CustomNetworkManager : NetworkManager
         Cursor.lockState = CursorLockMode.Locked;
         _transition.AwakeTransition(TransitionMode.Out);
 
-        SceneGameManager sceneGameManager = SceneGameManager.Singleton;
-
         EverywhereCanvas.Singleton.SwitchUIGameState(GameInfo.Singleton.CurrentCanvasGameState);
         EverywhereCanvas.Singleton.SetMapVoting(GameInfo.Singleton.IsVotingTime, false);
+
+        SceneGameManager.Singleton.CmdRequestChatHistory(NetworkClient.localPlayer.connectionToClient);
     }
 
     public override void OnServerDisconnect(NetworkConnectionToClient conn)
@@ -106,6 +106,7 @@ public class CustomNetworkManager : NetworkManager
             gameLoop.ExitedPlayers[player.Nickname] = (player.Score, player.Activity);
         }
 
+        SceneGameManager.Singleton.CmdSendChatMessage($"<b>Player <color={player.ColorHEX}>{player.Nickname}</color> disconnected.</b>");
         base.OnServerDisconnect(conn);
 
         SceneGameManager.Singleton.RpcForceClientsForLeaderboardUpdate();
@@ -127,6 +128,7 @@ public class CustomNetworkManager : NetworkManager
 
         yield return new WaitUntil(() => player.Initialized);
 
+        SceneGameManager.Singleton.CmdSendChatMessage($"<b>Player <color={player.ColorHEX}>{player.Nickname}</color> connected.</b>");
         if (gameLoop.ExitedPlayers.ContainsKey(player.Nickname))
         {
             (int score, int activity) value = gameLoop.ExitedPlayers[player.Nickname];

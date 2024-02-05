@@ -27,10 +27,17 @@ public class Chat : MonoBehaviour, IEverywhereCanvas
     private TweenerCore<float, float, FloatOptions> _fadeTween;
     private TweenerCore<float, float, FloatOptions> _messagesFadeTween;
 
+    private List<string> _chatHistory = new();
+    private List<GameObject> _chatHistoryObjects = new();
+
+    public string[] ChatHistory => _chatHistory.ToArray();
+
     public void OnDisconnect()
     {
         SetChat(false, false, false);
         StopCoroutine(nameof(CO_FadeMessages));
+        _chatHistory.Clear();
+        _chatHistoryObjects.Clear();
         foreach (Transform message in _messagesContainer)
         {
             Destroy(message.gameObject);
@@ -50,6 +57,16 @@ public class Chat : MonoBehaviour, IEverywhereCanvas
     public void AddMessage(string message)
     {
         var newMessage = Instantiate(_messagePrefab, _messagesContainer);
+        _chatHistory.Add(message);
+        _chatHistoryObjects.Add(newMessage);
+
+        if (_chatHistory.Count >= 100)
+        {
+            Destroy(_chatHistoryObjects[0]);
+            _chatHistory.RemoveAt(0);
+            _chatHistoryObjects.RemoveAt(0);
+        }
+
         newMessage.GetComponent<TMP_Text>().text = message;
         _messagesChat.alpha = 1;
         StartCoroutine(nameof(CO_ForceScrollDown));
@@ -78,7 +95,7 @@ public class Chat : MonoBehaviour, IEverywhereCanvas
         if (!Input.GetKeyDown(KeyCode.Return) || string.IsNullOrWhiteSpace(_inputField.text)) return;
 
         print($"sending chat message: {_inputField.text}");
-        var message = $"<b><color=#{NetworkPlayer.LocalPlayer.Color.ToHexString()}>{NetworkPlayer.LocalPlayer.Nickname}</color>:</b> {_inputField.text}";
+        var message = $"<b><color={NetworkPlayer.LocalPlayer.ColorHEX}>{NetworkPlayer.LocalPlayer.Nickname}</color>:</b> {_inputField.text}";
         SceneGameManager.Singleton.CmdSendChatMessage(message);
 
         _inputField.OnDeselect(new BaseEventData(EventSystem.current));
