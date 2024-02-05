@@ -11,3 +11,4 @@
 - Finished best city map
 
 ### Other
+- Host now cant collide with dead players
