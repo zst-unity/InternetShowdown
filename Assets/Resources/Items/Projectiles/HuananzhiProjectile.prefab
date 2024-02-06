@@ -127,10 +127,14 @@ MonoBehaviour:
   _destroyMode: 2
   _destroyTime: 1
   _destroyHits: 1
+  _startHealth: 10
+  _minRadius: 0
+  _requiredToBeExplosion: 1
+  _delay: 0.25
   _projectileSpeed: 75
   _projectileDamage: 5
   _forceApplyMode: 0
-  _continiousForceApply: 0
+  _continuousForceApply: 0
   _soundEffects: 5
   _particleEffects: 4
   _shakeEffects: 4

@@ -145,13 +145,16 @@ MonoBehaviour:
   _rb: {fileID: 5003493469569953143}
   _nrb: {fileID: 3231761565874047356}
   _nt: {fileID: 3231761565874047356}
-  _destroyMode: 1
+  _destroyMode: 17
   _destroyTime: 3
   _destroyHits: 1
+  _minRadius: 0
+  _minDamage: 0
+  _requiredToBeExplosion: 1
   _projectileSpeed: 110
   _projectileDamage: 20
   _forceApplyMode: 0
-  _continiousForceApply: 0
+  _continuousForceApply: 0
   _soundEffects: 6
   _particleEffects: 4
   _shakeEffects: 4

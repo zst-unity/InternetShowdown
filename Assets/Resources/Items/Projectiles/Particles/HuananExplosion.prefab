@@ -4938,6 +4938,7 @@ MonoBehaviour:
   syncInterval: 0
   _radius: 10
   _damage: 15
+  _explosion: 1
   _castDamageOvertime: 0
   _lifetime: 5
   _interval: 0.5

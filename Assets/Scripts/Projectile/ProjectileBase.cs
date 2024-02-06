@@ -4,27 +4,6 @@ using Mirror.Experimental;
 using NaughtyAttributes;
 using UnityEngine;
 
-/*
-КОРОЧЕ ПАВЕЛ
-Если хочешь сделать кастомное повидение прожектайлу, то можешь создать новый скрипт, в классе которого будешь наследовать ЭТОТ класс (ProjectileBase)
-Для кастомного повидения перезаписывай уже готовые методы OnCollide(), OnHitPlayer(), OnHitMap(), и т.д. (пустые виртуальные методы)
-
-К ПРИМЕРУ:
-
-public class MyProjectile : ProjectileBase
-{
-    protected override void OnCollide(int layer)
-    {
-        if (layer == 2)
-        {
-            Debug.Log("Ало пошол нахуй");
-        }
-    }
-}
-
-Если ты сделал кастомный скрипт для прожектайла, то удали ProjectileBase скрипт с инспектора и добавь свой скрипт (где у тебя кастомное повидение)
-
-*/
 [RequireComponent(typeof(Rigidbody), typeof(Collider), typeof(NetworkRigidbody))]
 [RequireComponent(typeof(NetworkTransformReliable))]
 public class ProjectileBase : NetworkBehaviour
@@ -38,6 +17,12 @@ public class ProjectileBase : NetworkBehaviour
     [SerializeField, Tooltip("Из-за чего должен удалиться снаряд?"), EnumFlags] protected HitDestroy _destroyMode;
     [SerializeField, Tooltip("После скольких секунд снаряд удалится?"), ShowIf(nameof(_destroyMode), HitDestroy.OnTime), AllowNesting] protected float _destroyTime = 3f;
     [SerializeField, Tooltip("После скольких столкновений снаряд удалится?"), ShowIf(nameof(_destroyMode), HitDestroy.OnCollide), AllowNesting, Min(1)] protected int _destroyHits = 1;
+    [SerializeField, ShowIf(nameof(_destroyMode), HitDestroy.OnRadiusDamage), AllowNesting, Min(0)] protected float _startHealth = 10f;
+    [SerializeField, ShowIf(nameof(_destroyMode), HitDestroy.OnRadiusDamage), AllowNesting, Min(0)] protected float _minRadius = 0f;
+    [SerializeField, ShowIf(nameof(_destroyMode), HitDestroy.OnRadiusDamage), AllowNesting, Min(1)] protected bool _requiredToBeExplosion = true;
+    [SerializeField, ShowIf(nameof(_destroyMode), HitDestroy.OnRadiusDamage), AllowNesting, Min(0)] protected float _delay = 0.25f;
+
+    private float _projectileHealth;
 
     [Header("Force Settings")]
     [SerializeField, Tooltip("Скорость снаряда")] protected float _projectileSpeed = 10;
@@ -46,7 +31,7 @@ public class ProjectileBase : NetworkBehaviour
     [Space(9)]
 
     [SerializeField, Tooltip("Как будет применяться скорость снаряду? Через _rb.velocity = force, или через _rb.AddForce(force)?")] protected ForceApplyMode _forceApplyMode = ForceApplyMode.SetForce;
-    [SerializeField, Tooltip("Снаряду будет постояно применяться скорость, или только тогда, когда он заспавнился?")] protected bool _continiousForceApply = true;
+    [SerializeField, Tooltip("Снаряду будет постоянно применяться скорость, или только тогда, когда он заспавнился?")] protected bool _continuousForceApply = false;
 
     [Header("Effect Settings")]
     [SerializeField, Tooltip("Какие и когда звуки должны проигрываться?"), EnumFlags] protected EffectModes _soundEffects;
@@ -74,6 +59,7 @@ public class ProjectileBase : NetworkBehaviour
     protected virtual void OnCollide(int layer, Vector3 velocity, ContactPoint contactPoint) { } // вызывается когда снаряд касается чего либо (в параметр возвращает слой объекта)
     protected virtual void OnHitPlayer(Vector3 velocity) { } // вызывается когда снаряд касается игрока
     protected virtual void OnHitMap(Vector3 velocity, ContactPoint contactPoint) { } // вызывается когда снаряд касается карты
+    protected virtual void OnRadiusDamageInteraction(float radius, float damage, bool explosion) { }
 
     protected virtual void OnInit() { } // вызывается когда снаряд инициализируется
     protected virtual void OnTime() { } // вызывается так же как и FixedUpdate
@@ -124,6 +110,7 @@ public class ProjectileBase : NetworkBehaviour
     {
         OnInit(); // вызов калбека для кастомного повидения
 
+        _projectileHealth = _startHealth;
         _targetDirection = transform.forward;
         gameObject.layer = 10;
 
@@ -143,7 +130,7 @@ public class ProjectileBase : NetworkBehaviour
     {
         OnTime(); // вызов калбека для кастомного повидения
 
-        if (_continiousForceApply) ApplyForce();
+        if (_continuousForceApply) ApplyForce();
     }
 
     private void OnCollisionEnter(Collision other)
@@ -242,6 +229,32 @@ public class ProjectileBase : NetworkBehaviour
 
     #region Network
 
+    [Command(requiresAuthority = false)]
+    public void CmdOnRadiusDamage(float radius, float damage, bool explosion)
+    {
+        TRpcOnRadiusDamage(netIdentity.connectionToClient, radius, damage, explosion);
+    }
+
+    [TargetRpc]
+    private void TRpcOnRadiusDamage(NetworkConnectionToClient target, float radius, float damage, bool explosion)
+    {
+        if (!isOwned)
+        {
+            Debug.LogWarning($"Tried to call OnRadiusDamageInteraction not from projectile owner! projectile {gameObject.name}");
+            return;
+        }
+
+        OnRadiusDamageInteraction(radius, damage, explosion);
+        if (_destroyMode.HasFlag(HitDestroy.OnRadiusDamage) && radius >= _minRadius)
+        {
+            if (!_requiredToBeExplosion || (_requiredToBeExplosion && explosion))
+            {
+                _projectileHealth -= damage;
+                if (_projectileHealth <= 0) Invoke(nameof(DestroySelf), _delay);
+            }
+        }
+    }
+
     [Command]
     private void CmdDestroySelf()
     {
@@ -276,7 +289,8 @@ public enum HitDestroy
     OnPlayer = 1,
     OnMap = 2,
     OnCollide = 4,
-    OnTime = 8
+    OnTime = 8,
+    OnRadiusDamage = 16
 }
 
 [Flags]

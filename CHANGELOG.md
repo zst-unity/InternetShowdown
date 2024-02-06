@@ -21,6 +21,7 @@
 - Pickable item's animation
 - Buffed toilet
 - Audio sliders are now use amplitude values instead of dB
+- Landmines now set off from other explosions
 
 ### Other
 - Host now cant collide with dead players

@@ -6,6 +6,7 @@ public class RadiusDamage : NetworkBehaviour
 {
     [SerializeField] private float _radius;
     [SerializeField] private float _damage;
+    [SerializeField] private bool _explosion;
 
     [Space(9)]
     [SerializeField] private bool _castDamageOvertime;
@@ -31,10 +32,14 @@ public class RadiusDamage : NetworkBehaviour
 
         foreach (Collider obj in all)
         {
-            if (obj.TryGetComponent(out NetworkPlayer outPlayer))
+            if (obj.TryGetComponent(out NetworkPlayer player))
             {
                 PlayerCurrentStats.Singleton.Damage = _damage;
-                outPlayer.CmdHitPlayer(NetworkClient.localPlayer, _damage + PlayerMutationStats.Singleton.Damage);
+                player.CmdHitPlayer(NetworkClient.localPlayer, _damage + PlayerMutationStats.Singleton.Damage);
+            }
+            else if (obj.TryGetComponent(out ProjectileBase projectile))
+            {
+                projectile.CmdOnRadiusDamage(_radius, _damage, _explosion);
             }
         }
     }

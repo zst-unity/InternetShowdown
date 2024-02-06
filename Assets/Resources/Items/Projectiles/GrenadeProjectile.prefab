@@ -205,10 +205,14 @@ MonoBehaviour:
   _destroyMode: 8
   _destroyTime: 1.85
   _destroyHits: 1
+  _startHealth: 10
+  _minRadius: 0
+  _requiredToBeExplosion: 1
+  _delay: 0.25
   _projectileSpeed: 25
   _projectileDamage: 0
   _forceApplyMode: 0
-  _continiousForceApply: 0
+  _continuousForceApply: 0
   _soundEffects: 5
   _particleEffects: 4
   _shakeEffects: 4
