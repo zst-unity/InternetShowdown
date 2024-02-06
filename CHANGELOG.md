@@ -4,6 +4,7 @@
 - Player death effect
 - Chat
 - Key to hide HUD (F1)
+- Percentages of map voting
 
 ### Fixed
 - Pause menu incorrect resize

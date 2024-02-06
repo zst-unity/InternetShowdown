@@ -58,6 +58,9 @@ public class EverywhereCanvas : MonoBehaviour, IEverywhereCanvas // юи кот�
     [Header("Voting")]
     [SerializeField] private CanvasGroup _mapVoting;
     [SerializeField] private TMP_Text _votingEndText;
+    [SerializeField] private RectTransform _percentagesContainer;
+    [SerializeField] private GameObject _percentagePrefab;
+    [SerializeField] private AudioClip _percentageShowSound;
 
     [Space(9)]
 
@@ -168,12 +171,6 @@ public class EverywhereCanvas : MonoBehaviour, IEverywhereCanvas // юи кот�
         _isExitingServer = false;
     }
 
-    public void OnVotingEnd(string message)
-    {
-        StopCoroutine(nameof(OnVotingEndCoroutine));
-        StartCoroutine(nameof(OnVotingEndCoroutine), message);
-    }
-
     public void PreMatchText(int fromCount)
     {
         StartCoroutine(nameof(PreMatchCoroutine), fromCount);
@@ -244,11 +241,27 @@ public class EverywhereCanvas : MonoBehaviour, IEverywhereCanvas // юи кот�
         SoundSystem.PlayInterfaceSound(new SoundTransporter(sound), volume: 0.35f);
     }
 
-    private IEnumerator OnVotingEndCoroutine(string message)
+    public void OnVotingEnd(string message, string[] percentages)
     {
+        StopCoroutine(nameof(OnVotingEndCoroutine));
+        StartCoroutine(nameof(OnVotingEndCoroutine), new VotingEndInfo() { message = message, percentages = percentages });
+    }
+
+    private struct VotingEndInfo
+    {
+        public string message;
+        public string[] percentages;
+    }
+
+    private IEnumerator OnVotingEndCoroutine(VotingEndInfo info)
+    {
+        foreach (Transform percentage in _percentagesContainer)
+        {
+            Destroy(percentage.gameObject);
+        }
         _votingEndText.text = string.Empty;
 
-        char[] messageChars = message.ToCharArray();
+        char[] messageChars = info.message.ToCharArray();
 
         foreach (var messageChar in messageChars)
         {
@@ -262,9 +275,29 @@ public class EverywhereCanvas : MonoBehaviour, IEverywhereCanvas // юи кот�
             }
         }
 
-        _votingEndText.text = message;
+        _votingEndText.text = info.message;
 
-        yield return new WaitForSeconds(2.5f);
+        yield return new WaitForSeconds(0.5f);
+
+        foreach (var percentage in info.percentages)
+        {
+            yield return new WaitForSeconds(0.25f);
+            SoundSystem.PlayInterfaceSound(new SoundTransporter(_percentageShowSound), 0.75f, 1.25f, 1f);
+            var newPercentage = Instantiate(_percentagePrefab, _percentagesContainer);
+            var textMesh = newPercentage.GetComponent<TMP_Text>();
+            textMesh.text = percentage;
+            textMesh.DOFade(1f, 0.5f);
+        }
+
+        yield return new WaitForSeconds(3f);
+
+        foreach (Transform percentage in _percentagesContainer)
+        {
+            yield return new WaitForSeconds(0.1f);
+            percentage.GetComponent<TMP_Text>().DOFade(0f, 0.5f).OnComplete(() => Destroy(percentage.gameObject));
+        }
+
+        yield return new WaitForSeconds(0.5f);
 
         for (int ch = 0; ch < messageChars.Length; ch++)
         {

@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.IO;
@@ -5,6 +6,7 @@ using System.Linq;
 using Mirror;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using Random = UnityEngine.Random;
 
 public class GameLoop : NetworkBehaviour
 {
@@ -102,18 +104,31 @@ public class GameLoop : NetworkBehaviour
         {
             Debug.LogWarning("Seems like nobody voted for map");
 
-            SceneGameManager.Singleton.RpcOnVotingEnd("Nobody voted :(");
+            SceneGameManager.Singleton.RpcOnVotingEnd("Nobody voted :(", Array.Empty<string>());
 
             return;
         }
 
         List<KeyValuePair<string, int>> _votesList = _votes.ToList();
         _votesList.Sort(CompareVotes);
-
         _votedMap = _votesList[0].Key;
-
         string votingEndMessage = $"{Path.GetFileNameWithoutExtension(_votedMap).ToSentence()} won!";
-        SceneGameManager.Singleton.RpcOnVotingEnd(votingEndMessage);
+
+        var totalVotes = 0;
+        foreach (var vote in _votesList)
+        {
+            totalVotes += vote.Value;
+        }
+
+        var percentages = new List<string>();
+        foreach (var vote in _votesList)
+        {
+            var percentage = (float)vote.Value / totalVotes * 100;
+            var mapName = Path.GetFileNameWithoutExtension(vote.Key).ToSentence();
+            percentages.Add($"{(int)percentage}% - {mapName}");
+        }
+
+        SceneGameManager.Singleton.RpcOnVotingEnd(votingEndMessage, percentages.ToArray());
     }
 
     private int CompareVotes(KeyValuePair<string, int> current, KeyValuePair<string, int> next)

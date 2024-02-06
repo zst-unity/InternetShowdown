@@ -100,9 +100,9 @@ public class SceneGameManager : NetworkBehaviour
     }
 
     [ClientRpc]
-    public void RpcOnVotingEnd(string message)
+    public void RpcOnVotingEnd(string message, string[] percentages)
     {
-        EverywhereCanvas.Singleton.OnVotingEnd(message);
+        EverywhereCanvas.Singleton.OnVotingEnd(message, percentages);
     }
 
     [ClientRpc]
