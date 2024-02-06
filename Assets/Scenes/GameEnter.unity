@@ -8860,7 +8860,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 00281dd18f982ea41985a5487d57287f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ConnectedMap: Assets/Scenes/Maps/BestCity.unity
+  ConnectedMap: Assets/Scenes/Maps/Prototype.unity
   MapScreenshot: {fileID: 1325000238}
   MapName: {fileID: 1509022844}
   VoteButton: {fileID: 1421754512}

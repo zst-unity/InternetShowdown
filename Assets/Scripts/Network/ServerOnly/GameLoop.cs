@@ -108,13 +108,17 @@ public class GameLoop : NetworkBehaviour
         }
 
         List<KeyValuePair<string, int>> _votesList = _votes.ToList();
-        _votesList.Sort((current, next) => current.Value > next.Value ? -1 : 1);
+        _votesList.Sort(CompareVotes);
 
-        _votedMap = _votesList.First().Key;
+        _votedMap = _votesList[0].Key;
 
         string votingEndMessage = $"{Path.GetFileNameWithoutExtension(_votedMap).ToSentence()} won!";
-
         SceneGameManager.Singleton.RpcOnVotingEnd(votingEndMessage);
+    }
+
+    private int CompareVotes(KeyValuePair<string, int> current, KeyValuePair<string, int> next)
+    {
+        return current.Value > next.Value ? -1 : 1;
     }
 
     private void CancelVoting()

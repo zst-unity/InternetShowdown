@@ -93,8 +93,8 @@ public class CustomNetworkManager : NetworkManager
 
     public override void OnServerDisconnect(NetworkConnectionToClient conn)
     {
-        if (!NetworkPlayer.LocalPlayer) return;
-        NetworkPlayer player = NetworkPlayer.LocalPlayer;
+        if (!conn.identity) return;
+        NetworkPlayer player = conn.identity.GetComponent<NetworkPlayer>();
         GameLoop gameLoop = GameLoop.Singleton;
 
         if (!gameLoop.ExitedPlayers.ContainsKey(player.Nickname))
@@ -121,9 +121,9 @@ public class CustomNetworkManager : NetworkManager
 
     private IEnumerator RegisterNewClient(NetworkConnectionToClient conn)
     {
-        yield return new WaitUntil(() => NetworkPlayer.LocalPlayer != null);
+        yield return new WaitUntil(() => conn.identity != null);
 
-        NetworkPlayer player = NetworkPlayer.LocalPlayer;
+        NetworkPlayer player = conn.identity.GetComponent<NetworkPlayer>();
         GameLoop gameLoop = GameLoop.Singleton;
 
         yield return new WaitUntil(() => player.Initialized);

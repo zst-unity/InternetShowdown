@@ -363,7 +363,7 @@ public class NetworkPlayer : NetworkBehaviour
     [TargetRpc]
     private void TRpcLogHit(NetworkConnectionToClient target, bool gonnaDie)
     {
-        NetworkPlayer networkPlayer = NetworkPlayer.LocalPlayer;
+        NetworkPlayer networkPlayer = LocalPlayer;
 
         if (networkPlayer == this)
         {
