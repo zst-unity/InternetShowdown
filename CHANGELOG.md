@@ -3,6 +3,7 @@
 ### Added
 - Player death effect
 - Chat
+- Key to hide HUD (F1)
 
 ### Fixed
 - Pause menu incorrect resize
