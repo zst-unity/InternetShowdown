@@ -28,9 +28,9 @@ public class EverywhereUIController : MonoBehaviour
             Chat.Singleton.SetChat(!Chat.Singleton.Enabled, !PauseMenu.Singleton.PauseMenuOpened && !EverywhereCanvas.Singleton.IsVotingActive && !ResultsWindow.Singleton.IsEnabled);
         }
 
-        if (Chat.Singleton.Active && Chat.Singleton.Enabled && Input.GetMouseButtonDown(0) && !Chat.Singleton.IsPointerOverChat())
+        if (Chat.Singleton.Active && !PauseMenu.Singleton.PauseMenuOpened && Chat.Singleton.Enabled && Input.GetMouseButtonDown(0) && !Chat.Singleton.IsPointerOverChat())
         {
-            Chat.Singleton.SetChat(false, !PauseMenu.Singleton.PauseMenuOpened && !EverywhereCanvas.Singleton.IsVotingActive && !ResultsWindow.Singleton.IsEnabled, false);
+            Chat.Singleton.SetChat(false, !EverywhereCanvas.Singleton.IsVotingActive && !ResultsWindow.Singleton.IsEnabled, false);
         }
     }
 
@@ -45,7 +45,7 @@ public class EverywhereUIController : MonoBehaviour
                 if (_groupsManager.EnabledGroups.Last() != PauseMenu.Singleton.PauseMenuGroup) return;
             }
 
-            PauseMenu.Singleton.Pause(WillEnable, !EverywhereCanvas.Singleton.IsVotingActive && !ResultsWindow.Singleton.IsEnabled);
+            PauseMenu.Singleton.Pause(WillEnable, !EverywhereCanvas.Singleton.IsVotingActive && !ResultsWindow.Singleton.IsEnabled && !Chat.Singleton.Enabled);
             _groupsManager.SetGroup(PauseMenu.Singleton.PauseMenuGroup, WillEnable, false, false);
         }
     }
