@@ -27,3 +27,4 @@
 ### Other
 - Host now cant collide with dead players
 - Game now restarts when network manager crashes
+- Removed ping display

@@ -10346,7 +10346,6 @@ GameObject:
   - component: {fileID: 1703730662}
   - component: {fileID: 1703730661}
   - component: {fileID: 1703730660}
-  - component: {fileID: 1703730658}
   m_Layer: 0
   m_Name: NetManager
   m_TagString: Untagged
@@ -10354,22 +10353,6 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!114 &1703730658
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1703730657}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: bc654f29862fc2643b948f772ebb9e68, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  color: {r: 1, g: 1, b: 1, a: 1}
-  padding: 2
-  width: 175
-  height: 35
 --- !u!114 &1703730660
 MonoBehaviour:
   m_ObjectHideFlags: 0
