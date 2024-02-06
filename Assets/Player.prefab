@@ -124,6 +124,8 @@ MonoBehaviour:
   <MapLayers>k__BackingField:
     serializedVersion: 2
     m_Bits: 64
+  _groundCheckRadius: 0.85
+  _groundCheckOffset: {x: 0, y: -0.7, z: 0}
   JumpKey: 32
   DashKey: 304
   GroundDashKey: 306
@@ -173,6 +175,7 @@ MonoBehaviour:
   <Traumas>k__BackingField: 0
   _nickname: 
   _color: {r: 0, g: 0, b: 0, a: 0}
+  _colorHex: 
   _initialized: 0
   _invincible: 0
   _health: 0

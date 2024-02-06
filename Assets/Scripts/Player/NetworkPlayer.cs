@@ -2,8 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using Mirror;
-using Mirror.Examples.Basic;
-using Mirror.Experimental;
 using UnityEngine;
 
 [RequireComponent(typeof(Rigidbody))]
@@ -73,13 +71,14 @@ public class NetworkPlayer : NetworkBehaviour
 
     [field: Header("Property Checking")]
     [field: SerializeField] public LayerMask MapLayers { get; private set; }
+    [SerializeField] private float _groundCheckRadius;
+    [SerializeField] private Vector3 _groundCheckOffset;
 
     [Header("Inputs")]
     public KeyCode JumpKey = KeyCode.Space;
     public KeyCode DashKey = KeyCode.LeftShift;
     public KeyCode GroundDashKey = KeyCode.LeftControl;
 
-    private (Vector3 center, Vector3 extends) _groundChecking;
     private Vector3 _slopeNormal;
 
     private float _accel;
@@ -383,8 +382,6 @@ public class NetworkPlayer : NetworkBehaviour
 
     private void OnValidate() // этот метод вызывается когда в инспекторе меняется поле или после компиляции скрипта
     {
-        SetVariables();
-
         if (TryGetComponent<Rigidbody>(out _rb)) // важные параметры для ригидбоди
         {
             _rb.interpolation = RigidbodyInterpolation.Interpolate; // чтоб было плавно
@@ -480,11 +477,6 @@ public class NetworkPlayer : NetworkBehaviour
         PlayerMoveCamera.Orientation = _orientation;
     }
 
-    private void SetVariables() // реализация тупая да и хуй с ней хд (короче забей тебе не надо знать зачем это)
-    {
-        _groundChecking = (transform.position + Vector3.down, new Vector3(1.25f, 0.4f, 1.25f));
-    }
-
     [Command]
     private void CmdChangeScore(int amount)
     {
@@ -519,8 +511,6 @@ public class NetworkPlayer : NetworkBehaviour
 #endif
 
         ReceiveInputs();
-        SetVariables();
-
         JumpHandle();
 
         if (_wantToDash && _readyToDash)
@@ -724,8 +714,7 @@ public class NetworkPlayer : NetworkBehaviour
 
     private bool CheckForGrounded()
     {
-        bool grounded = Physics.CheckBox(_groundChecking.center, _groundChecking.extends / 2, Quaternion.identity, MapLayers.value, QueryTriggerInteraction.Ignore);
-
+        var grounded = Physics.CheckSphere(transform.position + _groundCheckOffset, _groundCheckRadius, MapLayers.value, QueryTriggerInteraction.Ignore);
         return grounded;
     }
 
@@ -733,7 +722,7 @@ public class NetworkPlayer : NetworkBehaviour
     {
         if (!IsGrounded) return false;
 
-        Physics.Raycast(_groundChecking.center, Vector3.down, out RaycastHit hit, 1f, MapLayers.value, QueryTriggerInteraction.Ignore);
+        Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 3f, MapLayers.value, QueryTriggerInteraction.Ignore);
         _slopeNormal = hit.normal;
 
         return _slopeNormal != Vector3.up;
@@ -918,7 +907,7 @@ public class NetworkPlayer : NetworkBehaviour
     {
         Gizmos.color = Color.green;
 
-        Gizmos.DrawWireCube(_groundChecking.center, _groundChecking.extends);
+        Gizmos.DrawWireSphere(transform.position + _groundCheckOffset, _groundCheckRadius);
     }
 }
 

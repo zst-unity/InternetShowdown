@@ -12,6 +12,7 @@
 - Randomly voting for map with space bar
 - Invisible nicknames
 - Projectile desync
+- Slope handling not working everywhere
 
 ### Changed
 - Increased molotov fire radius
