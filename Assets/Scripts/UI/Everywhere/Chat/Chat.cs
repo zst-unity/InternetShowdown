@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using DG.Tweening;
 using DG.Tweening.Core;
 using DG.Tweening.Plugins.Options;
@@ -18,21 +19,26 @@ public class Chat : MonoBehaviour, IEverywhereCanvas
 
     [field: SerializeField] public TMP_InputField InputField { get; private set; }
     [SerializeField] private CanvasGroup _expandedChat;
-    [SerializeField] private CanvasGroup _messagesChat;
     [SerializeField] private ScrollRect _scrollRect;
     [SerializeField] private GameObject _messagePrefab;
     [SerializeField] private Transform _messagesContainer;
     [SerializeField] private Ease _enableEase;
     [SerializeField] private Ease _disableEase;
     private TweenerCore<float, float, FloatOptions> _fadeTween;
-    private TweenerCore<float, float, FloatOptions> _messagesFadeTween;
 
+    private readonly Dictionary<TMP_Text, MessageData> _messages = new();
     private List<string> _chatHistory = new();
-    private List<GameObject> _chatHistoryObjects = new();
 
     public string[] ChatHistory => _chatHistory.ToArray();
 
     public bool wasFocused;
+
+    private class MessageData
+    {
+        public TweenerCore<Color, Color, ColorOptions> tween = null;
+        public Coroutine coroutine = null;
+        public bool isNew = true;
+    }
 
     public void Focus()
     {
@@ -49,9 +55,15 @@ public class Chat : MonoBehaviour, IEverywhereCanvas
     public void OnDisconnect()
     {
         SetChat(false, false, false);
-        StopCoroutine(nameof(CO_FadeMessages));
         _chatHistory.Clear();
-        _chatHistoryObjects.Clear();
+
+        foreach (var data in _messages.Values)
+        {
+            data.tween?.Complete();
+            StopCoroutine(data.coroutine);
+        }
+        _messages.Clear();
+
         foreach (Transform message in _messagesContainer)
         {
             Destroy(message.gameObject);
@@ -63,30 +75,32 @@ public class Chat : MonoBehaviour, IEverywhereCanvas
         Singleton = this;
         Enabled = false;
         _fadeTween = null;
-        _messagesFadeTween = null;
         _expandedChat.alpha = 0;
-        _messagesChat.alpha = 0;
     }
 
-    public void AddMessage(string message)
+    public void AddMessage(string text)
     {
-        var newMessage = Instantiate(_messagePrefab, _messagesContainer);
-        _chatHistory.Add(message);
-        _chatHistoryObjects.Add(newMessage);
+        var messageObject = Instantiate(_messagePrefab, _messagesContainer);
+        var message = messageObject.GetComponent<TMP_Text>();
+
+        _chatHistory.Add(text);
+        _messages.Add(message, new());
 
         if (_chatHistory.Count >= 100)
         {
-            Destroy(_chatHistoryObjects[0]);
+            Destroy(_messages.First().Key.gameObject);
+
             _chatHistory.RemoveAt(0);
-            _chatHistoryObjects.RemoveAt(0);
+            _messages.Remove(_messages.First().Key);
         }
 
-        newMessage.GetComponent<TMP_Text>().text = message;
-        _messagesChat.alpha = 1;
+        message.text = text;
         StartCoroutine(nameof(CO_ForceScrollDown));
 
-        StopCoroutine(nameof(CO_FadeMessages));
-        StartCoroutine(nameof(CO_FadeMessages));
+        if (!Enabled)
+        {
+            _messages[message].coroutine = StartCoroutine(nameof(CO_FadeMessage), message);
+        }
     }
 
     private IEnumerator CO_ForceScrollDown()
@@ -95,13 +109,13 @@ public class Chat : MonoBehaviour, IEverywhereCanvas
         _scrollRect.verticalNormalizedPosition = 0f;
     }
 
-    private IEnumerator CO_FadeMessages()
+    private IEnumerator CO_FadeMessage(TMP_Text message)
     {
-        _messagesFadeTween?.Complete();
-        _messagesChat.alpha = 1;
+        _messages[message].tween?.Complete();
+        message.color = Color.white;
 
         yield return new WaitForSeconds(8f);
-        _messagesFadeTween = _messagesChat.DOFade(0f, 4.25f);
+        _messages[message].tween = message.DOColor(new(1, 1, 1, 0), 4.25f).OnComplete(() => _messages[message].isNew = false);
     }
 
     public void OnEndEdit()
@@ -127,9 +141,12 @@ public class Chat : MonoBehaviour, IEverywhereCanvas
 
         if (enable)
         {
-            StopCoroutine(nameof(CO_FadeMessages));
-            _messagesFadeTween?.Complete();
-            _messagesChat.alpha = 1f;
+            foreach (var message in _messages)
+            {
+                StopCoroutine(message.Value.coroutine);
+                message.Value.tween?.Complete();
+                message.Key.color = Color.white;
+            }
 
             if (fade) _fadeTween = _expandedChat.DOFade(1f, 0.35f).SetEase(_enableEase);
             else _expandedChat.alpha = 1f;
@@ -152,8 +169,11 @@ public class Chat : MonoBehaviour, IEverywhereCanvas
                 Cursor.lockState = CursorLockMode.Locked;
             }
 
-            StopCoroutine(nameof(CO_FadeMessages));
-            StartCoroutine(nameof(CO_FadeMessages));
+            foreach (var message in _messages)
+            {
+                if (message.Value.isNew) message.Value.coroutine = StartCoroutine(nameof(CO_FadeMessage), message.Key);
+                else message.Key.color = new(1, 1, 1, 0);
+            }
         }
     }
 

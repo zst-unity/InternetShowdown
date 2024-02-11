@@ -384,7 +384,6 @@ GameObject:
   m_Component:
   - component: {fileID: 42597127}
   - component: {fileID: 42597128}
-  - component: {fileID: 42597129}
   m_Layer: 14
   m_Name: Messages Scroll
   m_TagString: Untagged
@@ -442,18 +441,6 @@ MonoBehaviour:
   m_OnValueChanged:
     m_PersistentCalls:
       m_Calls: []
---- !u!225 &42597129
-CanvasGroup:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 42597126}
-  m_Enabled: 1
-  m_Alpha: 1
-  m_Interactable: 0
-  m_BlocksRaycasts: 1
-  m_IgnoreParentGroups: 0
 --- !u!1 &54880376
 GameObject:
   m_ObjectHideFlags: 0
@@ -4294,7 +4281,7 @@ GameObject:
   - component: {fileID: 613441235}
   - component: {fileID: 613441234}
   m_Layer: 14
-  m_Name: ExpandedChat
+  m_Name: Expanded Chat
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -9781,12 +9768,12 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   <InputField>k__BackingField: {fileID: 1889084664}
   _expandedChat: {fileID: 613441234}
-  _messagesChat: {fileID: 42597129}
   _scrollRect: {fileID: 42597128}
   _messagePrefab: {fileID: 1026343694587075603, guid: b99da7e29c99b454e8b1dd4dc2675f8f, type: 3}
   _messagesContainer: {fileID: 1813657278}
   _enableEase: 21
   _disableEase: 3
+  wasFocused: 0
 --- !u!114 &1574141772
 MonoBehaviour:
   m_ObjectHideFlags: 0
