@@ -8,5 +8,6 @@
 
 ### Changed
 - Overhauled chat
+- Overhauled water balloon
 
 ### Other
