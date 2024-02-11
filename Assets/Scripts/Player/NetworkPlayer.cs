@@ -123,6 +123,7 @@ public class NetworkPlayer : NetworkBehaviour
     [SerializeField, Tooltip("Не меняй")] private Transform _orientation;
     [SerializeField, Tooltip("Не меняй")] private MeshRenderer _body;
     [SerializeField, Tooltip("Не меняй")] private GameObject _deathEffect;
+    [SerializeField, Tooltip("Не меняй")] private TrailRenderer _trail;
 
     [HideInInspector] public Camera PlayerCamera;
     [HideInInspector] public CameraMovement PlayerMoveCamera;
@@ -446,6 +447,7 @@ public class NetworkPlayer : NetworkBehaviour
     {
         SetHealth(_maxHealth);
 
+        _trail.emitting = false;
         _body.gameObject.SetActive(false);
         gameObject.layer = 12;
     }
@@ -768,6 +770,7 @@ public class NetworkPlayer : NetworkBehaviour
         }
 
         _rb.AddForce(targetDirection * (PlayerCurrentStats.Singleton.Speed + PlayerMutationStats.Singleton.Speed));
+        CmdSetTrail(Mathf.Clamp01((_rb.velocity.magnitude - 20) / 75));
     }
 
     private void HandleDrag()
@@ -909,6 +912,19 @@ public class NetworkPlayer : NetworkBehaviour
 
     private void OnCollisionStay(Collision other) => _isColliding = true;
     private void OnCollisionExit(Collision other) => _isColliding = false;
+
+    [Command]
+    private void CmdSetTrail(float alpha)
+    {
+        RpcSetTrail(alpha);
+    }
+
+    [ClientRpc]
+    private void RpcSetTrail(float alpha)
+    {
+        _trail.endColor = Color.Lerp(Color - Color.black, Color, alpha);
+        _trail.startColor = Color - Color.black;
+    }
 
     private void OnDrawGizmosSelected()
     {

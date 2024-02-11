@@ -163,6 +163,7 @@ MonoBehaviour:
   _orientation: {fileID: 5613802264008730177}
   _body: {fileID: 3291134265114765407}
   _deathEffect: {fileID: 8480117098400520781, guid: 60d31db724c83574389132c9788f3a7f, type: 3}
+  _trail: {fileID: 3865814531508564666}
   PlayerCamera: {fileID: 0}
   PlayerMoveCamera: {fileID: 0}
   AllowMovement: 0
@@ -178,6 +179,7 @@ MonoBehaviour:
   _colorHex: 
   _initialized: 0
   _invincible: 0
+  _isDead: 0
   _health: 0
 --- !u!114 &6314750545462305294
 MonoBehaviour:
@@ -324,7 +326,7 @@ TrailRenderer:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 3602822793115751588}
-  m_Enabled: 0
+  m_Enabled: 1
   m_CastShadows: 1
   m_ReceiveShadows: 1
   m_DynamicOccludee: 1
@@ -360,7 +362,7 @@ TrailRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 0
-  m_Time: 0.25
+  m_Time: 0.35
   m_PreviewTimeScale: 1
   m_Parameters:
     serializedVersion: 3
@@ -371,12 +373,12 @@ TrailRenderer:
       - serializedVersion: 3
         time: 0
         value: 1
-        inSlope: -1.3732886
-        outSlope: -1.3732886
+        inSlope: 3.8515549
+        outSlope: 3.8515549
         tangentMode: 0
         weightedMode: 0
         inWeight: 0.33333334
-        outWeight: 0.10297483
+        outWeight: 0.11670481
       - serializedVersion: 3
         time: 1
         value: 0
@@ -391,10 +393,10 @@ TrailRenderer:
       m_RotationOrder: 4
     colorGradient:
       serializedVersion: 2
-      key0: {r: 1, g: 1, b: 1, a: 0.22352941}
-      key1: {r: 1, g: 1, b: 1, a: 0.67058825}
+      key0: {r: 1, g: 1, b: 1, a: 0}
+      key1: {r: 1, g: 1, b: 1, a: 1}
       key2: {r: 0, g: 0, b: 0, a: 0.67058825}
-      key3: {r: 0, g: 0, b: 0, a: 0}
+      key3: {r: 0, g: 0, b: 0, a: 0.67058825}
       key4: {r: 0, g: 0, b: 0, a: 0}
       key5: {r: 0, g: 0, b: 0, a: 0}
       key6: {r: 0, g: 0, b: 0, a: 0}
@@ -410,7 +412,7 @@ TrailRenderer:
       atime0: 0
       atime1: 65535
       atime2: 65535
-      atime3: 0
+      atime3: 65535
       atime4: 0
       atime5: 0
       atime6: 0
