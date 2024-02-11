@@ -160,6 +160,9 @@ public class NetworkPlayer : NetworkBehaviour
     [SyncVar, SerializeField, ReadOnly] private bool _invincible;
     public bool Invincible { get => _invincible; }
 
+    [SyncVar, SerializeField, ReadOnly] private bool _isDead;
+    public bool IsDead { get => _isDead; }
+
     public static NetworkPlayer LocalPlayer { get; private set; }
 
     [Command]
@@ -272,6 +275,8 @@ public class NetworkPlayer : NetworkBehaviour
     [Command]
     private void CmdDie()
     {
+        _isDead = true;
+
         var newEffect = Instantiate(_deathEffect, transform.position - Vector3.up * 0.5f, _orientation.rotation);
         NetworkServer.Spawn(newEffect);
         _spawnedDeathEffects.Add(newEffect);
@@ -297,6 +302,8 @@ public class NetworkPlayer : NetworkBehaviour
     [Command]
     private void CmdRespawn()
     {
+        _isDead = false;
+
         foreach (var effect in _spawnedDeathEffects)
         {
             NetworkServer.Destroy(effect);

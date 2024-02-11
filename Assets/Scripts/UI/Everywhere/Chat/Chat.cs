@@ -109,7 +109,9 @@ public class Chat : MonoBehaviour, IEverywhereCanvas
         if (!Input.GetKeyDown(KeyCode.Return) || string.IsNullOrWhiteSpace(InputField.text)) return;
 
         print($"sending chat message: {InputField.text}");
-        var message = $"<b><color={NetworkPlayer.LocalPlayer.ColorHEX}>{NetworkPlayer.LocalPlayer.Nickname}</color>:</b> {InputField.text}";
+        var color = NetworkPlayer.LocalPlayer.ColorHEX;
+        var nickname = NetworkPlayer.LocalPlayer.Nickname;
+        var message = NetworkPlayer.LocalPlayer.IsDead ? $"<color=#8F8F8F><i>(dead)</i></color>   <b><color={color}>{nickname}</color>:</b> {InputField.text}" : $"<b><color={color}>{nickname}</color>:</b> {InputField.text}";
         SceneGameManager.Singleton.CmdSendChatMessage(message);
 
         Unfocus();

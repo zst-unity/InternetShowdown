@@ -55,7 +55,8 @@
     "Scriptable",
     "Tweener",
     "Tweening",
-    "Tweens"
+    "Tweens",
+    "unfocusing"
   ],
   "cSpell.language": "en, ru"
 }
