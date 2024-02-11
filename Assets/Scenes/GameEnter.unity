@@ -9779,7 +9779,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5419cbbbc667f034189b851605553cee, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _inputField: {fileID: 1889084664}
+  <InputField>k__BackingField: {fileID: 1889084664}
   _expandedChat: {fileID: 613441234}
   _messagesChat: {fileID: 42597129}
   _scrollRect: {fileID: 42597128}

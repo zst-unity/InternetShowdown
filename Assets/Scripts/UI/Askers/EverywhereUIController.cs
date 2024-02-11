@@ -1,5 +1,6 @@
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class EverywhereUIController : MonoBehaviour
 {
@@ -23,14 +24,23 @@ public class EverywhereUIController : MonoBehaviour
             }
         }
 
-        if (Chat.Singleton.Active && Input.GetKeyDown(KeyCode.T) && !Chat.Singleton.Focused && !PauseMenu.Singleton.PauseMenuOpened)
+        if (Chat.Singleton.Active)
         {
-            Chat.Singleton.SetChat(!Chat.Singleton.Enabled, !PauseMenu.Singleton.PauseMenuOpened && !EverywhereCanvas.Singleton.IsVotingActive && !ResultsWindow.Singleton.IsEnabled);
-        }
+            if (Input.GetKeyDown(KeyCode.T) && !Chat.Singleton.Focused && !PauseMenu.Singleton.PauseMenuOpened)
+            {
+                Chat.Singleton.SetChat(!Chat.Singleton.Enabled, !EverywhereCanvas.Singleton.IsVotingActive && !ResultsWindow.Singleton.IsEnabled);
+            }
 
-        if (Chat.Singleton.Active && !PauseMenu.Singleton.PauseMenuOpened && Chat.Singleton.Enabled && Input.GetMouseButtonDown(0) && !Chat.Singleton.IsPointerOverChat())
-        {
-            Chat.Singleton.SetChat(false, !EverywhereCanvas.Singleton.IsVotingActive && !ResultsWindow.Singleton.IsEnabled, false);
+            if (!PauseMenu.Singleton.PauseMenuOpened && Chat.Singleton.Enabled && Input.GetMouseButtonDown(0) && !Chat.Singleton.IsPointerOverChat())
+            {
+                Chat.Singleton.SetChat(false, !EverywhereCanvas.Singleton.IsVotingActive && !ResultsWindow.Singleton.IsEnabled, false);
+            }
+
+            if (Input.GetKeyDown(KeyCode.Return) && Chat.Singleton.Enabled && !PauseMenu.Singleton.PauseMenuOpened && string.IsNullOrWhiteSpace(Chat.Singleton.InputField.text))
+            {
+                Chat.Singleton.InputField.text = "";
+                Chat.Singleton.SetChat(false, !EverywhereCanvas.Singleton.IsVotingActive && !ResultsWindow.Singleton.IsEnabled, false);
+            }
         }
     }
 
@@ -43,6 +53,12 @@ public class EverywhereUIController : MonoBehaviour
             if (!WillEnable && _groupsManager.EnabledGroups.Count > 0)
             {
                 if (_groupsManager.EnabledGroups.Last() != PauseMenu.Singleton.PauseMenuGroup) return;
+            }
+
+            if (WillEnable && Chat.Singleton.Enabled)
+            {
+                Chat.Singleton.SetChat(false, !EverywhereCanvas.Singleton.IsVotingActive && !ResultsWindow.Singleton.IsEnabled);
+                return;
             }
 
             PauseMenu.Singleton.Pause(WillEnable, !EverywhereCanvas.Singleton.IsVotingActive && !ResultsWindow.Singleton.IsEnabled && !Chat.Singleton.Enabled);
@@ -71,5 +87,12 @@ public class EverywhereUIController : MonoBehaviour
     private void Awake()
     {
         Singleton = this;
+        SceneManager.sceneLoaded += (a, b) =>
+        {
+            if (Chat.Singleton.Active && Chat.Singleton.wasFocused)
+            {
+                Chat.Singleton.Focus();
+            }
+        };
     }
 }

@@ -14,9 +14,9 @@ public class Chat : MonoBehaviour, IEverywhereCanvas
     public static Chat Singleton { get; private set; }
     public bool Active { get; set; }
     public bool Enabled { get; private set; }
-    public bool Focused => _inputField.isFocused;
+    public bool Focused => InputField.isFocused;
 
-    [SerializeField] private TMP_InputField _inputField;
+    [field: SerializeField] public TMP_InputField InputField { get; private set; }
     [SerializeField] private CanvasGroup _expandedChat;
     [SerializeField] private CanvasGroup _messagesChat;
     [SerializeField] private ScrollRect _scrollRect;
@@ -31,6 +31,20 @@ public class Chat : MonoBehaviour, IEverywhereCanvas
     private List<GameObject> _chatHistoryObjects = new();
 
     public string[] ChatHistory => _chatHistory.ToArray();
+
+    public bool wasFocused;
+
+    public void Focus()
+    {
+        wasFocused = true;
+        InputField.ActivateInputField();
+    }
+
+    public void Unfocus()
+    {
+        wasFocused = false;
+        InputField.OnDeselect(new BaseEventData(EventSystem.current));
+    }
 
     public void OnDisconnect()
     {
@@ -92,14 +106,14 @@ public class Chat : MonoBehaviour, IEverywhereCanvas
 
     public void OnEndEdit()
     {
-        if (!Input.GetKeyDown(KeyCode.Return) || string.IsNullOrWhiteSpace(_inputField.text)) return;
+        if (!Input.GetKeyDown(KeyCode.Return) || string.IsNullOrWhiteSpace(InputField.text)) return;
 
-        print($"sending chat message: {_inputField.text}");
-        var message = $"<b><color={NetworkPlayer.LocalPlayer.ColorHEX}>{NetworkPlayer.LocalPlayer.Nickname}</color>:</b> {_inputField.text}";
+        print($"sending chat message: {InputField.text}");
+        var message = $"<b><color={NetworkPlayer.LocalPlayer.ColorHEX}>{NetworkPlayer.LocalPlayer.Nickname}</color>:</b> {InputField.text}";
         SceneGameManager.Singleton.CmdSendChatMessage(message);
 
-        _inputField.OnDeselect(new BaseEventData(EventSystem.current));
-        _inputField.text = "";
+        Unfocus();
+        InputField.text = "";
         SetChat(false, !PauseMenu.Singleton.PauseMenuOpened && !EverywhereCanvas.Singleton.IsVotingActive && !ResultsWindow.Singleton.IsEnabled, false);
     }
 
@@ -123,7 +137,7 @@ public class Chat : MonoBehaviour, IEverywhereCanvas
             {
                 Cursor.lockState = CursorLockMode.None;
             }
-            _inputField.ActivateInputField();
+            Focus();
         }
         else
         {
