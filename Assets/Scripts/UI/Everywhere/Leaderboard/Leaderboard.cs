@@ -58,7 +58,7 @@ public class Leaderboard : MonoBehaviour, IEverywhereCanvas
         foreach (NetworkPlayer connPlayer in allPlayers)
         {
             connPlayer.Place = place;
-            newLeaderboardValue.Add((connPlayer.Nickname, connPlayer.Score, connPlayer.Activity));
+            newLeaderboardValue.Add(($"<color={connPlayer.ColorHEX}>{connPlayer.Nickname}</color>", connPlayer.Score, connPlayer.Activity));
 
             place++;
         }
