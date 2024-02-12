@@ -120,11 +120,15 @@ public class EverywhereCanvas : MonoBehaviour, IEverywhereCanvas // юи кот�
         _killLog.alpha = 0;
         _kafifEasterEgg.alpha = 0;
         _mapVoting.alpha = 0;
-
         _TTOText.color = ColorISH.Invisible;
 
-        HideDeathScreen();
+        _votingEndText.text = string.Empty;
+        foreach (Transform percentage in _percentagesContainer)
+        {
+            Destroy(percentage.gameObject);
+        }
 
+        HideDeathScreen();
         _onStart.Invoke();
     }
 
@@ -162,7 +166,11 @@ public class EverywhereCanvas : MonoBehaviour, IEverywhereCanvas // юи кот�
         NetworkManager.singleton.StopHost();
     }
 
-    public void OnDisconnect() { }
+    public void OnDisconnect()
+    {
+        StopCoroutine(nameof(PreMatchCoroutine));
+        StopCoroutine(nameof(OnVotingEndCoroutine));
+    }
 
     private IEnumerator OnDisconnectPressed()
     {
@@ -178,9 +186,9 @@ public class EverywhereCanvas : MonoBehaviour, IEverywhereCanvas // юи кот�
 
     private IEnumerator PreMatchCoroutine(int fromCount)
     {
-        Color targetColor = Color.white;
-        AudioClip targetSound = null;
-        string targetText = string.Empty;
+        Color targetColor;
+        AudioClip targetSound;
+        string targetText;
 
         void SetTextParams(Color color, AudioClip sound, string text)
         {
@@ -455,11 +463,7 @@ public class EverywhereCanvas : MonoBehaviour, IEverywhereCanvas // юи кот�
             yield return new WaitForSeconds(1f);
         }
 
-        if (onRespawn != null)
-        {
-            onRespawn.Invoke();
-        }
-
+        onRespawn?.Invoke();
         _deathScreen.SetActive(false);
     }
 

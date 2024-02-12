@@ -11,6 +11,8 @@
 ### Fixed
 - Chat's input field unfocusing after scene changed
 - Player cant jump from other player
+- Pre match text sounds being played in menu
+- Voting end sounds being player in menu
 
 ### Changed
 - Overhauled chat
