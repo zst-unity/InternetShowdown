@@ -5,6 +5,7 @@
 - Player squish effect 
 - Chronosphere OST
 - Airflow OST
+- Knockback from explosions
 
 ### Fixed
 - Chat's input field unfocusing after scene changed

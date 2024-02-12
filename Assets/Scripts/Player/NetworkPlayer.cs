@@ -69,6 +69,7 @@ public class NetworkPlayer : NetworkBehaviour
 
     [Header("Ground Dashing Control")]
     [SerializeField, Tooltip("Сила рывка вниз"), Min(0)] private float _groundDashForce = 5f;
+    private bool _isGroundDashing;
 
     [Header("Player Squish Control")]
     [SerializeField, Tooltip("Не меняй")] private GameObject _springPrefab;
@@ -397,6 +398,18 @@ public class NetworkPlayer : NetworkBehaviour
     }
 
     #endregion
+
+    [Command(requiresAuthority = false)]
+    public void CmdKnockback(float force, Vector3 position, float radius, float upwardsModifier)
+    {
+        TRpcKnockback(connectionToClient, force, position, radius, upwardsModifier);
+    }
+
+    [TargetRpc]
+    private void TRpcKnockback(NetworkConnectionToClient target, float force, Vector3 position, float radius, float upwardsModifier)
+    {
+        _rb.AddExplosionForce(force, position, radius, upwardsModifier, ForceMode.Impulse);
+    }
 
     private void OnValidate() // этот метод вызывается когда в инспекторе меняется поле или после компиляции скрипта
     {

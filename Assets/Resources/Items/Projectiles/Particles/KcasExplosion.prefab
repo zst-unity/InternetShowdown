@@ -4930,6 +4930,7 @@ MonoBehaviour:
   _radius: 20
   _damage: 20
   _explosion: 1
+  _knockback: 67
   _castDamageOvertime: 0
   _lifetime: 5
   _interval: 0.5

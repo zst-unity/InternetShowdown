@@ -7,6 +7,7 @@ public class RadiusDamage : NetworkBehaviour
     [SerializeField] private float _radius;
     [SerializeField] private float _damage;
     [SerializeField] private bool _explosion;
+    [SerializeField] private float _knockback;
 
     [Space(9)]
     [SerializeField] private bool _castDamageOvertime;
@@ -36,6 +37,7 @@ public class RadiusDamage : NetworkBehaviour
             {
                 PlayerCurrentStats.Singleton.Damage = _damage;
                 player.CmdHitPlayer(NetworkClient.localPlayer, _damage + PlayerMutationStats.Singleton.Damage);
+                if (_knockback != 0f) player.CmdKnockback(_knockback, transform.position, _radius, 1.5f);
             }
             else if (obj.TryGetComponent(out ProjectileBase projectile))
             {
