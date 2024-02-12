@@ -11,6 +11,7 @@
 - Overhauled chat
 - Overhauled water balloon
 - Overhauled landmine
+- Increased grenade explosion radius
 
 ### Other
 - Player nickname and color now sets only when client connects

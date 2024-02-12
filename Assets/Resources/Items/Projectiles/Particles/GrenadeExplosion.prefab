@@ -171,8 +171,8 @@ ParticleSystem:
     startSpeed:
       serializedVersion: 2
       minMaxState: 3
-      scalar: 180
-      minScalar: 40
+      scalar: 210
+      minScalar: 50
       maxCurve:
         serializedVersion: 2
         m_Curve:
@@ -4937,7 +4937,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  _radius: 12
+  _radius: 16
   _damage: 100
   _explosion: 1
   _castDamageOvertime: 0
