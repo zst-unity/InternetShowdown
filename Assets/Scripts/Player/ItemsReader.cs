@@ -1,8 +1,10 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using Mirror;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class ItemsReader : NetworkBehaviour
 {
@@ -184,13 +186,49 @@ public class ItemsReader : NetworkBehaviour
     {
         var rarity = Rarity.Common;
         var itemsOfRarity = new List<UsableItem>();
+
         do
         {
             rarity = RarityUtils.PickRarity(NetworkPlayer.MutationStats.Mutate(_startLuck, NetworkPlayer.MutationStats.luck));
             itemsOfRarity = RegisteredItems.FindAll(item => item.ItemRarity == rarity);
         } while (itemsOfRarity.Count == 0);
 
-        SetCurrentItem(itemsOfRarity[Random.Range(0, itemsOfRarity.Count)]);
+        var randomItemsOfRarity = itemsOfRarity.FindAll(item =>
+        {
+            if (string.IsNullOrEmpty(item.CanDropCondition)) return true;
+
+            bool canDrop;
+            try
+            {
+                canDrop = item.CanDropCondition.Compute<bool>
+                (
+                    ("health", _player.Health),
+                    ("speed_a", NetworkPlayer.MutationStats.speed.added),
+                    ("speed_m", NetworkPlayer.MutationStats.speed.multiplied),
+                    ("bounce_a", NetworkPlayer.MutationStats.bounce.added),
+                    ("bounce_m", NetworkPlayer.MutationStats.bounce.multiplied),
+                    ("damage_a", NetworkPlayer.MutationStats.damage.added),
+                    ("damage_m", NetworkPlayer.MutationStats.damage.multiplied),
+                    ("luck_a", NetworkPlayer.MutationStats.luck.added),
+                    ("luck_m", NetworkPlayer.MutationStats.luck.multiplied)
+                );
+            }
+            catch (Exception e)
+            {
+                Debug.LogWarning($"Cant compute drop condition of {item.name} item: {e}");
+                return false;
+            }
+
+            return canDrop;
+        });
+
+        if (randomItemsOfRarity.Count == 0)
+        {
+            GetItem();
+            return;
+        }
+
+        SetCurrentItem(randomItemsOfRarity[Random.Range(0, randomItemsOfRarity.Count)]);
     }
 
     private void MakeVisual(GameObject visual, float zOffset = 0)

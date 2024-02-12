@@ -6,6 +6,7 @@
 - Chronosphere OST
 - Airflow OST
 - Knockback from explosions
+- "Can drop" conditions for items
 
 ### Fixed
 - Chat's input field unfocusing after scene changed
@@ -21,6 +22,7 @@
 - Energy drink now no longer adds luck
 - MedKit now no longer reduces speed
 - Toilet now no longer adds speed
+- MedKit now only can drop if player health is bellow 60
 
 ### Other
 - Player nickname and color now sets only when client connects

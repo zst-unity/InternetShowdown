@@ -7,9 +7,9 @@ public static class RarityUtils
     public static readonly Dictionary<float, Rarity> Rarities = new()
     {
         { 5f, Rarity.Legendary },
-        { 15f, Rarity.Epic },
-        { 25f, Rarity.Unique },
-        { 40f, Rarity.Rare },
+        { 10f, Rarity.Epic },
+        { 15f, Rarity.Unique },
+        { 30f, Rarity.Rare },
         { 60f, Rarity.Quaint },
         { 100f, Rarity.Common },
     };

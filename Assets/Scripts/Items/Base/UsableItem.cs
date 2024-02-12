@@ -9,6 +9,7 @@ public class UsableItem : ScriptableObject
     [Header("Base Settings")]
     public GameObject ItemVisual;
     public Rarity ItemRarity = Rarity.Common;
+    [Tooltip("health\nspeed_a speed_m\nbounce_a bounce_m\ndamage_a damage_m\nluck_a luck_m")] public string CanDropCondition;
 
     [Header("Use Settings")]
     [Tooltip("Should player hold to use the item?")] public bool HoldToUse = false;

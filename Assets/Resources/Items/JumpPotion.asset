@@ -14,6 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ItemVisual: {fileID: 954594090075906597, guid: 52d91c70c5456ef41823507166f629e5, type: 3}
   ItemRarity: 3
+  CanDropCondition: bounce_a < 50
   HoldToUse: 1
   UseTime: 0.5
   Mutations:
