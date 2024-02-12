@@ -1,10 +1,13 @@
+using System;
 using System.Collections.Generic;
+using NaughtyAttributes;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using Random = UnityEngine.Random;
 
 public class MusicSystem : MonoBehaviour
 {
-    [SerializeField] private List<AudioClip> _lobbySoundtracks;
-    [SerializeField] private List<AudioClip> _matchSoundtracks;
+    [SerializeField] private List<Music> _musics;
 
     public static ActiveMusic MainSoundtrack { get; private set; }
 
@@ -13,45 +16,27 @@ public class MusicSystem : MonoBehaviour
         return FindFirstObjectByType<MusicSystem>(FindObjectsInactive.Include);
     }
 
-    public static int? GetIndex(MusicGameState state)
+    public static int GetRandomMusicIndex()
     {
         MusicSystem current = Singleton();
 
-        if (state == MusicGameState.Lobby)
+        var sceneMusics = current._musics.FindAll(music => music.scene == SceneManager.GetActiveScene().buildIndex);
+        if (sceneMusics.Count == 0)
         {
-            if (current._lobbySoundtracks.Count != 0) return Random.Range(0, current._lobbySoundtracks.Count);
-        }
-        else if (state == MusicGameState.Match)
-        {
-            if (current._matchSoundtracks.Count != 0) return Random.Range(0, current._matchSoundtracks.Count);
+            Debug.LogWarning("Cant find musics for this scene");
+            return -1;
         }
 
-        return null;
+        return current._musics.IndexOf(sceneMusics[Random.Range(0, sceneMusics.Count)]);
     }
 
-    public static ActiveMusic StartMusic(MusicGameState state, float offset = 0f, int? idx = null)
+    public static ActiveMusic StartMusic(MusicGameState state, int index, float offset = 0f)
     {
+        if (index == -1) return null;
         MusicSystem current = Singleton();
 
-        AudioClip target = null;
-        AudioSource source = null;
-
-        if (state == MusicGameState.Lobby)
-        {
-            if (current._lobbySoundtracks.Count > 0) target = current._lobbySoundtracks[idx ?? Random.Range(0, current._lobbySoundtracks.Count)];
-        }
-        else if (state == MusicGameState.Match)
-        {
-            if (current._matchSoundtracks.Count > 0) target = current._matchSoundtracks[idx ?? Random.Range(0, current._matchSoundtracks.Count)];
-        }
-
-        if (target == null)
-        {
-            Debug.LogWarning("There's no music to play");
-            return null;
-        }
-
-        source = SoundSystem.PlaySound(new SoundTransporter(target), new SoundPositioner(Vector3.zero), SoundType.Music, volume: 0.525f, enableFade: false);
+        AudioClip target = current._musics[index].music;
+        AudioSource source = SoundSystem.PlaySound(new SoundTransporter(target), new SoundPositioner(Vector3.zero), SoundType.Music, volume: 0.525f, enableFade: false);
         source.time = offset;
 
         ActiveMusic newInstance = new ActiveMusic()
@@ -61,7 +46,6 @@ public class MusicSystem : MonoBehaviour
         };
 
         MainSoundtrack = newInstance;
-
         return newInstance;
     }
 }
@@ -70,6 +54,13 @@ public class ActiveMusic
 {
     public AudioClip Current;
     public AudioSource Source;
+}
+
+[Serializable]
+public class Music
+{
+    [Scene] public int scene;
+    public AudioClip music;
 }
 
 public enum MusicGameState

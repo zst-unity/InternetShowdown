@@ -219,7 +219,7 @@ public class GameLoop : NetworkBehaviour
         {
             yield return _waitForSceneLoaded;
 
-            GameInfo.Singleton.CurrentMusicIndex = MusicSystem.GetIndex(MusicGameState.Lobby);
+            GameInfo.Singleton.CurrentMusicIndex = MusicSystem.GetRandomMusicIndex();
             GameInfo.Singleton.StartMusicOffset();
 
             if (_currentGamesPlayed % _roundsToLargeBreak == 0)
@@ -243,7 +243,7 @@ public class GameLoop : NetworkBehaviour
             LoadMatch();
             yield return _waitForSceneLoaded;
 
-            GameInfo.Singleton.CurrentMusicIndex = MusicSystem.GetIndex(MusicGameState.Match);
+            GameInfo.Singleton.CurrentMusicIndex = MusicSystem.GetRandomMusicIndex();
             GameInfo.Singleton.StartMusicOffset();
 
             SetGameState(GameState.Prepare, CanvasGameState.Lobby, MusicGameState.Match, _prepareLength);

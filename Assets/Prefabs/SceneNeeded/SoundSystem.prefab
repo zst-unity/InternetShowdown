@@ -106,11 +106,20 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6da9689f558fcd449b439f2a64ff966b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  _lobbySoundtracks: []
-  _matchSoundtracks:
-  - {fileID: 8300000, guid: 9db5a76890339844a9f5990120d02ae5, type: 3}
-  - {fileID: 8300000, guid: 468eab5836c505248b37e0f4944094f0, type: 3}
-  - {fileID: 8300000, guid: b73a516f07ac2144f84b4bcd66466200, type: 3}
-  - {fileID: 8300000, guid: 89cf3c5a04bb7824abcbfbdc872a91af, type: 3}
-  - {fileID: 8300000, guid: caefc3c713c663647a5a0141156d12f7, type: 3}
-  - {fileID: 8300000, guid: 30e50c3a021d80c44b81227aab151bbc, type: 3}
+  _musics:
+  - scene: 3
+    music: {fileID: 8300000, guid: 1c4bbe75713d8954398da018ae722831, type: 3}
+  - scene: 3
+    music: {fileID: 8300000, guid: d113b305b109ca445a07ddc7be7cf3f5, type: 3}
+  - scene: 3
+    music: {fileID: 8300000, guid: b46bf930c96fcea41afb8f80f63d4253, type: 3}
+  - scene: 3
+    music: {fileID: 8300000, guid: 6b1170f582cd84a4a8d58e6721ceea82, type: 3}
+  - scene: 4
+    music: {fileID: 8300000, guid: 66076ed11a1cadf4ab5354f7dcc36640, type: 3}
+  - scene: 4
+    music: {fileID: 8300000, guid: d84dcdc0230f86d42bd280944ed6adab, type: 3}
+  - scene: 4
+    music: {fileID: 8300000, guid: 02bfb12f67de7c24db8e98006cb9084f, type: 3}
+  - scene: 4
+    music: {fileID: 8300000, guid: af8c5c34bba5dd84986e0496a23ebcb2, type: 3}

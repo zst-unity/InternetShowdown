@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using Mirror;
 using UnityEngine;
@@ -16,10 +17,12 @@ public class GameInfo : NetworkBehaviour
     [SyncVar, ReadOnly] public CanvasGameState CurrentCanvasGameState;
     [SyncVar, ReadOnly] public MusicGameState CurrentMusicGameState;
 
-    [SyncVar, ReadOnly] public int? CurrentMusicIndex;
+    [SyncVar, ReadOnly] public int CurrentMusicIndex;
     [SyncVar, ReadOnly] public float CurrentMusicOffset;
 
     [SyncVar, ReadOnly] public bool IsVotingTime;
+
+    private DateTime _musicStartTime;
 
     public bool IsLobby
     {
@@ -29,6 +32,7 @@ public class GameInfo : NetworkBehaviour
     [Server]
     public void StartMusicOffset()
     {
+        _musicStartTime = DateTime.Now;
         StartCoroutine(nameof(MusicTimerLogic));
     }
 
@@ -45,8 +49,8 @@ public class GameInfo : NetworkBehaviour
 
         while (NetworkServer.active)
         {
-            CurrentMusicOffset += 0.1f;
-            yield return new WaitForSeconds(0.1f);
+            CurrentMusicOffset = (float)(DateTime.Now - _musicStartTime).TotalSeconds;
+            yield return new WaitForSecondsRealtime(0.1f);
         }
     }
 }

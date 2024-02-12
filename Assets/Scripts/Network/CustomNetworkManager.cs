@@ -180,7 +180,7 @@ public class CustomNetworkManager : NetworkManager
     {
         yield return new WaitUntil(() => NetworkClient.localPlayer != null);
 
-        MusicSystem.StartMusic(GameInfo.Singleton.CurrentMusicGameState, GameInfo.Singleton.CurrentMusicOffset, GameInfo.Singleton.CurrentMusicIndex);
+        MusicSystem.StartMusic(GameInfo.Singleton.CurrentMusicGameState, GameInfo.Singleton.CurrentMusicIndex, GameInfo.Singleton.CurrentMusicOffset);
         _transition.AwakeTransition(TransitionMode.Out);
 
         if (GameInfo.Singleton.IsLobby && !_justConnected)
