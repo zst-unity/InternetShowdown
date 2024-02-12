@@ -1,4 +1,3 @@
-using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
@@ -12,7 +11,7 @@ public class ItemsReader : NetworkBehaviour
     [SerializeField] private SoundEffect _pickupSound;
 
     [Header("Other")]
-    [SerializeField] private byte _luckModifier = 0;
+    [SerializeField] private float _luckModifier = 0f;
     [SerializeField] private Transform _itemHolder;
 
     public bool HasItem { get => _currentItem != null; }
@@ -184,39 +183,15 @@ public class ItemsReader : NetworkBehaviour
     public void GetItem()
     {
         PlayerCurrentStats.Singleton.Luck = _luckModifier;
-
-        List<UsableItem> sortedItems;
-        Rarity closestRarity;
-
-        (sortedItems, closestRarity) = Generate();
-
-        while (RarityJobs.GetAllWithRarity(sortedItems, closestRarity).Count == 0)
+        var rarity = Rarity.Common;
+        var itemsOfRarity = new List<UsableItem>();
+        do
         {
-            (sortedItems, closestRarity) = Generate();
-        }
+            rarity = RarityUtils.PickRarity(PlayerCurrentStats.Singleton.Luck + PlayerMutationStats.Singleton.Luck);
+            itemsOfRarity = RegisteredItems.FindAll(item => item.ItemRarity == rarity);
+        } while (itemsOfRarity.Count == 0);
 
-        List<UsableItem> chosenCategory = new();
-
-        foreach (var item in sortedItems)
-        {
-            if (item.ItemRarity == closestRarity) chosenCategory.Add(item);
-        }
-
-        SetCurrentItem(chosenCategory[UnityEngine.Random.Range(0, chosenCategory.Count)]);
-    }
-
-    private (List<UsableItem> sortedItems, Rarity closestRarity) Generate()
-    {
-        byte choice = RarityJobs.Select((byte)(PlayerCurrentStats.Singleton.Luck + PlayerMutationStats.Singleton.Luck));
-
-        List<UsableItem> sortedItems = RarityJobs.Sort(RegisteredItems).ToList();
-
-        var closestRarity = RarityJobs.Rarities.ToList();
-        closestRarity.Sort((first, second) => second.Value > choice ? 1 : -1);
-
-        Rarity convertedClosestRarity = RarityJobs.KeyValuePairToRarity(closestRarity.First());
-
-        return (sortedItems, convertedClosestRarity);
+        SetCurrentItem(itemsOfRarity[Random.Range(0, itemsOfRarity.Count)]);
     }
 
     private void MakeVisual(GameObject visual, float zOffset = 0)

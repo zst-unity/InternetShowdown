@@ -985,7 +985,7 @@ public class PlayerStats
 {
     public float Speed;
     public float Bounce;
-    public byte Luck;
+    public float Luck;
     public float Damage;
 
     public void ResetStats()

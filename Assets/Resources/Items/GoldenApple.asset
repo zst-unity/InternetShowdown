@@ -27,7 +27,7 @@ MonoBehaviour:
     Time: 12.5
   - Type: 3
     ChangeAs: 0
-    Amount: 25
+    Amount: 20
     Time: 15
   - Type: 0
     ChangeAs: 0

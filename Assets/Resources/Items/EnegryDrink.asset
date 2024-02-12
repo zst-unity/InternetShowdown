@@ -25,9 +25,5 @@ MonoBehaviour:
     ChangeAs: 1
     Amount: 2
     Time: 15
-  - Type: 3
-    ChangeAs: 0
-    Amount: 10
-    Time: 22
   Projectiles: []
   HealAmount: 0

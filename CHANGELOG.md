@@ -18,7 +18,11 @@
 - Increased grenade explosion radius
 - Player color now displays in leaderboard
 - There is now 4 musics for each map
+- Energy drink now no longer adds luck
+- MedKit now no longer reduces speed
+- Toilet now no longer adds speed
 
 ### Other
 - Player nickname and color now sets only when client connects
 - Music offset is now calculated by subtracting start date and current date
+- Reworked luck mutation

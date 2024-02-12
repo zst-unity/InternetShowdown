@@ -1,33 +1,20 @@
 using System;
 using System.Collections.Generic;
-using UnityEngine;
+using Random = UnityEngine.Random;
 
-public static class RarityJobs
+public static class RarityUtils
 {
-    public static readonly Dictionary<string, byte> Rarities = new()
+    public static readonly Dictionary<float, Rarity> Rarities = new()
     {
-        { "Legendary", 7 },
-        { "Epic", 25 },
-        { "Unique", 65 },
-        { "Rare", 105 },
-        { "Quaint", 155 },
-        { "Common", 255 },
+        { 5f, Rarity.Legendary },
+        { 15f, Rarity.Epic },
+        { 25f, Rarity.Unique },
+        { 40f, Rarity.Rare },
+        { 60f, Rarity.Quaint },
+        { 100f, Rarity.Common },
     };
 
-    public static Rarity RarityFromName(this string value) => (Rarity)Enum.Parse(typeof(Rarity), value, true);
-
-    public static List<UsableItem> GetAllWithRarity(List<UsableItem> input, Rarity rarity)
-    {
-        List<UsableItem> output = new();
-        foreach (UsableItem item in input)
-        {
-            if (item.ItemRarity == rarity) output.Add(item);
-        }
-
-        return output;
-    }
-
-    public static List<UsableItem> Sort(List<UsableItem> input)
+    public static List<UsableItem> SortByRarity(this List<UsableItem> input)
     {
         List<UsableItem> output = input;
         output.Sort((first, second) => (byte)first.ItemRarity < (byte)second.ItemRarity ? -1 : 1);
@@ -35,16 +22,21 @@ public static class RarityJobs
         return output;
     }
 
-    public static Rarity KeyValuePairToRarity(KeyValuePair<string, byte> input) => RarityFromName(input.Key);
-
-    public static byte Select(byte modifier)
+    public static Rarity PickRarity(float luck)
     {
-        bool isPositive = modifier > 0;
-        byte absoluteModifier = (byte)Math.Abs(modifier);
+        float absoluteLuck = Math.Clamp(Math.Abs(luck), -100f, 100f);
 
-        if (isPositive)
-            return (byte)UnityEngine.Random.Range(0, 255 - absoluteModifier);
+        float random;
+        if (luck > 0)
+            random = Random.Range(0, 100f - absoluteLuck);
         else
-            return (byte)UnityEngine.Random.Range(absoluteModifier, 255);
+            random = Random.Range(absoluteLuck, 100f);
+
+        foreach (var rarity in Rarities)
+        {
+            if (random <= rarity.Key) return rarity.Value;
+        }
+
+        return Rarity.Common;
     }
 }
