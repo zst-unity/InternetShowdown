@@ -70,6 +70,13 @@ public class NetworkPlayer : NetworkBehaviour
     [Header("Ground Dashing Control")]
     [SerializeField, Tooltip("Сила рывка вниз"), Min(0)] private float _groundDashForce = 5f;
 
+    [Header("Player Squish Control")]
+    [SerializeField, Tooltip("Не меняй")] private GameObject _springPrefab;
+    [SerializeField] private Vector3 _squishDown = new(1.1f, 0.9f, 1.1f);
+    [SerializeField] private Vector3 _squishUp = new(0.9f, 1.1f, 0.9f);
+    [SerializeField] private float _scaleCoefficient;
+    private ConfigurableJoint _spring;
+
     [field: Header("Property Checking")]
     [field: SerializeField] public LayerMask MapLayers { get; private set; }
     [SerializeField] private float _groundCheckRadius;
@@ -405,6 +412,10 @@ public class NetworkPlayer : NetworkBehaviour
 
     private void Start()
     {
+        var spring = Instantiate(_springPrefab);
+        _spring = spring.GetComponent<ConfigurableJoint>();
+        _spring.connectedBody = _rb;
+
         InitializeVariables();
     }
 
@@ -514,6 +525,18 @@ public class NetworkPlayer : NetworkBehaviour
 
     private void Update()
     {
+        var springRelativeToPlayer = transform.InverseTransformPoint(_spring.transform.position);
+        var t = springRelativeToPlayer.y - _scaleCoefficient;
+
+        if (t < 0)
+        {
+            _body.transform.localScale = Vector3.LerpUnclamped(_squishDown, Vector3.one, t + 1f);
+        }
+        else
+        {
+            _body.transform.localScale = Vector3.LerpUnclamped(Vector3.one, _squishUp, t);
+        }
+
         if (!isLocalPlayer) return; // эта строка заставляет выйти из метода, если мы не являемся локальным игроком
 
 #if DEVELOPMENT_BUILD || UNITY_EDITOR

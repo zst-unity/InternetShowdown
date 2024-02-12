@@ -2,6 +2,7 @@
 
 ### Added
 - High speed trail behind players
+- Player squish effect 
 
 ### Fixed
 - Chat's input field unfocusing after scene changed
