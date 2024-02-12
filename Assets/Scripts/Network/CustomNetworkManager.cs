@@ -66,8 +66,10 @@ public class CustomNetworkManager : NetworkManager
     public override void OnClientConnect()
     {
         base.OnClientConnect();
-
         _justConnected = true;
+
+        NetworkPlayer.LocalNickname = PlayerPrefs.GetString("PlayerNicknameValue");
+        NetworkPlayer.LocalColor = PlayerPrefs.GetString("PlayerColorHEX", "FFFFFF");
 
         foreach (var canvas in GetEverywhereCanvases())
         {

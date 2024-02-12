@@ -13,3 +13,4 @@
 - Overhauled landmine
 
 ### Other
+- Player nickname and color now sets only when client connects

@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using Mirror;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
 
 [RequireComponent(typeof(Rigidbody))]
 public class NetworkPlayer : NetworkBehaviour
@@ -165,6 +166,8 @@ public class NetworkPlayer : NetworkBehaviour
     public bool IsDead { get => _isDead; }
 
     public static NetworkPlayer LocalPlayer { get; private set; }
+    public static string LocalNickname;
+    public static string LocalColor;
 
     [Command]
     public void CmdInitialize(string nickname, string color)
@@ -421,9 +424,7 @@ public class NetworkPlayer : NetworkBehaviour
 
     private void Initialize() // уничтожаем другие камеры на сцене и создаем себе новую
     {
-        string nickname = PlayerPrefs.GetString("PlayerNicknameValue");
-        var color = PlayerPrefs.GetString("PlayerColorHEX", "FFFFFF");
-        CmdInitialize(nickname, color);
+        CmdInitialize(LocalNickname, LocalColor);
 
         SetupPlayerAndGameObject();
 
