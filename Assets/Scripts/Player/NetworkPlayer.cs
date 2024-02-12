@@ -177,6 +177,8 @@ public class NetworkPlayer : NetworkBehaviour
     public static string LocalNickname;
     public static string LocalColor;
 
+    public static MutationStats MutationStats { get; private set; }
+
     [Command]
     public void CmdInitialize(string nickname, string color)
     {
@@ -464,8 +466,7 @@ public class NetworkPlayer : NetworkBehaviour
         PlayerCamera = newCamera.AddComponent<Camera>();
         InitializeCamera();
 
-        PlayerCurrentStats.Singleton.ResetStats();
-        PlayerMutationStats.Singleton.ResetStats();
+        MutationStats = new MutationStats();
     }
 
     private void SetupPlayerAndGameObject()
@@ -689,8 +690,7 @@ public class NetworkPlayer : NetworkBehaviour
     {
         if (!AllowMovement || Chat.Singleton.Focused || PauseMenu.Singleton.PauseMenuOpened) return;
 
-        PlayerCurrentStats.Singleton.Bounce = _jumpForce;
-        _rb.velocity = new Vector3(_rb.velocity.x, PlayerCurrentStats.Singleton.Bounce + PlayerMutationStats.Singleton.Bounce, _rb.velocity.z);
+        _rb.velocity = new Vector3(_rb.velocity.x, MutationStats.Mutate(_jumpForce, MutationStats.bounce), _rb.velocity.z);
 
         CheckForBhop();
         MakeJumpEffects();
@@ -800,13 +800,13 @@ public class NetworkPlayer : NetworkBehaviour
 
         Vector3 targetDirection = IsSloped() ? Vector3.ProjectOnPlane(_playerDirection, _slopeNormal) : _playerDirection;
 
-        PlayerCurrentStats.Singleton.Speed = _startSpeed + _accel + _bhop + angleBoost;
+        var speed = _startSpeed + _accel + _bhop + angleBoost;
         if (!IsGrounded)
         {
-            PlayerCurrentStats.Singleton.Speed /= _airSpeedDivider;
+            speed /= _airSpeedDivider;
         }
 
-        _rb.AddForce(targetDirection * (PlayerCurrentStats.Singleton.Speed + PlayerMutationStats.Singleton.Speed));
+        _rb.AddForce(targetDirection * MutationStats.Mutate(speed, MutationStats.speed));
         CmdSetTrail(Mathf.Clamp01((_rb.velocity.magnitude - 20) / 75));
     }
 
@@ -968,31 +968,5 @@ public class NetworkPlayer : NetworkBehaviour
         Gizmos.color = Color.green;
 
         Gizmos.DrawWireSphere(transform.position + _groundCheckOffset, _groundCheckRadius);
-    }
-}
-
-public class PlayerMutationStats : PlayerStats // статы, на которые влияют мутации на самом деле (но игроки тупые обезьяны они об этом не узнают)
-{
-    public static PlayerCurrentStats Singleton = new();
-}
-
-public class PlayerCurrentStats : PlayerStats // эти статы сделаны для защиты (чтоб никакие хакеры хуякеры не могли получить всего игрока)
-{
-    public static PlayerCurrentStats Singleton = new();
-}
-
-public class PlayerStats
-{
-    public float Speed;
-    public float Bounce;
-    public float Luck;
-    public float Damage;
-
-    public void ResetStats()
-    {
-        Speed = 0;
-        Bounce = 0;
-        Luck = 0;
-        Damage = 0;
     }
 }

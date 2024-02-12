@@ -1,18 +1,50 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
-using UnityEngine;
+
+public class MutationStats
+{
+    public readonly MutationStat speed = new();
+    public readonly MutationStat bounce = new();
+    public readonly MutationStat luck = new();
+    public readonly MutationStat damage = new();
+
+    public void Reset()
+    {
+        speed.Reset();
+        bounce.Reset();
+        luck.Reset();
+        damage.Reset();
+    }
+
+    public float Mutate(float original, MutationStat mutation)
+    {
+        return original * (mutation.multiplied <= 0 ? 1 : mutation.multiplied) + mutation.added;
+    }
+}
+
+public class MutationStat
+{
+    public float added;
+    public float multiplied;
+
+    public void Reset()
+    {
+        added = 0;
+        multiplied = 0;
+    }
+}
 
 public static class MutationJobs
 {
-    public static Mutation InspectorToMutation(InspectorMutation input)
+    public static Mutation InspectorToMutation(MutationStats stats, InspectorMutation input)
     {
         return input.Type switch
         {
-            MutationType.Speed => new SpeedMutation(input.ChangeAs, input.Amount, input.Time),
-            MutationType.Bounce => new BounceMutation(input.ChangeAs, input.Amount, input.Time),
-            MutationType.Luck => new LuckMutation(input.ChangeAs, input.Amount, input.Time),
-            MutationType.Damage => new DamageMutation(input.ChangeAs, input.Amount, input.Time),
+            MutationType.Speed => new SpeedMutation(stats, input.ChangeAs, input.Amount, input.Time),
+            MutationType.Bounce => new BounceMutation(stats, input.ChangeAs, input.Amount, input.Time),
+            MutationType.Luck => new LuckMutation(stats, input.ChangeAs, input.Amount, input.Time),
+            MutationType.Damage => new DamageMutation(stats, input.ChangeAs, input.Amount, input.Time),
             _ => throw new Exception("invalid mutation type"),
         };
     }
@@ -25,169 +57,83 @@ public abstract class Mutation
     public float Amount { get; protected set; }
     public float Time { get; protected set; }
 
-    public CancellationTokenSource Source { get; protected set; } = new();
+    protected MutationStats _stats;
 
-    protected abstract void OnAdd();
-    protected abstract void OnMultiply();
+    public Mutation(MutationStats stats, ChangeType change, float amount, float time)
+    {
+        ChangeAs = change;
+        Amount = amount;
+        Time = time;
 
-    protected abstract void OnDecrease();
-    protected abstract void OnDivide();
+        _stats = stats;
+    }
 
-    protected bool _isCanceled;
-    protected float _changedStats;
+    protected float _added;
+    protected float _multiplied;
 
-    protected float MultiplyTool(float s) => (s * Amount) - s;
+    public abstract MutationStat StatModifying { get; }
 
     public void Mutate()
     {
         int milliseconds = (int)TimeSpan.FromSeconds(Time).TotalMilliseconds;
 
-        if (ChangeAs == ChangeType.Add) OnAdd();
-        else if (ChangeAs == ChangeType.Multiply) OnMultiply();
+        if (ChangeAs == ChangeType.Add) StatModifying.added += Amount;
+        else if (ChangeAs == ChangeType.Multiply) StatModifying.multiplied += Amount;
 
         Task.Delay(milliseconds, Source.Token).ContinueWith(o =>
         {
             if (_isCanceled) return;
-            if (ChangeAs == ChangeType.Add) OnDecrease();
-            else if (ChangeAs == ChangeType.Multiply) OnDivide();
+            if (ChangeAs == ChangeType.Add) StatModifying.added -= Amount;
+            else if (ChangeAs == ChangeType.Multiply) StatModifying.multiplied -= Amount;
         });
     }
+
+    public CancellationTokenSource Source { get; protected set; } = new();
+    protected bool _isCanceled;
 
     public void CancelMutation()
     {
         _isCanceled = true;
         Source.Cancel();
     }
-
-    public Mutation(ChangeType change, float amount, float time)
-    {
-        ChangeAs = change;
-        Amount = amount;
-        Time = time;
-    }
-
-    ~Mutation()
-    {
-        Debug.Log("GC: Mutation has been disposed!");
-    }
 }
 
 [Serializable]
 public class SpeedMutation : Mutation
 {
-    public SpeedMutation(ChangeType change, float amount, float time) : base(change, amount, time) { }
-
-    protected override void OnAdd()
+    public SpeedMutation(MutationStats stats, ChangeType change, float amount, float time) : base(stats, change, amount, time)
     {
-        _changedStats = Amount;
-
-        PlayerMutationStats.Singleton.Speed += _changedStats;
     }
 
-    protected override void OnMultiply()
-    {
-        _changedStats = MultiplyTool(PlayerCurrentStats.Singleton.Speed);
-
-        PlayerMutationStats.Singleton.Speed += _changedStats;
-    }
-
-    protected override void OnDecrease()
-    {
-        PlayerMutationStats.Singleton.Speed -= _changedStats;
-    }
-
-    protected override void OnDivide()
-    {
-        PlayerMutationStats.Singleton.Speed -= _changedStats;
-    }
+    public override MutationStat StatModifying => _stats.speed;
 }
 
 [Serializable]
 public class BounceMutation : Mutation
 {
-    public BounceMutation(ChangeType change, float amount, float time) : base(change, amount, time) { }
-
-    protected override void OnAdd()
+    public BounceMutation(MutationStats stats, ChangeType change, float amount, float time) : base(stats, change, amount, time)
     {
-        _changedStats = Amount;
-
-        PlayerMutationStats.Singleton.Bounce += _changedStats;
     }
 
-    protected override void OnMultiply()
-    {
-        _changedStats = MultiplyTool(PlayerCurrentStats.Singleton.Bounce);
-
-        PlayerMutationStats.Singleton.Bounce += _changedStats;
-    }
-
-    protected override void OnDecrease()
-    {
-        PlayerMutationStats.Singleton.Bounce -= _changedStats;
-    }
-
-    protected override void OnDivide()
-    {
-        PlayerMutationStats.Singleton.Bounce -= _changedStats;
-    }
+    public override MutationStat StatModifying => _stats.bounce;
 }
 
 [Serializable]
 public class LuckMutation : Mutation
 {
-    public LuckMutation(ChangeType change, float amount, float time) : base(change, amount, time) { }
-
-    protected override void OnAdd()
+    public LuckMutation(MutationStats stats, ChangeType change, float amount, float time) : base(stats, change, amount, time)
     {
-        _changedStats = Amount;
-
-        PlayerMutationStats.Singleton.Luck += (byte)_changedStats;
     }
 
-    protected override void OnMultiply()
-    {
-        _changedStats = MultiplyTool(PlayerCurrentStats.Singleton.Luck);
-
-        PlayerMutationStats.Singleton.Luck += (byte)_changedStats;
-    }
-
-    protected override void OnDecrease()
-    {
-        PlayerMutationStats.Singleton.Luck -= (byte)_changedStats;
-    }
-
-    protected override void OnDivide()
-    {
-        PlayerMutationStats.Singleton.Luck -= (byte)_changedStats;
-    }
+    public override MutationStat StatModifying => _stats.luck;
 }
 
 [Serializable]
 public class DamageMutation : Mutation
 {
-    public DamageMutation(ChangeType change, float amount, float time) : base(change, amount, time) { }
-
-    protected override void OnAdd()
+    public DamageMutation(MutationStats stats, ChangeType change, float amount, float time) : base(stats, change, amount, time)
     {
-        _changedStats = Amount;
-
-        PlayerMutationStats.Singleton.Damage += _changedStats;
     }
 
-    protected override void OnMultiply()
-    {
-        _changedStats = MultiplyTool(PlayerCurrentStats.Singleton.Damage);
-
-        PlayerMutationStats.Singleton.Damage += _changedStats;
-    }
-
-    protected override void OnDecrease()
-    {
-        PlayerMutationStats.Singleton.Damage -= _changedStats;
-    }
-
-    protected override void OnDivide()
-    {
-        PlayerMutationStats.Singleton.Damage -= _changedStats;
-    }
+    public override MutationStat StatModifying => _stats.damage;
 }

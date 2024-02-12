@@ -35,8 +35,7 @@ public class RadiusDamage : NetworkBehaviour
         {
             if (obj.TryGetComponent(out NetworkPlayer player))
             {
-                PlayerCurrentStats.Singleton.Damage = _damage;
-                player.CmdHitPlayer(NetworkClient.localPlayer, _damage + PlayerMutationStats.Singleton.Damage);
+                player.CmdHitPlayer(NetworkClient.localPlayer, NetworkPlayer.MutationStats.Mutate(_damage, NetworkPlayer.MutationStats.damage));
                 if (_knockback != 0f) player.CmdKnockback(_knockback, transform.position, _radius, 1.5f);
             }
             else if (obj.TryGetComponent(out ProjectileBase projectile))

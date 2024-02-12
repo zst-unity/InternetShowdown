@@ -187,8 +187,7 @@ public class ProjectileBase : NetworkBehaviour
             return;
         }
 
-        PlayerCurrentStats.Singleton.Damage = _projectileDamage;
-        toHit.CmdHitPlayer(NetworkClient.localPlayer, _projectileDamage + PlayerMutationStats.Singleton.Damage);
+        toHit.CmdHitPlayer(NetworkClient.localPlayer, NetworkPlayer.MutationStats.Mutate(_projectileDamage, NetworkPlayer.MutationStats.damage));
 
         CheckForDestroy(HitDestroy.OnPlayer);
     }

@@ -484,42 +484,25 @@ public class EverywhereCanvas : MonoBehaviour, IEverywhereCanvas // юи кот�
 
     private void DebugStats()
     {
+        if (!Active) return;
+
         for (int i = 0; i < _playerDebugStats.Length; i++)
         {
-            switch (i)
+            _playerDebugStats[i].text = i switch
             {
-                case 0:
-                    _playerDebugStats[i].text = $"{_playerDebugStats[i].name} {PlayerMutationStats.Singleton.Speed}";
-                    break;
+                0 => $"{_playerDebugStats[i].name} {NetworkPlayer.MutationStats.speed.added}",
+                1 => $"{_playerDebugStats[i].name} {NetworkPlayer.MutationStats.speed.multiplied}",
 
-                case 1:
-                    _playerDebugStats[i].text = $"{_playerDebugStats[i].name} {PlayerMutationStats.Singleton.Bounce}";
-                    break;
+                2 => $"{_playerDebugStats[i].name} {NetworkPlayer.MutationStats.bounce.added}",
+                3 => $"{_playerDebugStats[i].name} {NetworkPlayer.MutationStats.bounce.multiplied}",
 
-                case 2:
-                    _playerDebugStats[i].text = $"{_playerDebugStats[i].name} {PlayerMutationStats.Singleton.Luck}";
-                    break;
+                4 => $"{_playerDebugStats[i].name} {NetworkPlayer.MutationStats.damage.added}",
+                5 => $"{_playerDebugStats[i].name} {NetworkPlayer.MutationStats.damage.multiplied}",
 
-                case 3:
-                    _playerDebugStats[i].text = $"{_playerDebugStats[i].name} {PlayerMutationStats.Singleton.Damage}";
-                    break;
-
-                case 4:
-                    _playerDebugStats[i].text = $"{_playerDebugStats[i].name} {PlayerCurrentStats.Singleton.Speed}";
-                    break;
-
-                case 5:
-                    _playerDebugStats[i].text = $"{_playerDebugStats[i].name} {PlayerCurrentStats.Singleton.Bounce}";
-                    break;
-
-                case 6:
-                    _playerDebugStats[i].text = $"{_playerDebugStats[i].name} {PlayerCurrentStats.Singleton.Luck}";
-                    break;
-
-                case 7:
-                    _playerDebugStats[i].text = $"{_playerDebugStats[i].name} {PlayerCurrentStats.Singleton.Damage}";
-                    break;
-            }
+                6 => $"{_playerDebugStats[i].name} {NetworkPlayer.MutationStats.luck.added}",
+                7 => $"{_playerDebugStats[i].name} {NetworkPlayer.MutationStats.luck.multiplied}",
+                _ => "",
+            };
         }
     }
 }

@@ -26,3 +26,4 @@
 - Player nickname and color now sets only when client connects
 - Music offset is now calculated by subtracting start date and current date
 - Reworked luck mutation
+- Reworked mutation system

@@ -11,7 +11,7 @@ public class ItemsReader : NetworkBehaviour
     [SerializeField] private SoundEffect _pickupSound;
 
     [Header("Other")]
-    [SerializeField] private float _luckModifier = 0f;
+    [SerializeField] private float _startLuck = 0f;
     [SerializeField] private Transform _itemHolder;
 
     public bool HasItem { get => _currentItem != null; }
@@ -123,7 +123,7 @@ public class ItemsReader : NetworkBehaviour
 
         foreach (InspectorMutation insMutation in _currentItem.Mutations)
         {
-            Mutation mutation = MutationJobs.InspectorToMutation(insMutation);
+            Mutation mutation = MutationJobs.InspectorToMutation(NetworkPlayer.MutationStats, insMutation);
 
             mutation.Mutate();
             ActiveMutations.Add(mutation);
@@ -159,7 +159,7 @@ public class ItemsReader : NetworkBehaviour
             mutation.CancelMutation();
         }
 
-        PlayerMutationStats.Singleton.ResetStats();
+        NetworkPlayer.MutationStats.Reset();
     }
 
     public void LoseItem()
@@ -182,12 +182,11 @@ public class ItemsReader : NetworkBehaviour
 
     public void GetItem()
     {
-        PlayerCurrentStats.Singleton.Luck = _luckModifier;
         var rarity = Rarity.Common;
         var itemsOfRarity = new List<UsableItem>();
         do
         {
-            rarity = RarityUtils.PickRarity(PlayerCurrentStats.Singleton.Luck + PlayerMutationStats.Singleton.Luck);
+            rarity = RarityUtils.PickRarity(NetworkPlayer.MutationStats.Mutate(_startLuck, NetworkPlayer.MutationStats.luck));
             itemsOfRarity = RegisteredItems.FindAll(item => item.ItemRarity == rarity);
         } while (itemsOfRarity.Count == 0);
 

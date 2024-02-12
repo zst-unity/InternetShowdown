@@ -16,10 +16,6 @@ MonoBehaviour:
   ItemRarity: 2
   HoldToUse: 1
   UseTime: 1
-  Mutations:
-  - Type: 1
-    ChangeAs: 0
-    Amount: -5
-    Time: 5
+  Mutations: []
   Projectiles: []
   HealAmount: 50

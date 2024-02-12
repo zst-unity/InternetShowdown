@@ -16,10 +16,7 @@ MonoBehaviour:
   ItemRarity: 0
   HoldToUse: 0
   UseTime: 1
-  Mutations:
-  - Type: 1
-    ChangeAs: 0
-    Amount: 25
-    Time: 30
+  Mutations: []
   Projectiles:
   - {fileID: 2647737111156447500, guid: d26c4d688ca35af41a03baa004689ec8, type: 3}
+  HealAmount: 0
