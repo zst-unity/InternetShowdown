@@ -123,7 +123,7 @@ MonoBehaviour:
   _groundDashForce: 17.5
   <MapLayers>k__BackingField:
     serializedVersion: 2
-    m_Bits: 64
+    m_Bits: 2112
   _groundCheckRadius: 0.85
   _groundCheckOffset: {x: 0, y: -0.7, z: 0}
   JumpKey: 32
