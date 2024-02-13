@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   ItemVisual: {fileID: 6913337331051909140, guid: 1f868e4e8dfe88946b334b27c3f7f6a6, type: 3}
   ItemRarity: 5
-  CanDropCondition: speed_a <= 50 || damage_m < 10
+  CanDropCondition: speed_a <= 50 && damage_m < 10
   HoldToUse: 0
   UseTime: 0.25
   Mutations:
