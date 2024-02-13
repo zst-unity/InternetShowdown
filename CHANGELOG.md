@@ -31,3 +31,4 @@
 - Music offset is now calculated by subtracting start date and current date
 - Reworked luck mutation
 - Reworked mutation system
+- Music now adjust to time

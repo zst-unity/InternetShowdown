@@ -31,15 +31,13 @@ public class GameLoop : NetworkBehaviour
 
     private Dictionary<string, int> _votes = new();
     private string _votedMap;
-    private bool _isSceneLoaded;
+    private bool _sceneLoaded;
     private bool _isSkipNeeded;
     private int _timeCounter;
     private int _repeatSeconds;
     private int _currentGamesPlayed;
 
     public Dictionary<string, (int score, int activity)> ExitedPlayers = new();
-
-    public void SetSceneLoaded(bool loaded) => _isSceneLoaded = loaded;
 
     [Server]
     public void AddMapVote(string mapName)
@@ -60,7 +58,17 @@ public class GameLoop : NetworkBehaviour
         {
             Singleton = this;
             DontDestroyOnLoad(transform);
+
+            SceneManager.activeSceneChanged += (a, b) => StartCoroutine(nameof(CO_SceneLoaded));
         }
+    }
+
+    private IEnumerator CO_SceneLoaded()
+    {
+        yield return new WaitForEndOfFrame();
+        _sceneLoaded = true;
+        yield return null;
+        _sceneLoaded = false;
     }
 
     [ServerCallback]
@@ -208,8 +216,6 @@ public class GameLoop : NetworkBehaviour
 
     private IEnumerator Loop()
     {
-        WaitUntil _waitForSceneLoaded = new(() => _isSceneLoaded);
-
         _currentGamesPlayed = 1;
 
         GameObject newGameInfo = Instantiate(_gameInfo.gameObject);
@@ -217,7 +223,7 @@ public class GameLoop : NetworkBehaviour
 
         while (NetworkServer.active)
         {
-            yield return _waitForSceneLoaded;
+            yield return new WaitUntil(() => _sceneLoaded);
 
             GameInfo.Singleton.CurrentMusicIndex = MusicSystem.GetRandomMusicIndex();
             GameInfo.Singleton.StartMusicOffset();
@@ -241,14 +247,12 @@ public class GameLoop : NetworkBehaviour
             GameInfo.Singleton.StopMusicOffset();
 
             LoadMatch();
-            yield return _waitForSceneLoaded;
+            yield return new WaitUntil(() => _sceneLoaded);
 
             GameInfo.Singleton.CurrentMusicIndex = MusicSystem.GetRandomMusicIndex();
             GameInfo.Singleton.StartMusicOffset();
 
             SetGameState(GameState.Prepare, CanvasGameState.Lobby, MusicGameState.Match, _prepareLength);
-
-            yield return new WaitForSeconds(0.75f);
             yield return StartCoroutine(Timer(new List<ColorFrom>() { new(Color.gray, _repeatSeconds) }, _repeatSeconds, 3));
             StartMatch();
 

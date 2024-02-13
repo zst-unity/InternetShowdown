@@ -1,7 +1,6 @@
 using System;
 using System.Collections;
 using Mirror;
-using UnityEngine;
 using UnityEngine.SceneManagement;
 
 public class GameInfo : NetworkBehaviour
@@ -50,7 +49,7 @@ public class GameInfo : NetworkBehaviour
         while (NetworkServer.active)
         {
             CurrentMusicOffset = (float)(DateTime.Now - _musicStartTime).TotalSeconds;
-            yield return new WaitForSecondsRealtime(0.1f);
+            yield return null;
         }
     }
 }

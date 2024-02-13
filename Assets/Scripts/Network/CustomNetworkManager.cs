@@ -158,15 +158,11 @@ public class CustomNetworkManager : NetworkManager
     public override void OnServerSceneChanged(string sceneName)
     {
         base.OnServerSceneChanged(sceneName);
-
-        if (GameLoop.Singleton != null) GameLoop.Singleton.SetSceneLoaded(true);
     }
 
     public override void OnServerChangeScene(string newSceneName)
     {
         base.OnServerChangeScene(newSceneName);
-
-        if (GameLoop.Singleton != null) GameLoop.Singleton.SetSceneLoaded(false);
     }
 
     public override void OnClientSceneChanged()
@@ -179,8 +175,7 @@ public class CustomNetworkManager : NetworkManager
     private IEnumerator WaitForPlayerAfterSceneChanged()
     {
         yield return new WaitUntil(() => NetworkClient.localPlayer != null);
-
-        MusicSystem.StartMusic(GameInfo.Singleton.CurrentMusicGameState, GameInfo.Singleton.CurrentMusicIndex, GameInfo.Singleton.CurrentMusicOffset);
+        MusicSystem.StartMusic(GameInfo.Singleton.CurrentMusicIndex, GameInfo.Singleton.CurrentMusicOffset);
         _transition.AwakeTransition(TransitionMode.Out);
 
         if (GameInfo.Singleton.IsLobby && !_justConnected)

@@ -106,6 +106,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6da9689f558fcd449b439f2a64ff966b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  <AudioMixer>k__BackingField: {fileID: 24100000, guid: a77f4635d53cb694f9e6f72d3486e8fb, type: 2}
   _musics:
   - scene: 3
     music: {fileID: 8300000, guid: 1c4bbe75713d8954398da018ae722831, type: 3}
