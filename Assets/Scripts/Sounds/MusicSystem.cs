@@ -63,7 +63,7 @@ public class MusicSystem : MonoBehaviour
             var speed = 1f + (GameInfo.Singleton.CurrentMusicOffset - MainMusic.Source.time);
 
             if (speed <= 0.25f || speed >= 1.75f) MainMusic.Source.time = GameInfo.Singleton.CurrentMusicOffset;
-            else MainMusic.Source.pitch = speed;
+            else MainMusic.Source.pitch = Mathf.Lerp(MainMusic.Source.pitch, speed, Time.deltaTime * 5);
         }
     }
 }

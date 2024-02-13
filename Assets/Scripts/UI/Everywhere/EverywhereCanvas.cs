@@ -488,7 +488,7 @@ public class EverywhereCanvas : MonoBehaviour, IEverywhereCanvas // юи кот�
 
     private void DebugStats()
     {
-        if (!Active) return;
+        if (!Active || NetworkPlayer.MutationStats == null) return;
 
         for (int i = 0; i < _playerDebugStats.Length; i++)
         {
