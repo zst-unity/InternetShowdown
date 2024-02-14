@@ -276,7 +276,7 @@ public class NetworkPlayer : NetworkBehaviour
         AllowMovement = false;
         PlayerMoveCamera.BlockMovement = true;
 
-        DisablePlayer(false);
+        SetPlayerDead(true);
 
         _rb.velocity = Vector3.zero;
 
@@ -303,7 +303,7 @@ public class NetworkPlayer : NetworkBehaviour
         AllowMovement = true;
         PlayerMoveCamera.BlockMovement = false;
 
-        DisablePlayer(true);
+        SetPlayerDead(false);
         ActivateInvincible(5f);
 
         _dashesRemaining = _dashesAvailable;
@@ -335,24 +335,24 @@ public class NetworkPlayer : NetworkBehaviour
     [Command]
     private void CmdSetHealth(float amount) { _health = amount; }
 
-    private void DisablePlayer(bool enable)
+    private void SetPlayerDead(bool dead)
     {
-        gameObject.layer = enable ? 12 : 13;
+        gameObject.layer = dead ? 13 : 12;
 
-        CmdDisablePlayer(enable);
+        RpcSetPlayerDead(dead);
     }
 
     [Command]
-    private void CmdDisablePlayer(bool enable) { RpcDisablePlayer(enable); }
+    private void CmdSetPlayerDead(bool dead) => RpcSetPlayerDead(dead);
 
     [ClientRpc]
-    private void RpcDisablePlayer(bool enable)
+    private void RpcSetPlayerDead(bool dead)
     {
-        _body.GetComponent<MeshRenderer>().enabled = enable;
+        _body.GetComponent<MeshRenderer>().enabled = !dead;
 
         if (isLocalPlayer) return;
-
-        gameObject.layer = enable ? 11 : 13;
+        gameObject.layer = dead ? 13 : 11;
+        _trail.emitting = !dead;
     }
 
     [Command(requiresAuthority = false)]
@@ -427,7 +427,7 @@ public class NetworkPlayer : NetworkBehaviour
 
     private void Start()
     {
-        var spring = Instantiate(_springPrefab);
+        var spring = Instantiate(_springPrefab, transform.position, Quaternion.identity);
         _spring = spring.GetComponent<ConfigurableJoint>();
         _spring.connectedBody = _rb;
 
@@ -713,13 +713,13 @@ public class NetworkPlayer : NetworkBehaviour
     private void MakeJumpEffects()
     {
         SoundSystem.Singleton.PlaySFX(new SoundTransporter(_jumpSound), new SoundPositioner(transform.position), 0.85f, 1f, 0.6f);
-        CmdSpawnParticle(0);
+        CmdSpawnParticle(0, transform.position);
     }
 
     [Command]
-    private void CmdSpawnParticle(int idx) // охуевший метод спавна партиклов спасибо миррор
+    private void CmdSpawnParticle(int idx, Vector3 position)
     {
-        GameObject particle = Instantiate(_particles[idx], transform.position, _particles[idx].transform.rotation * _body.transform.rotation);
+        GameObject particle = Instantiate(_particles[idx], position, _particles[idx].transform.rotation * _body.transform.rotation);
 
         NetworkServer.Spawn(particle, gameObject);
     }
@@ -838,7 +838,7 @@ public class NetworkPlayer : NetworkBehaviour
         TimeoutDash(_dashTimeout);
 
         SoundSystem.Singleton.PlaySFX(new SoundTransporter(_dashSound), new SoundPositioner(transform.position), 0.85f, 1f, 0.6f);
-        CmdSpawnParticle(1);
+        CmdSpawnParticle(1, transform.position);
     }
 
     private IEnumerator DashReloadLogic()
@@ -878,7 +878,7 @@ public class NetworkPlayer : NetworkBehaviour
 
         SoundSystem.Singleton.PlaySFX(new SoundTransporter(_groundSlamSounds), new SoundPositioner(transform.position), 0.85f, 1f, 0.6f);
         PlayerMoveCamera.Shake(0.15f, 0.15f);
-        CmdSpawnParticle(2);
+        CmdSpawnParticle(2, transform.position);
     }
 
     public void LogHit()
