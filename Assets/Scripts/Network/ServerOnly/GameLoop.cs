@@ -56,10 +56,13 @@ public class GameLoop : NetworkBehaviour
         else
         {
             Singleton = this;
-            DontDestroyOnLoad(transform);
-
-            SceneManager.activeSceneChanged += (a, b) => StartCoroutine(nameof(CO_SceneLoaded));
+            DontDestroyOnLoad(gameObject);
         }
+    }
+
+    private void Start()
+    {
+        SceneManager.activeSceneChanged += (a, b) => StartCoroutine(nameof(CO_SceneLoaded));
     }
 
     private IEnumerator CO_SceneLoaded()
@@ -68,12 +71,6 @@ public class GameLoop : NetworkBehaviour
         _sceneLoaded = true;
         yield return null;
         _sceneLoaded = false;
-    }
-
-    [ServerCallback]
-    public void StartLoop()
-    {
-        StartCoroutine(nameof(Loop));
     }
 
     private IEnumerator HandleMapVoting()
@@ -202,6 +199,9 @@ public class GameLoop : NetworkBehaviour
         yield return new WaitForSecondsRealtime(1f);
     }
 
+    [ServerCallback]
+    public void StartLoop() => StartCoroutine(nameof(Loop));
+
     private IEnumerator Loop()
     {
         _currentGamesPlayed = 1;
@@ -211,8 +211,6 @@ public class GameLoop : NetworkBehaviour
 
         while (NetworkServer.active)
         {
-            yield return new WaitUntil(() => _sceneLoaded);
-
             GameInfo.Singleton.CurrentMusicIndex = MusicSystem.GetRandomMusicIndex();
             GameInfo.Singleton.StartMusicOffset();
 
@@ -262,6 +260,7 @@ public class GameLoop : NetworkBehaviour
             yield return new WaitForSecondsRealtime(Transition.Singleton().FullDurationIn);
 
             TimeToBreak();
+            yield return new WaitUntil(() => _sceneLoaded);
         }
     }
 

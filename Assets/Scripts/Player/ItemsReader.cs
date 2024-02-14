@@ -29,7 +29,7 @@ public class ItemsReader : NetworkBehaviour
 
     private void Awake()
     {
-        RegisteredItems = Resources.LoadAll<UsableItem>("Items").ToList().FindAll(item => item.name == "WaterBalloon");
+        RegisteredItems = Resources.LoadAll<UsableItem>("Items").ToList();
     }
 
     private void Start()
