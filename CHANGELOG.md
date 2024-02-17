@@ -14,6 +14,7 @@
 - Pre match text sounds being played in menu
 - Voting end sounds being player in menu
 - Particles desync on client
+- Awkward results display when closed too early 
 
 ### Changed
 - Overhauled chat

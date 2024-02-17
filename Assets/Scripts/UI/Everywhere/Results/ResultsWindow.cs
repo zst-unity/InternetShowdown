@@ -26,6 +26,8 @@ public class ResultsWindow : MonoBehaviour, IEverywhereCanvas
     private TweenerCore<float, float, FloatOptions> _fadeTween;
     private TweenerCore<Vector3, Vector3, VectorOptions> _scaleTween;
 
+    private readonly Dictionary<ResultsStat, TweenerCore<float, float, FloatOptions>> _statsFadeTweens = new();
+
     public void ResetCanvas()
     {
         Singleton = this;
@@ -104,7 +106,7 @@ public class ResultsWindow : MonoBehaviour, IEverywhereCanvas
             float pitch = 0.85f;
             foreach (var stat in _stats)
             {
-                stat.Group.DOFade(1, 0.15f);
+                _statsFadeTweens.Add(stat, stat.Group.DOFade(1, 0.15f));
 
                 SoundSystem.PlayInterfaceSound(new SoundTransporter(_statShow), pitch, pitch, 0.6f);
                 pitch += 0.05f;
@@ -118,7 +120,12 @@ public class ResultsWindow : MonoBehaviour, IEverywhereCanvas
 
             if (windowParams.ModifyCursor) { Cursor.lockState = CursorLockMode.Locked; }
 
-            foreach (var stat in _stats) { stat.Group.alpha = 0; }
+            foreach (var stat in _stats)
+            {
+                if (_statsFadeTweens.ContainsKey(stat)) _statsFadeTweens[stat].Complete();
+                stat.Group.alpha = 0;
+            }
+            _statsFadeTweens.Clear();
         }
     }
 
