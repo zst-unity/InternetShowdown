@@ -144,7 +144,7 @@ public class Chat : MonoBehaviour, IEverywhereCanvas
             foreach (var message in _messages)
             {
                 StopCoroutine(message.Value.coroutine);
-                message.Value.tween?.Complete();
+                message.Value.tween?.Kill();
                 message.Key.color = Color.white;
             }
 

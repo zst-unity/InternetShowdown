@@ -71,34 +71,20 @@ public class Leaderboard : MonoBehaviour, IEverywhereCanvas
     private void UpdateLeaderboardUI()
     {
         ClearLeaderboardUI();
-
-        int clampedLeaderboardSize = Mathf.Clamp(_leaderboard.Count, 0, 6);
+        int clampedLeaderboardSize = Mathf.Clamp(_leaderboard.Count, 0, 5);
 
         for (int idx = 0; idx < clampedLeaderboardSize; idx++)
         {
             int place = idx + 1;
-
             Place placeComp = Instantiate(_placePrefab.gameObject, _placeContainer).GetComponent<Place>();
 
-            switch (place)
+            placeComp.Number.color = place switch
             {
-                default:
-                    placeComp.Number.color = Color.white;
-                    break;
-
-                case 1:
-                    placeComp.Number.color = ColorISH.Gold;
-                    break;
-
-                case 2:
-                    placeComp.Number.color = ColorISH.Silver;
-                    break;
-
-                case 3:
-                    placeComp.Number.color = ColorISH.Bronze;
-                    break;
-            }
-
+                1 => (Color)ColorISH.Gold,
+                2 => (Color)ColorISH.Silver,
+                3 => (Color)ColorISH.Bronze,
+                _ => Color.white,
+            };
             placeComp.Number.text = place.ToString();
             placeComp.Nickname.text = _leaderboard[idx].nickname;
             placeComp.Score.text = _leaderboard[idx].score.ToString();

@@ -37,9 +37,6 @@ public class EverywhereCanvas : MonoBehaviour, IEverywhereCanvas // юи кот�
     [SerializeField] private TMP_Text OthersNickname;
     [field: SerializeField] public TMP_Text Timer { get; private set; }
 
-    [SerializeField] private GameObject _playerDebugPanel;
-    [SerializeField] private TMP_Text[] _playerDebugStats;
-
     [SerializeField] private CanvasGroup _killLog;
 
     [Header("Preparing")]
@@ -130,16 +127,6 @@ public class EverywhereCanvas : MonoBehaviour, IEverywhereCanvas // юи кот�
 
         HideDeathScreen();
         _onStart.Invoke();
-    }
-
-    private void Update()
-    {
-        _playerDebugPanel.SetActive(false);
-
-#if DEVELOPMENT_BUILD || UNITY_EDITOR
-        _playerDebugPanel.SetActive(true);
-        DebugStats();
-#endif
     }
 
     public void QuitAction()
@@ -484,30 +471,6 @@ public class EverywhereCanvas : MonoBehaviour, IEverywhereCanvas // юи кот�
     private void ClearSelections()
     {
         EventSystem.current.SetSelectedGameObject(null);
-    }
-
-    private void DebugStats()
-    {
-        if (!Active || NetworkPlayer.MutationStats == null) return;
-
-        for (int i = 0; i < _playerDebugStats.Length; i++)
-        {
-            _playerDebugStats[i].text = i switch
-            {
-                0 => $"{_playerDebugStats[i].name} {NetworkPlayer.MutationStats.speed.added}",
-                1 => $"{_playerDebugStats[i].name} {NetworkPlayer.MutationStats.speed.multiplied}",
-
-                2 => $"{_playerDebugStats[i].name} {NetworkPlayer.MutationStats.bounce.added}",
-                3 => $"{_playerDebugStats[i].name} {NetworkPlayer.MutationStats.bounce.multiplied}",
-
-                4 => $"{_playerDebugStats[i].name} {NetworkPlayer.MutationStats.damage.added}",
-                5 => $"{_playerDebugStats[i].name} {NetworkPlayer.MutationStats.damage.multiplied}",
-
-                6 => $"{_playerDebugStats[i].name} {NetworkPlayer.MutationStats.luck.added}",
-                7 => $"{_playerDebugStats[i].name} {NetworkPlayer.MutationStats.luck.multiplied}",
-                _ => "",
-            };
-        }
     }
 }
 
