@@ -1,5 +1,6 @@
 using Unity.Collections;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace Game.Player
 {
@@ -42,7 +43,7 @@ namespace Game.Player
             return new()
             {
                 move = new(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")),
-                wishJumping = Input.GetKeyDown(KeyCode.Space),
+                wishJumping = Input.GetKey(KeyCode.Space),
             };
         }
     }

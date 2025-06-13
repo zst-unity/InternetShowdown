@@ -609,7 +609,7 @@ Transform:
   m_GameObject: {fileID: 352437288}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 1.14, z: 0}
+  m_LocalPosition: {x: 2.7, y: 6.51, z: 3.27}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
@@ -644,8 +644,126 @@ MonoBehaviour:
   motor: {fileID: 352437294}
   orientation: {fileID: 938034313}
   speed: 7
+  moveSmoothingDuration: 0.25
+  moveSmootingCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2
+      outSlope: 2
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  accelerationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: -0.00027545617
+      value: 0.00211005
+      inSlope: 8.429614
+      outSlope: 8.429614
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.25439677
+    - serializedVersion: 3
+      time: 0.27016106
+      value: 0.769915
+      inSlope: 1.0396237
+      outSlope: 1.0396237
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.33333334
+      outWeight: 0.07951385
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  accelerationDuration: 0.6
+  deccelerationCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 8.854379
+      outSlope: 8.854379
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.054225497
+    - serializedVersion: 3
+      time: 0.15072265
+      value: 0.6155924
+      inSlope: 1.448195
+      outSlope: 1.448195
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.2943081
+      outWeight: 0.33333334
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0
+      outSlope: 0
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
+  deccelerationDuration: 0.35
+  jumpHeight: 3
+  jumpDuration: 0.6
+  jumpCurve:
+    serializedVersion: 2
+    m_Curve:
+    - serializedVersion: 3
+      time: 0
+      value: 0
+      inSlope: 2.2347074
+      outSlope: 2.2347074
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0
+      outWeight: 0.03918919
+    - serializedVersion: 3
+      time: 1
+      value: 1
+      inSlope: 0.11593296
+      outSlope: 0.11593296
+      tangentMode: 0
+      weightedMode: 0
+      inWeight: 0.0702703
+      outWeight: 0
+    m_PreInfinity: 2
+    m_PostInfinity: 2
+    m_RotationOrder: 4
   gravity: -20
-  jumpForce: 10
 --- !u!114 &352437294
 MonoBehaviour:
   m_ObjectHideFlags: 0

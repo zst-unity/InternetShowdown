@@ -12,10 +12,43 @@ namespace Game.Player
         public KinematicCharacterMotor motor;
         public Transform orientation;
 
-        [Header("Settings")]
+        [Header("Movement")]
         public float speed;
+
+        private float _targetSpeed;
+
+        [Space(9)]
+        public float moveSmoothingDuration;
+        public AnimationCurve moveSmootingCurve;
+
+        private Vector2 _prevMoveInput;
+        private Vector2 _fromMoveInput;
+        private Vector2 _targetMoveInput;
+        private float _elapsedFromMoveInputChange;
+
+        [Space(9)]
+        public AnimationCurve accelerationCurve;
+        public float accelerationDuration;
+
+        private float _movementTime;
+
+        [Space(9)]
+        public AnimationCurve deccelerationCurve;
+        public float deccelerationDuration;
+
+        private float _idleTime;
+
+        [Header("Jumping")]
+        public float jumpHeight;
+        public float jumpDuration;
+        public AnimationCurve jumpCurve;
+
+        private bool _jumping;
+        private float _jumpTimer;
+        private float _currentJumpHeight;
+
+        [Header("Settings")]
         public float gravity;
-        public float jumpForce;
 
         private PlayerInputs inputs;
 
@@ -37,7 +70,33 @@ namespace Game.Player
         public void BeforeCharacterUpdate(float deltaTime)
         {
             if (controller == null) return;
+
             inputs = controller.GetInputs();
+
+            if (motor.GroundingStatus.IsStableOnGround)
+            {
+                _jumpTimer = 0f;
+
+                if (inputs.wishJumping)
+                {
+                    motor.ForceUnground();
+                    _jumping = true;
+                }
+            }
+
+            // TODO: прыжок на слопах кал (немног двигает вниз слопа)
+
+            if (!inputs.wishJumping) _jumping = false;
+
+            var currentY = transform.position.y - _currentJumpHeight;
+            if (_jumping)
+            {
+                _jumpTimer += deltaTime;
+                _currentJumpHeight = jumpCurve.Evaluate(Mathf.Min(_jumpTimer, jumpDuration) / jumpDuration) * jumpHeight;
+                motor.MoveCharacter(new(transform.position.x, currentY + _currentJumpHeight, transform.position.z));
+
+                if (_jumpTimer >= jumpDuration) _jumping = false;
+            }
         }
 
         public bool IsColliderValidForCollisions(Collider coll)
@@ -77,8 +136,44 @@ namespace Game.Player
 
         public void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime)
         {
-            var dir = (orientation.forward * inputs.move.y + orientation.right * inputs.move.x).normalized;
-            currentVelocity = new(dir.x * speed, currentVelocity.y, dir.z * speed);
+            if (inputs.move != _prevMoveInput)
+            {
+                _fromMoveInput = _targetMoveInput;
+                _elapsedFromMoveInputChange = 0f;
+            }
+            _prevMoveInput = inputs.move;
+
+            if (inputs.move.sqrMagnitude != 0)
+            {
+                _idleTime = 0f;
+
+                _movementTime += deltaTime;
+                _elapsedFromMoveInputChange += Time.deltaTime;
+
+                _targetMoveInput = Vector2.Lerp
+                (
+                    _fromMoveInput,
+                    inputs.move.normalized,
+                    moveSmootingCurve.Evaluate(Mathf.Min(_elapsedFromMoveInputChange, moveSmoothingDuration) / moveSmoothingDuration)
+                );
+
+                _targetSpeed = speed * accelerationCurve.Evaluate(Mathf.Min(_movementTime, accelerationDuration) / accelerationDuration);
+            }
+            else
+            {
+                _movementTime = 0f;
+
+                _idleTime += deltaTime;
+                _targetMoveInput = Vector2.Lerp
+                (
+                    _fromMoveInput,
+                    Vector2.zero,
+                    deccelerationCurve.Evaluate(Mathf.Min(_idleTime, deccelerationDuration) / deccelerationDuration)
+                );
+            }
+
+            var dir = orientation.forward * _targetMoveInput.y + orientation.right * _targetMoveInput.x;
+            currentVelocity = new(dir.x * _targetSpeed, currentVelocity.y, dir.z * _targetSpeed);
 
             if (motor.GroundingStatus.IsStableOnGround) UpdateVelocityOnGround(ref currentVelocity, deltaTime);
             else UpdateVelocityInAir(ref currentVelocity, deltaTime);
@@ -86,16 +181,11 @@ namespace Game.Player
 
         private void UpdateVelocityOnGround(ref Vector3 currentVelocity, float deltaTime)
         {
-            if (inputs.wishJumping)
-            {
-                currentVelocity.y += jumpForce;
-                motor.ForceUnground();
-            }
         }
 
         private void UpdateVelocityInAir(ref Vector3 currentVelocity, float deltaTime)
         {
-            currentVelocity.y += gravity * deltaTime;
+            if (!_jumping) currentVelocity.y += gravity * deltaTime;
         }
     }
 }
