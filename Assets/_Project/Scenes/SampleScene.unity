@@ -763,7 +763,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  gravity: -20
+  coyoteTime: 0.2
+  gravity: -22
 --- !u!114 &352437294
 MonoBehaviour:
   m_ObjectHideFlags: 0

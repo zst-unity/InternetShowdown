@@ -47,6 +47,11 @@ namespace Game.Player
         private float _jumpTimer;
         private float _currentJumpHeight;
 
+        [Space(9)]
+        public float coyoteTime;
+
+        private float _coyoteTimer;
+
         [Header("Settings")]
         public float gravity;
 
@@ -73,12 +78,17 @@ namespace Game.Player
 
             inputs = controller.GetInputs();
 
-            if (motor.GroundingStatus.IsStableOnGround)
+            if (motor.GroundingStatus.IsStableOnGround) _coyoteTimer = 0f;
+            else _coyoteTimer += deltaTime;
+
+            if (_coyoteTimer < coyoteTime)
             {
                 _jumpTimer = 0f;
+                _currentJumpHeight = 0f;
 
                 if (inputs.wishJumping)
                 {
+                    _coyoteTimer = coyoteTime;
                     motor.ForceUnground();
                     _jumping = true;
                 }
@@ -185,7 +195,8 @@ namespace Game.Player
 
         private void UpdateVelocityInAir(ref Vector3 currentVelocity, float deltaTime)
         {
-            if (!_jumping) currentVelocity.y += gravity * deltaTime;
+            if (_jumping) currentVelocity.y = 0f;
+            else currentVelocity.y += gravity * deltaTime;
         }
     }
 }
