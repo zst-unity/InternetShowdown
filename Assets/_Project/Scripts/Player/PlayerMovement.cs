@@ -49,8 +49,11 @@ namespace Game.Player
 
         [Space(9)]
         public float coyoteTime;
+        public float bufferTime;
 
         private float _coyoteTimer;
+        private float _bufferTimer;
+        private bool _prevWishJumping;
 
         [Header("Settings")]
         public float gravity;
@@ -76,7 +79,14 @@ namespace Game.Player
         {
             if (controller == null) return;
 
+            _prevWishJumping = inputs.wishJumping;
             inputs = controller.GetInputs();
+
+            if (inputs.wishJumping && !_prevWishJumping)
+            {
+                _bufferTimer = 0f;
+            }
+            _bufferTimer += deltaTime;
 
             if (motor.GroundingStatus.IsStableOnGround) _coyoteTimer = 0f;
             else _coyoteTimer += deltaTime;
@@ -86,7 +96,7 @@ namespace Game.Player
                 _jumpTimer = 0f;
                 _currentJumpHeight = 0f;
 
-                if (inputs.wishJumping)
+                if (_bufferTimer <= bufferTime)
                 {
                     _coyoteTimer = coyoteTime;
                     motor.ForceUnground();
