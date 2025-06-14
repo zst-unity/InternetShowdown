@@ -136,7 +136,7 @@ namespace Game.Player
 
         public void OnMovementHit(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, ref HitStabilityReport hitStabilityReport)
         {
-
+            if (hitNormal.y < 0f) _jumping = false;
         }
 
         public void PostGroundingUpdate(float deltaTime)
