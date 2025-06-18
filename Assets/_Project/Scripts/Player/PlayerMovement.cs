@@ -1,3 +1,4 @@
+using System;
 using Game.Player;
 using KinematicCharacterController;
 using UnityEngine;
@@ -46,6 +47,18 @@ namespace Game.Player
         private bool _jumping;
         private float _jumpTimer;
         private float _currentJumpHeight;
+
+        [Space(9)]
+        public float jumpEndDuration;
+        public float jumpEndMultiplier;
+        public AnimationCurve jumpEndCurve;
+
+        private bool _endingJump;
+        private float _jumpEndTimer;
+        private float _releaseJumpHeight;
+        private float _releaseY;
+        private float _endJumpHeight;
+        private float _adjustedJumpEndDuration;
 
         [Space(9)]
         public float coyoteTime;
@@ -104,18 +117,41 @@ namespace Game.Player
                 }
             }
 
-            // TODO: прыжок на слопах кал (немног двигает вниз слопа)
-
-            if (!inputs.wishJumping) _jumping = false;
-
             var currentY = transform.position.y - _currentJumpHeight;
-            if (_jumping)
+            if (!inputs.wishJumping)
+            {
+                if (_jumping)
+                {
+                    _jumping = false;
+                    _endingJump = true;
+                    _jumpEndTimer = 0f;
+                    _releaseJumpHeight = _currentJumpHeight;
+                    var xyi = (1f - _jumpTimer / jumpDuration);
+                    _endJumpHeight = _currentJumpHeight + (jumpCurve.Evaluate(Mathf.Min(_jumpTimer + jumpEndDuration, jumpDuration) / jumpDuration) * jumpHeight - _currentJumpHeight) * jumpEndMultiplier * xyi;
+                    _releaseY = currentY;
+                    _adjustedJumpEndDuration = jumpEndDuration * xyi;
+                }
+            }
+
+            if (_jumping || _endingJump)
             {
                 _jumpTimer += deltaTime;
                 _currentJumpHeight = jumpCurve.Evaluate(Mathf.Min(_jumpTimer, jumpDuration) / jumpDuration) * jumpHeight;
-                motor.MoveCharacter(new(transform.position.x, currentY + _currentJumpHeight, transform.position.z));
 
-                if (_jumpTimer >= jumpDuration) _jumping = false;
+                if (_jumping)
+                {
+                    motor.MoveCharacter(new(transform.position.x, currentY + _currentJumpHeight, transform.position.z));
+
+                    if (_jumpTimer >= jumpDuration) _jumping = false;
+                }
+
+                if (_endingJump)
+                {
+                    motor.MoveCharacter(new(transform.position.x, _releaseY + Mathf.Lerp(_releaseJumpHeight, _endJumpHeight, jumpEndCurve.Evaluate(_jumpEndTimer / _adjustedJumpEndDuration)), transform.position.z));
+
+                    _jumpEndTimer += deltaTime;
+                    if (_jumpEndTimer > jumpEndDuration) _endingJump = false;
+                }
             }
         }
 
@@ -136,7 +172,11 @@ namespace Game.Player
 
         public void OnMovementHit(Collider hitCollider, Vector3 hitNormal, Vector3 hitPoint, ref HitStabilityReport hitStabilityReport)
         {
-            if (hitNormal.y < 0f) _jumping = false;
+            if (hitNormal.y < 0f)
+            {
+                _jumping = false;
+                _endingJump = false;
+            }
         }
 
         public void PostGroundingUpdate(float deltaTime)
@@ -205,7 +245,7 @@ namespace Game.Player
 
         private void UpdateVelocityInAir(ref Vector3 currentVelocity, float deltaTime)
         {
-            if (_jumping) currentVelocity.y = 0f;
+            if (_jumping || _endingJump) currentVelocity.y = 0f;
             else currentVelocity.y += gravity * deltaTime;
         }
     }
