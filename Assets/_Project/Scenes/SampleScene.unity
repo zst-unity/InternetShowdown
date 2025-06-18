@@ -871,8 +871,8 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  jumpEndDuration: 0.15
-  jumpEndMultiplier: 0.55
+  jumpEndDuration: 0.12
+  jumpEndMultiplier: 0.52
   jumpEndCurve:
     serializedVersion: 2
     m_Curve:
