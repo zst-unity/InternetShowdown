@@ -68,8 +68,16 @@ namespace Game.Player
         private float _bufferTimer;
         private bool _prevWishJumping;
 
-        [Header("Settings")]
+        [Header("Ground Slam")]
+        public float groundSlamForce;
+        public float groundSlamDistanceForceRatio;
+
+        private bool _groundSlamming;
+        private bool _canGroundSlam;
+
+        [Header("Gravity")]
         public float gravity;
+        public float gravityClamp;
 
         private PlayerInputs inputs;
 
@@ -94,6 +102,8 @@ namespace Game.Player
 
             _prevWishJumping = inputs.wishJumping;
             inputs = controller.GetInputs();
+
+            if (!inputs.wishGroundSlam) _canGroundSlam = true;
 
             if (inputs.wishJumping && !_prevWishJumping)
             {
@@ -194,44 +204,47 @@ namespace Game.Player
 
         public void UpdateVelocity(ref Vector3 currentVelocity, float deltaTime)
         {
-            if (inputs.move != _prevMoveInput)
+            if (!_groundSlamming)
             {
-                _fromMoveInput = _targetMoveInput;
-                _elapsedFromMoveInputChange = 0f;
+                if (inputs.move != _prevMoveInput)
+                {
+                    _fromMoveInput = _targetMoveInput;
+                    _elapsedFromMoveInputChange = 0f;
+                }
+                _prevMoveInput = inputs.move;
+
+                if (inputs.move.sqrMagnitude != 0)
+                {
+                    _idleTime = 0f;
+
+                    _movementTime += deltaTime;
+                    _elapsedFromMoveInputChange += Time.deltaTime;
+
+                    _targetMoveInput = Vector2.Lerp
+                    (
+                        _fromMoveInput,
+                        inputs.move.normalized,
+                        moveSmootingCurve.Evaluate(Mathf.Min(_elapsedFromMoveInputChange, moveSmoothingDuration) / moveSmoothingDuration)
+                    );
+
+                    _targetSpeed = speed * accelerationCurve.Evaluate(Mathf.Min(_movementTime, accelerationDuration) / accelerationDuration);
+                }
+                else
+                {
+                    _movementTime = 0f;
+
+                    _idleTime += deltaTime;
+                    _targetMoveInput = Vector2.Lerp
+                    (
+                        _fromMoveInput,
+                        Vector2.zero,
+                        deccelerationCurve.Evaluate(Mathf.Min(_idleTime, deccelerationDuration) / deccelerationDuration)
+                    );
+                }
+
+                var dir = orientation.forward * _targetMoveInput.y + orientation.right * _targetMoveInput.x;
+                currentVelocity = new(dir.x * _targetSpeed, currentVelocity.y, dir.z * _targetSpeed);
             }
-            _prevMoveInput = inputs.move;
-
-            if (inputs.move.sqrMagnitude != 0)
-            {
-                _idleTime = 0f;
-
-                _movementTime += deltaTime;
-                _elapsedFromMoveInputChange += Time.deltaTime;
-
-                _targetMoveInput = Vector2.Lerp
-                (
-                    _fromMoveInput,
-                    inputs.move.normalized,
-                    moveSmootingCurve.Evaluate(Mathf.Min(_elapsedFromMoveInputChange, moveSmoothingDuration) / moveSmoothingDuration)
-                );
-
-                _targetSpeed = speed * accelerationCurve.Evaluate(Mathf.Min(_movementTime, accelerationDuration) / accelerationDuration);
-            }
-            else
-            {
-                _movementTime = 0f;
-
-                _idleTime += deltaTime;
-                _targetMoveInput = Vector2.Lerp
-                (
-                    _fromMoveInput,
-                    Vector2.zero,
-                    deccelerationCurve.Evaluate(Mathf.Min(_idleTime, deccelerationDuration) / deccelerationDuration)
-                );
-            }
-
-            var dir = orientation.forward * _targetMoveInput.y + orientation.right * _targetMoveInput.x;
-            currentVelocity = new(dir.x * _targetSpeed, currentVelocity.y, dir.z * _targetSpeed);
 
             if (motor.GroundingStatus.IsStableOnGround) UpdateVelocityOnGround(ref currentVelocity, deltaTime);
             else UpdateVelocityInAir(ref currentVelocity, deltaTime);
@@ -239,12 +252,29 @@ namespace Game.Player
 
         private void UpdateVelocityOnGround(ref Vector3 currentVelocity, float deltaTime)
         {
+            if (_groundSlamming) _groundSlamming = false;
         }
 
         private void UpdateVelocityInAir(ref Vector3 currentVelocity, float deltaTime)
         {
             if (_jumping || _endingJump) currentVelocity.y = 0f;
-            else currentVelocity.y += gravity * deltaTime;
+            else if (currentVelocity.y > gravityClamp)
+            {
+                currentVelocity.y += gravity * deltaTime;
+            }
+
+            if (inputs.wishGroundSlam && !_groundSlamming && _canGroundSlam)
+            {
+                var wasHit = Physics.Raycast(transform.position, Vector3.down, out RaycastHit hit, 1000f, motor.StableGroundLayers);
+                if (!wasHit) return;
+
+                currentVelocity.y = Mathf.Lerp(-hit.distance * groundSlamForce, -groundSlamForce, groundSlamDistanceForceRatio);
+
+                _jumping = false;
+                _endingJump = false;
+                _groundSlamming = true;
+                _canGroundSlam = false;
+            }
         }
     }
 }

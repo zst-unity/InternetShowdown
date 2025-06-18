@@ -6,5 +6,6 @@ namespace Game.Player
     {
         public Vector2 move;
         public bool wishJumping;
+        public bool wishGroundSlam;
     }
 }
