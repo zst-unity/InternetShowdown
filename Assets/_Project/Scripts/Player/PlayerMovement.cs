@@ -52,13 +52,13 @@ namespace Game.Player
         public float jumpEndDuration;
         public float jumpEndMultiplier;
         public AnimationCurve jumpEndCurve;
+        public AnimationCurve jumpEndFalloffCurve;
 
         private bool _endingJump;
         private float _jumpEndTimer;
-        private float _releaseJumpHeight;
         private float _releaseY;
         private float _endJumpHeight;
-        private float _adjustedJumpEndDuration;
+        private float _jumpEndFalloffValue;
 
         [Space(9)]
         public float coyoteTime;
@@ -125,33 +125,31 @@ namespace Game.Player
                     _jumping = false;
                     _endingJump = true;
                     _jumpEndTimer = 0f;
-                    _releaseJumpHeight = _currentJumpHeight;
-                    var xyi = (1f - _jumpTimer / jumpDuration);
-                    _endJumpHeight = _currentJumpHeight + (jumpCurve.Evaluate(Mathf.Min(_jumpTimer + jumpEndDuration, jumpDuration) / jumpDuration) * jumpHeight - _currentJumpHeight) * jumpEndMultiplier * xyi;
+                    _jumpEndFalloffValue = jumpEndFalloffCurve.Evaluate(1f - _jumpTimer / jumpDuration);
+                    _endJumpHeight = _currentJumpHeight + (jumpCurve.Evaluate(Mathf.Min(_jumpTimer + jumpEndDuration, jumpDuration) / jumpDuration) * jumpHeight - _currentJumpHeight) * jumpEndMultiplier * _jumpEndFalloffValue;
                     _releaseY = currentY;
-                    _adjustedJumpEndDuration = jumpEndDuration * xyi;
                 }
             }
 
-            if (_jumping || _endingJump)
+            if (_jumping)
             {
                 _jumpTimer += deltaTime;
                 _currentJumpHeight = jumpCurve.Evaluate(Mathf.Min(_jumpTimer, jumpDuration) / jumpDuration) * jumpHeight;
+                motor.MoveCharacter(new(transform.position.x, currentY + _currentJumpHeight, transform.position.z));
 
-                if (_jumping)
-                {
-                    motor.MoveCharacter(new(transform.position.x, currentY + _currentJumpHeight, transform.position.z));
+                if (_jumpTimer >= jumpDuration) _jumping = false;
+            }
+            else if (_endingJump)
+            {
+                motor.MoveCharacter(
+                new(
+                    transform.position.x,
+                    _releaseY + Mathf.Lerp(_currentJumpHeight, _endJumpHeight, jumpEndCurve.Evaluate(_jumpEndTimer / (jumpEndDuration * _jumpEndFalloffValue))),
+                    transform.position.z
+                ));
 
-                    if (_jumpTimer >= jumpDuration) _jumping = false;
-                }
-
-                if (_endingJump)
-                {
-                    motor.MoveCharacter(new(transform.position.x, _releaseY + Mathf.Lerp(_releaseJumpHeight, _endJumpHeight, jumpEndCurve.Evaluate(_jumpEndTimer / _adjustedJumpEndDuration)), transform.position.z));
-
-                    _jumpEndTimer += deltaTime;
-                    if (_jumpEndTimer > jumpEndDuration) _endingJump = false;
-                }
+                _jumpEndTimer += deltaTime;
+                if (_jumpEndTimer > jumpEndDuration * _jumpEndFalloffValue) _endingJump = false;
             }
         }
 
