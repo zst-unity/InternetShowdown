@@ -936,11 +936,12 @@ MonoBehaviour:
   slidingDownSpeed: 0.5
   wallJumpSmoothing: 0.1
   wallJumpSpeed: 15
+  higherWallDashDirectionThreshold: 0.27
+  lowerWallDashDirectionThreshold: -0.15
   gravity: -22
   gravityClamp: -40
   groundAdditionalVelocityDrag: 6.5
   airAdditionalVelocityDrag: 1.65
-  additionalVelocityCounteractStrength: 25
 --- !u!114 &352437294
 MonoBehaviour:
   m_ObjectHideFlags: 0

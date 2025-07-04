@@ -98,6 +98,8 @@ namespace Game.Player
         public float slidingDownSpeed;
         public float wallJumpSmoothing;
         public float wallJumpSpeed;
+        public float higherWallDashDirectionThreshold;
+        public float lowerWallDashDirectionThreshold;
 
         private bool _walled;
         private bool _prevWalled;
@@ -111,7 +113,6 @@ namespace Game.Player
         [Header("Other")]
         public float groundAdditionalVelocityDrag;
         public float airAdditionalVelocityDrag;
-        public float additionalVelocityCounteractStrength;
 
         private PlayerInputs inputs;
         private Vector3 _additionalVelocity;
@@ -207,12 +208,13 @@ namespace Game.Player
                 _dashStartPos = transform.position;
 
                 var playerViewRot = Quaternion.Euler(new(inputs.orientationX, orientation.eulerAngles.y, 0f));
-                var playerViewDir = playerViewRot * Vector3.forward;
                 if (_walled)
                 {
-                    if (Vector3.Dot(playerViewDir, _wallHitInfo.normal) > 0.5f)
+                    var playerViewDir = playerViewRot * Vector3.forward;
+                    var playerViewDirMasked = new Vector3(playerViewDir.x, 0f, playerViewDir.z);
+                    if (Vector3.Dot(playerViewDirMasked, _wallHitInfo.normal) > higherWallDashDirectionThreshold)
                         _dashDirection = playerViewDir;
-                    else if (Vector3.Dot(playerViewDir, _wallHitInfo.normal) < -0.5f)
+                    else if (Vector3.Dot(playerViewDirMasked, _wallHitInfo.normal) < lowerWallDashDirectionThreshold)
                         _dashDirection = -playerViewDir;
                     else _dashDirection = _wallHitInfo.normal;
                 }
