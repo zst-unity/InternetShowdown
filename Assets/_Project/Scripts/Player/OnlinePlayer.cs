@@ -44,7 +44,9 @@ namespace Game.Player
             {
                 move = new(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")),
                 wishJumping = Input.GetKey(KeyCode.Space),
-                wishGroundSlam = Input.GetKey(KeyCode.LeftControl)
+                wishDashing = Input.GetKey(KeyCode.LeftShift),
+                wishGroundSlam = Input.GetKey(KeyCode.LeftControl),
+                orientationX = _cameraRotX,
             };
         }
     }
