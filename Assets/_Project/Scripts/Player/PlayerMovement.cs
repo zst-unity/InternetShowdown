@@ -206,11 +206,20 @@ namespace Game.Player
                 _dashTimer = 0f;
                 _dashStartPos = transform.position;
 
-                if (_walled) _dashDirection = _wallHitInfo.normal;
+                var playerViewRot = Quaternion.Euler(new(inputs.orientationX, orientation.eulerAngles.y, 0f));
+                var playerViewDir = playerViewRot * Vector3.forward;
+                if (_walled)
+                {
+                    if (Vector3.Dot(playerViewDir, _wallHitInfo.normal) > 0.5f)
+                        _dashDirection = playerViewDir;
+                    else if (Vector3.Dot(playerViewDir, _wallHitInfo.normal) < -0.5f)
+                        _dashDirection = -playerViewDir;
+                    else _dashDirection = _wallHitInfo.normal;
+                }
                 else
                 {
                     var relative = inputs.move.sqrMagnitude == 0 ? Vector3.forward : new Vector3(inputs.move.x, 0f, inputs.move.y);
-                    _dashDirection = Quaternion.Euler(new(inputs.orientationX, orientation.eulerAngles.y, 0f)) * relative;
+                    _dashDirection = playerViewRot * relative;
                 }
 
                 _jumping = false;

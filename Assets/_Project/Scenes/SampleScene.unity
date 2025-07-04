@@ -939,7 +939,7 @@ MonoBehaviour:
   gravity: -22
   gravityClamp: -40
   groundAdditionalVelocityDrag: 6.5
-  airAdditionalVelocityDrag: 1.5
+  airAdditionalVelocityDrag: 1.65
   additionalVelocityCounteractStrength: 25
 --- !u!114 &352437294
 MonoBehaviour:
