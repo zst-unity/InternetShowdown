@@ -1,6 +1,7 @@
+using System.Reflection;
 using UnityEngine;
 
-namespace Game
+namespace Game.Player
 {
     [CreateAssetMenu(fileName = "PlayerMovementConfig", menuName = "Player Movement Config", order = 0)]
     public class PlayerMovementConfig : ScriptableObject

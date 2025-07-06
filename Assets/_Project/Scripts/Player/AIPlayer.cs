@@ -1,3 +1,4 @@
+using Mirror;
 using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
@@ -6,24 +7,22 @@ using UnityEngine.InputSystem;
 namespace Game.Player
 {
     [RequireComponent(typeof(PlayerMovement))]
-    public class AIPlayer : MonoBehaviour, IPlayerController
+    public class AIPlayer : NetworkBehaviour, IPlayerController
     {
         public PlayerMovement movement;
         private int _seed;
 
-        private void OnValidate()
+        protected override void OnValidate()
         {
+            base.OnValidate();
             movement = GetComponent<PlayerMovement>();
         }
 
-        private void Awake()
+        public override void OnStartServer()
         {
             movement.controller = this;
             _seed = UnityEngine.Random.Range(-10000, 10000);
-        }
-
-        private void Update()
-        {
+            movement.EnableMotor();
         }
 
         public PlayerInputs GetInputs()
@@ -34,7 +33,7 @@ namespace Game.Player
                 move = new(Threshold(SamplePerlin(0f, 0.2f, 1f), 0.2f), Threshold(SamplePerlin(1000f, 0.2f, 1f), 0.2f)),
                 wishJumping = SamplePerlin(0f, 0.5f, 1f) > 0.3f,
                 wishDashing = UnityEngine.Random.value > 0.9f,
-                wishGroundSlam = false,
+                wishGroundSlam = UnityEngine.Random.value > 0.99f,
                 orientationX = UnityEngine.Random.Range(-90f, 90f),
             };
         }

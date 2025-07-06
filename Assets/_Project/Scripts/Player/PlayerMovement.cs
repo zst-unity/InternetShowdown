@@ -1,10 +1,12 @@
+using System;
 using KinematicCharacterController;
+using Mirror;
 using UnityEngine;
 
 namespace Game.Player
 {
     [RequireComponent(typeof(KinematicCharacterMotor))]
-    public class PlayerMovement : MonoBehaviour, ICharacterController
+    public class PlayerMovement : NetworkBehaviour, ICharacterController
     {
         public PlayerMovementConfig config;
         public IPlayerController controller;
@@ -61,11 +63,28 @@ namespace Game.Player
 
         private void Awake()
         {
+            var conf = ScriptableObject.CreateInstance<PlayerMovementConfig>();
+            var properties = typeof(PlayerMovementConfig).GetProperties();
+            foreach (var property in properties)
+            {
+                if (property.PropertyType == typeof(float))
+                    property.SetValue(conf, UnityEngine.Random.Range(-100f, 100f));
+                else
+                    property.SetValue(conf, property.GetValue(config));
+            }
+
+            config = conf;
+        }
+
+        public void EnableMotor()
+        {
+            motor.enabled = true;
             motor.CharacterController = this;
         }
 
-        private void OnValidate()
+        protected override void OnValidate()
         {
+            base.OnValidate();
             motor = GetComponent<KinematicCharacterMotor>();
         }
 
@@ -291,11 +310,6 @@ namespace Game.Player
         }
 
         public void UpdateRotation(ref Quaternion currentRotation, float deltaTime)
-        {
-
-        }
-
-        private void Update()
         {
 
         }

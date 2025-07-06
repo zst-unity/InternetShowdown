@@ -1,12 +1,14 @@
 using System.Collections.Generic;
 using System.Linq;
+using Mirror;
 using UnityEngine;
 
 namespace Game.Player
 {
     [RequireComponent(typeof(PlayerMovement))]
-    public class OnlinePlayer : MonoBehaviour, IPlayerController
+    public class OnlinePlayer : NetworkBehaviour, IPlayerController
     {
+        public GameObject cameraPrefab;
         public PlayerMovement movement;
         public int speedRecordSize;
 
@@ -14,7 +16,6 @@ namespace Game.Player
 
         [Header("Speedlines")]
         public bool enableSpeedlines;
-        public Transform speedlines;
         public Material speedlinesFullscreenMaterial;
         public float minSpeedlinesSpeed;
         public float maxSpeedlinesSpeed;
@@ -31,25 +32,29 @@ namespace Game.Player
         public AnimationCurve FOVCurve;
         public float FOVSmoothingSpeed;
 
-        private Camera _camera;
+        private PlayerCamera _camera;
         private float _cameraRotX;
         private Vector3 _prevPosition;
 
-        private void OnValidate()
+        protected override void OnValidate()
         {
+            base.OnValidate();
             movement = GetComponent<PlayerMovement>();
         }
 
-        private void Awake()
+        public override void OnStartLocalPlayer()
         {
             _speedRecord = new(speedRecordSize);
             movement.controller = this;
             Cursor.lockState = CursorLockMode.Locked;
-            _camera = Camera.main;
+            _camera = Instantiate(cameraPrefab, movement.orientation).GetComponent<PlayerCamera>();
+            movement.EnableMotor();
         }
 
         private void Update()
         {
+            if (!isLocalPlayer) return;
+
             // CAMERA ROTATION
             var delta = Input.mousePositionDelta * 0.2f;
             movement.orientation.localEulerAngles += new Vector3(0f, delta.x, 0f);
@@ -76,9 +81,9 @@ namespace Game.Player
             {
                 var dot = Vector3.Dot(_camera.transform.forward, dir);
                 var targetFov = Mathf.Lerp(idleFOV, maxFOV, FOVCurve.Evaluate(speed / maxFOVSpeed * Mathf.Abs(dot)));
-                _camera.fieldOfView = Mathf.Lerp(_camera.fieldOfView, targetFov, Time.deltaTime * FOVSmoothingSpeed);
+                _camera.camera.fieldOfView = Mathf.Lerp(_camera.camera.fieldOfView, targetFov, Time.deltaTime * FOVSmoothingSpeed);
             }
-            else _camera.fieldOfView = idleFOV;
+            else _camera.camera.fieldOfView = idleFOV;
 
             // SPEEDLINES
             if (enableSpeedlines)
@@ -88,7 +93,7 @@ namespace Game.Player
                     var targetAlpha = speedlinesAlphaCurve.Evaluate((speed - minSpeedlinesSpeed) / maxSpeedlinesSpeed);
                     _currentSpeedlinesAlpha = Mathf.Lerp(_currentSpeedlinesAlpha, targetAlpha, Time.deltaTime * speedlinesAlphaSmoothingSpeed);
 
-                    speedlines.transform.SetPositionAndRotation(_camera.transform.position + dir * 2.3f, Quaternion.LookRotation(-dir));
+                    _camera.speedlines.transform.SetPositionAndRotation(_camera.transform.position + dir * 2.3f, Quaternion.LookRotation(-dir));
                 }
                 else _currentSpeedlinesAlpha = Mathf.Lerp(_currentSpeedlinesAlpha, 0f, Time.deltaTime * speedlinesAlphaSmoothingSpeed);
 
