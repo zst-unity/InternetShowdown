@@ -1,6 +1,4 @@
-using Unity.Collections;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace Game.Player
 {
@@ -9,8 +7,18 @@ namespace Game.Player
     {
         public PlayerMovement movement;
 
+        [Header("Speedlines")]
+        public Transform speedlines;
+        public Material speedlinesFullscreenMaterial;
+        public float minSpeedlinesSpeed;
+        public float maxSpeedlinesSpeed;
+        public AnimationCurve speedlinesAlphaCurve;
+        public float speedlinesAlphaSmoothingSpeed;
+
         private Camera _camera;
         private float _cameraRotX;
+        private Vector3 _prevPosition;
+        private float _targetSpeedlinesAlpha;
 
         private void OnValidate()
         {
@@ -36,6 +44,23 @@ namespace Game.Player
                 0f,
                 0f
             );
+
+            var dir = transform.position - _prevPosition;
+            var speed = dir.magnitude / Time.deltaTime;
+
+            if (speed >= minSpeedlinesSpeed)
+            {
+                dir.Normalize();
+
+                var alpha = speedlinesAlphaCurve.Evaluate((speed - minSpeedlinesSpeed) / maxSpeedlinesSpeed);
+                _targetSpeedlinesAlpha = Mathf.Lerp(_targetSpeedlinesAlpha, alpha, Time.deltaTime * speedlinesAlphaSmoothingSpeed);
+
+                speedlines.transform.SetPositionAndRotation(_camera.transform.position + dir * 2.3f, Quaternion.LookRotation(-dir));
+            }
+            else _targetSpeedlinesAlpha = Mathf.Lerp(_targetSpeedlinesAlpha, 0f, Time.deltaTime * speedlinesAlphaSmoothingSpeed);
+
+            speedlinesFullscreenMaterial.SetFloat("_alpha", _targetSpeedlinesAlpha);
+            _prevPosition = transform.position;
         }
 
         public PlayerInputs GetInputs()

@@ -189,7 +189,7 @@ MonoBehaviour:
   dashDuration: 0.15
   dashCooldown: 0.35
   dashBuffer: 0.2
-  minGroundSlamForce: -20
+  minGroundSlamForce: -15
   maxGroundSlamForce: -60
   groundSlamForceInterpolationDistance: 25
   wallLayers:
