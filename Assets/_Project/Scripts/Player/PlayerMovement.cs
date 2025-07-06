@@ -1,5 +1,3 @@
-using System;
-using Game.Player;
 using KinematicCharacterController;
 using UnityEngine;
 
@@ -8,72 +6,34 @@ namespace Game.Player
     [RequireComponent(typeof(KinematicCharacterMotor))]
     public class PlayerMovement : MonoBehaviour, ICharacterController
     {
-        [Header("Objects")]
+        public PlayerMovementConfig config;
         public IPlayerController controller;
         public KinematicCharacterMotor motor;
         public Transform orientation;
 
-        [Header("Movement")]
-        public float speed;
-
+        // movement
         private float _targetSpeed;
-
-        [Space(9)]
-        public float moveSmoothingDuration;
-        public AnimationCurve moveSmootingCurve;
-
         private Vector2 _prevMoveInput;
         private Vector2 _fromMoveInput;
         private Vector2 _targetMoveInput;
         private float _elapsedFromMoveInputChange;
-
-        [Space(9)]
-        public AnimationCurve accelerationCurve;
-        public float accelerationDuration;
-
         private float _movementTime;
-
-        [Space(9)]
-        public AnimationCurve deccelerationCurve;
-        public float deccelerationDuration;
-
         private float _idleTime;
 
-        [Header("Jumping")]
-        public float jumpHeight;
-        public float jumpDuration;
-        public AnimationCurve jumpCurve;
-
+        // jumping
         private bool _jumping;
         private float _jumpTimer;
         private float _currentJumpHeight;
-
-        [Space(9)]
-        public float jumpEndDuration;
-        public float jumpEndMultiplier;
-        public AnimationCurve jumpEndCurve;
-        public AnimationCurve jumpEndFalloffCurve;
-
         private bool _endingJump;
         private float _jumpEndTimer;
         private float _releaseY;
         private float _endJumpHeight;
         private float _jumpEndFalloffValue;
-
-        [Space(9)]
-        public float coyoteTime;
-        public float bufferTime;
-
         private float _coyoteTimer;
         private float _bufferTimer;
         private bool _prevWishJumping;
 
-        [Header("Dash")]
-        public float dashDistance;
-        public float dashDuration;
-        public float dashCooldown;
-        public float dashBuffer;
-
+        // dash
         private bool _dashing;
         private bool _canDash;
         private float _dashTimer;
@@ -83,37 +43,18 @@ namespace Game.Player
         private float _dashBufferTimer;
         private bool _prevWishDashing;
 
-        [Header("Ground Slam")]
-        public float groundSlamForce;
-
+        // ground slam
         private bool _groundSlamming;
+        private float _groundSlamForce;
         private bool _canGroundSlam;
 
-        [Header("Wall Running")]
-        public LayerMask wallLayers;
-        public float wallDetectionDistance;
-        public int wallCheckRayCount;
-
-        [Space(9)]
-        public float slidingDownSpeed;
-        public float wallJumpSmoothing;
-        public float wallJumpSpeed;
-        public float higherWallDashDirectionThreshold;
-        public float lowerWallDashDirectionThreshold;
-
+        // wall running
         private bool _walled;
         private bool _prevWalled;
         private RaycastHit _wallHitInfo;
         private bool _jumpingFromGround;
 
-        [Header("Gravity")]
-        public float gravity;
-        public float gravityClamp;
-
-        [Header("Other")]
-        public float groundAdditionalVelocityDrag;
-        public float airAdditionalVelocityDrag;
-
+        // other
         private PlayerInputs inputs;
         private Vector3 _additionalVelocity;
         private float _gravityVelocity;
@@ -130,11 +71,11 @@ namespace Game.Player
 
         public void AfterCharacterUpdate(float deltaTime)
         {
-            var drag = motor.GroundingStatus.IsStableOnGround ? groundAdditionalVelocityDrag : airAdditionalVelocityDrag;
+            var drag = motor.GroundingStatus.IsStableOnGround ? config.groundAdditionalVelocityDrag : config.airAdditionalVelocityDrag;
             _additionalVelocity *= 1f - drag * deltaTime;
 
             if (new Vector2(_additionalVelocity.x, _additionalVelocity.z).magnitude <= 0.5f)
-                _additionalVelocity = Vector2.zero;
+                _additionalVelocity = Vector3.up * _additionalVelocity.y;
         }
 
         private void CheckWalled()
@@ -146,12 +87,12 @@ namespace Game.Player
             if (!motor.GroundingStatus.IsStableOnGround && !_groundSlamming && !_jumpingFromGround)
             {
                 var origin = transform.position + Vector3.up * motor.Capsule.height / 2f;
-                var maxdist = wallDetectionDistance + motor.Capsule.radius;
-                for (int i = 0; i < wallCheckRayCount; i++)
+                var maxdist = config.wallDetectionDistance + motor.Capsule.radius;
+                for (int i = 0; i < config.wallCheckRayCount; i++)
                 {
-                    var x = i * Mathf.PI * 2 / wallCheckRayCount;
+                    var x = i * Mathf.PI * 2 / config.wallCheckRayCount;
                     var dir = new Vector3(Mathf.Sin(x), 0f, Mathf.Cos(x));
-                    if (Physics.Raycast(origin, orientation.rotation * dir, out hit, maxdist, wallLayers))
+                    if (Physics.Raycast(origin, orientation.rotation * dir, out hit, maxdist, config.wallLayers))
                     {
                         _walled = true;
                         break;
@@ -183,15 +124,16 @@ namespace Game.Player
                 && inputs.wishGroundSlam
                 && !_groundSlamming
                 && _canGroundSlam
-                && Physics.Raycast(transform.position, Vector3.down, 1000f, motor.StableGroundLayers))
+                && Physics.Raycast(transform.position, Vector3.down, out var hitInfo, 1000f, motor.StableGroundLayers))
             {
                 _jumping = false;
                 _endingJump = false;
                 _dashing = false;
+                _groundSlamForce = Mathf.Lerp(config.minGroundSlamForce, config.maxGroundSlamForce, hitInfo.distance / config.groundSlamForceInterpolationDistance);
 
                 _groundSlamming = true;
                 _canGroundSlam = false;
-                _bufferTimer = bufferTime;
+                _bufferTimer = config.bufferTime;
             }
 
             if (inputs.wishDashing && !_prevWishDashing)
@@ -200,7 +142,7 @@ namespace Game.Player
             }
             _dashBufferTimer += deltaTime;
 
-            if (_dashBufferTimer < dashBuffer && !_dashing && _canDash && _dashCooldownTimer <= 0f)
+            if (_dashBufferTimer < config.dashBuffer && !_dashing && _canDash && _dashCooldownTimer <= 0f)
             {
                 _dashing = true;
                 _canDash = false;
@@ -212,9 +154,9 @@ namespace Game.Player
                 {
                     var playerViewDir = playerViewRot * Vector3.forward;
                     var playerViewDirMasked = new Vector3(playerViewDir.x, 0f, playerViewDir.z);
-                    if (Vector3.Dot(playerViewDirMasked, _wallHitInfo.normal) > higherWallDashDirectionThreshold)
+                    if (Vector3.Dot(playerViewDirMasked, _wallHitInfo.normal) > config.higherWallDashDirectionThreshold)
                         _dashDirection = playerViewDir;
-                    else if (Vector3.Dot(playerViewDirMasked, _wallHitInfo.normal) < lowerWallDashDirectionThreshold)
+                    else if (Vector3.Dot(playerViewDirMasked, _wallHitInfo.normal) < config.lowerWallDashDirectionThreshold)
                         _dashDirection = -playerViewDir;
                     else _dashDirection = _wallHitInfo.normal;
                 }
@@ -227,9 +169,9 @@ namespace Game.Player
                 _jumping = false;
                 _endingJump = false;
                 _groundSlamming = false;
-                motor.ForceUnground(dashDuration);
+                motor.ForceUnground(config.dashDuration);
 
-                _dashBufferTimer = dashBuffer;
+                _dashBufferTimer = config.dashBuffer;
             }
 
             if (inputs.wishJumping && !_prevWishJumping)
@@ -242,9 +184,9 @@ namespace Game.Player
             {
                 _coyoteTimer = 0f;
                 _dashTimer += deltaTime;
-                motor.MoveCharacter(Vector3.Lerp(_dashStartPos, _dashStartPos + _dashDirection * dashDistance, _dashTimer / dashDuration));
+                motor.MoveCharacter(Vector3.Lerp(_dashStartPos, _dashStartPos + _dashDirection * config.dashDistance, _dashTimer / config.dashDuration));
 
-                _dashCooldownTimer = dashCooldown;
+                _dashCooldownTimer = config.dashCooldown;
                 return;
             }
 
@@ -257,12 +199,12 @@ namespace Game.Player
             }
             else _coyoteTimer += deltaTime;
 
-            if (_coyoteTimer < coyoteTime)
+            if (_coyoteTimer < config.coyoteTime)
             {
                 _jumpTimer = 0f;
                 _currentJumpHeight = 0f;
 
-                if (_bufferTimer <= bufferTime) BeginJump();
+                if (_bufferTimer <= config.bufferTime) BeginJump();
             }
 
             var currentY = transform.position.y - _currentJumpHeight;
@@ -273,8 +215,8 @@ namespace Game.Player
                     _jumping = false;
                     _endingJump = true;
                     _jumpEndTimer = 0f;
-                    _jumpEndFalloffValue = jumpEndFalloffCurve.Evaluate(1f - _jumpTimer / jumpDuration);
-                    _endJumpHeight = _currentJumpHeight + (jumpCurve.Evaluate(Mathf.Min(_jumpTimer + jumpEndDuration, jumpDuration) / jumpDuration) * jumpHeight - _currentJumpHeight) * jumpEndMultiplier * _jumpEndFalloffValue;
+                    _jumpEndFalloffValue = config.jumpEndFalloffCurve.Evaluate(1f - _jumpTimer / config.jumpDuration);
+                    _endJumpHeight = _currentJumpHeight + (config.jumpCurve.Evaluate(Mathf.Min(_jumpTimer + config.jumpEndDuration, config.jumpDuration) / config.jumpDuration) * config.jumpHeight - _currentJumpHeight) * config.jumpEndMultiplier * _jumpEndFalloffValue;
                     _releaseY = currentY;
                 }
             }
@@ -282,10 +224,10 @@ namespace Game.Player
             if (_jumping)
             {
                 _jumpTimer += deltaTime;
-                _currentJumpHeight = jumpCurve.Evaluate(Mathf.Min(_jumpTimer, jumpDuration) / jumpDuration) * jumpHeight;
+                _currentJumpHeight = config.jumpCurve.Evaluate(Mathf.Min(_jumpTimer, config.jumpDuration) / config.jumpDuration) * config.jumpHeight;
                 motor.MoveCharacter(new(transform.position.x, currentY + _currentJumpHeight, transform.position.z));
 
-                if (_jumpTimer >= jumpDuration) _jumping = false;
+                if (_jumpTimer >= config.jumpDuration) _jumping = false;
             }
             else
             {
@@ -295,19 +237,19 @@ namespace Game.Player
                     motor.MoveCharacter(
                     new(
                         transform.position.x,
-                        _releaseY + Mathf.Lerp(_currentJumpHeight, _endJumpHeight, jumpEndCurve.Evaluate(_jumpEndTimer / (jumpEndDuration * _jumpEndFalloffValue))),
+                        _releaseY + Mathf.Lerp(_currentJumpHeight, _endJumpHeight, config.jumpEndCurve.Evaluate(_jumpEndTimer / (config.jumpEndDuration * _jumpEndFalloffValue))),
                         transform.position.z
                     ));
 
                     _jumpEndTimer += deltaTime;
-                    if (_jumpEndTimer > jumpEndDuration * _jumpEndFalloffValue) _endingJump = false;
+                    if (_jumpEndTimer > config.jumpEndDuration * _jumpEndFalloffValue) _endingJump = false;
                 }
             }
         }
 
         private void BeginJump()
         {
-            _coyoteTimer = coyoteTime;
+            _coyoteTimer = config.coyoteTime;
             motor.ForceUnground();
             _jumping = true;
             if (!_walled) _jumpingFromGround = true;
@@ -362,16 +304,16 @@ namespace Game.Player
         {
             if (_dashing)
             {
-                if ((_dashTimer >= dashDuration) || (inputs.wishJumping && !_prevWishJumping))
+                if ((_dashTimer >= config.dashDuration) || (inputs.wishJumping && !_prevWishJumping))
                 {
                     _dashing = false;
-                    _additionalVelocity = _dashDirection * (dashDistance / dashDuration);
+                    _additionalVelocity = _dashDirection * (config.dashDistance / config.dashDuration);
                 }
             }
 
             if (_walled && _jumping)
             {
-                _additionalVelocity = _wallHitInfo.normal * wallJumpSpeed;
+                _additionalVelocity = _wallHitInfo.normal * config.wallJumpSpeed;
             }
 
             if (inputs.move != _prevMoveInput)
@@ -388,14 +330,15 @@ namespace Game.Player
                 _movementTime += deltaTime;
                 _elapsedFromMoveInputChange += Time.deltaTime;
 
+                var smoothingDuration = motor.GroundingStatus.IsStableOnGround ? config.groundMoveSmoothingDuration : config.airMoveSmoothingDuration;
                 _targetMoveInput = Vector2.Lerp
                 (
                     _fromMoveInput,
                     inputs.move.normalized,
-                    moveSmootingCurve.Evaluate(Mathf.Min(_elapsedFromMoveInputChange, moveSmoothingDuration) / moveSmoothingDuration)
+                    config.moveSmootingCurve.Evaluate(Mathf.Min(_elapsedFromMoveInputChange, smoothingDuration) / smoothingDuration)
                 );
 
-                _targetSpeed = speed * accelerationCurve.Evaluate(Mathf.Min(_movementTime, accelerationDuration) / accelerationDuration);
+                _targetSpeed = config.speed * config.accelerationCurve.Evaluate(Mathf.Min(_movementTime, config.accelerationDuration) / config.accelerationDuration);
             }
             else
             {
@@ -406,7 +349,7 @@ namespace Game.Player
                 (
                     _fromMoveInput,
                     Vector2.zero,
-                    deccelerationCurve.Evaluate(Mathf.Min(_idleTime, deccelerationDuration) / deccelerationDuration)
+                    config.deccelerationCurve.Evaluate(Mathf.Min(_idleTime, config.deccelerationDuration) / config.deccelerationDuration)
                 );
             }
             var dir = orientation.rotation * new Vector3(_targetMoveInput.x, 0f, _targetMoveInput.y);
@@ -423,8 +366,8 @@ namespace Game.Player
 
             var addvel = _jumping ? new Vector3(_additionalVelocity.x, 0f, _additionalVelocity.z) : _additionalVelocity;
 
-            if (_groundSlamming) currentVelocity = new(currentVelocity.x, groundSlamForce, currentVelocity.z);
-            else if (_walled) currentVelocity = new Vector3(movementVelocity.x, -slidingDownSpeed, movementVelocity.z) + addvel;
+            if (_groundSlamming) currentVelocity = new(currentVelocity.x, _groundSlamForce, currentVelocity.z);
+            else if (_walled) currentVelocity = new Vector3(movementVelocity.x, -config.slidingDownSpeed, movementVelocity.z) + addvel;
             else currentVelocity = movementVelocity + addvel + Vector3.up * _gravityVelocity;
 
             if (motor.GroundingStatus.IsStableOnGround) UpdateVelocityOnGround(ref currentVelocity, deltaTime);
@@ -440,9 +383,9 @@ namespace Game.Player
         private void UpdateVelocityInAir(ref Vector3 currentVelocity, float deltaTime)
         {
             if (_jumping || _endingJump || _dashing || _walled) _gravityVelocity = 0f;
-            else if (currentVelocity.y > gravityClamp)
+            else if (currentVelocity.y > config.gravityClamp)
             {
-                _gravityVelocity += gravity * deltaTime;
+                _gravityVelocity += config.gravity * deltaTime;
             }
         }
 
@@ -450,10 +393,10 @@ namespace Game.Player
         {
             Gizmos.color = Color.green;
             var origin = transform.position + Vector3.up * motor.Capsule.height / 2f;
-            var distance = wallDetectionDistance + motor.Capsule.radius;
-            for (int i = 0; i < wallCheckRayCount; i++)
+            var distance = config.wallDetectionDistance + motor.Capsule.radius;
+            for (int i = 0; i < config.wallCheckRayCount; i++)
             {
-                var x = i * Mathf.PI * 2 / wallCheckRayCount;
+                var x = i * Mathf.PI * 2 / config.wallCheckRayCount;
                 Gizmos.DrawRay(origin, new Vector3(Mathf.Sin(x), 0f, Mathf.Cos(x)) * distance);
             }
         }
