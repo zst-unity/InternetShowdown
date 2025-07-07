@@ -57,23 +57,13 @@ namespace Game.Player
         private bool _jumpingFromGround;
 
         // other
-        private PlayerInputs inputs;
+        public PlayerInputs inputs;
         private Vector3 _additionalVelocity;
         private float _gravityVelocity;
 
         private void Awake()
         {
-            var conf = ScriptableObject.CreateInstance<PlayerMovementConfig>();
-            var properties = typeof(PlayerMovementConfig).GetProperties();
-            foreach (var property in properties)
-            {
-                if (property.PropertyType == typeof(float))
-                    property.SetValue(conf, UnityEngine.Random.Range(-100f, 100f));
-                else
-                    property.SetValue(conf, property.GetValue(config));
-            }
-
-            config = conf;
+            motor.enabled = false;
         }
 
         public void EnableMotor()
