@@ -95,7 +95,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  speedlinesAlphaSmoothingSpeed: 10
+  speedlinesAlphaSmoothingSpeed: 14
   enableSpeedAffectsFOV: 1
   idleFOV: 60
   maxFOV: 90
@@ -131,9 +131,10 @@ MonoBehaviour:
   cameraBopTiltAmplitude: 0.5
   cameraBopFrequency: 10.5
   cameraBopStopSpeed: 5
-  groundSlamCameraShake: 0.7
-  cameraShakeFrequency: 6
+  cameraShakeFrequency: 7
   cameraShakeFalloffSpeed: 9
+  groundSlamCameraShakeMultiplier: 0.05
+  maxGroundSlamCameraShake: 3
 --- !u!136 &241399185085964307
 CapsuleCollider:
   m_ObjectHideFlags: 8

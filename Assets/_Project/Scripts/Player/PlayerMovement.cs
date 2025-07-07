@@ -50,6 +50,7 @@ namespace Game.Player
         private bool _groundSlamming;
         private float _groundSlamForce;
         private bool _canGroundSlam;
+        private float _groundSlamDistance;
 
         // wall running
         private bool _walled;
@@ -62,7 +63,7 @@ namespace Game.Player
         private Vector3 _additionalVelocity;
         private float _gravityVelocity;
 
-        public UnityEvent onGroundSlamLanded = new();
+        public UnityEvent<float> onGroundSlamLanded = new();
 
         private void Awake()
         {
@@ -144,6 +145,7 @@ namespace Game.Player
                 _groundSlamForce = Mathf.Lerp(config.minGroundSlamForce, config.maxGroundSlamForce, hitInfo.distance / config.groundSlamForceInterpolationDistance);
 
                 _groundSlamming = true;
+                _groundSlamDistance = hitInfo.distance;
                 _canGroundSlam = false;
                 _bufferTimer = config.bufferTime;
             }
@@ -387,7 +389,7 @@ namespace Game.Player
             if (_groundSlamming)
             {
                 _groundSlamming = false;
-                onGroundSlamLanded?.Invoke();
+                onGroundSlamLanded?.Invoke(_groundSlamDistance);
             }
         }
 

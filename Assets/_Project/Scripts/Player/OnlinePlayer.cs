@@ -51,9 +51,12 @@ namespace Game.Player
         private float _cameraBopTilt;
 
         [Header("Camera Shake")]
-        public float groundSlamCameraShake;
         public float cameraShakeFrequency;
         public float cameraShakeFalloffSpeed;
+
+        [Space(9)]
+        public float groundSlamCameraShakeMultiplier;
+        public float maxGroundSlamCameraShake;
 
         private PlayerCamera _camera;
         private float _cameraRotX;
@@ -79,7 +82,7 @@ namespace Game.Player
 
             movement.controller = this;
             movement.EnableMotor();
-            movement.onGroundSlamLanded.AddListener(() => ShakeCamera(groundSlamCameraShake));
+            movement.onGroundSlamLanded.AddListener((dist) => ShakeCamera(Mathf.Min(dist * groundSlamCameraShakeMultiplier, maxGroundSlamCameraShake)));
         }
 
         public void ShakeCamera(float amplitude)
