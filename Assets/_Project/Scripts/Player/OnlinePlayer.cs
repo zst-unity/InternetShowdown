@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Mirror;
+using Unity.Mathematics;
 using UnityEngine;
 
 namespace Game.Player
@@ -9,6 +10,7 @@ namespace Game.Player
     public class OnlinePlayer : NetworkBehaviour, IPlayerController
     {
         public GameObject cameraPrefab;
+        public GameObject model;
         public PlayerMovement movement;
         public Transform cameraHolder;
         public int speedRecordSize;
@@ -48,10 +50,18 @@ namespace Game.Player
         private float _cameraBopHeight;
         private float _cameraBopTilt;
 
+        [Header("Camera Shake")]
+        public float groundSlamCameraShake;
+        public float cameraShakeFrequency;
+        public float cameraShakeFalloffSpeed;
+
         private PlayerCamera _camera;
         private float _cameraRotX;
         private Vector3 _prevPosition;
         private float _timeSinceRunning;
+
+        private Vector3 _cameraShake;
+        private float _cameraShakeMult;
 
         protected override void OnValidate()
         {
@@ -62,15 +72,34 @@ namespace Game.Player
         public override void OnStartLocalPlayer()
         {
             _speedRecord = new(speedRecordSize);
-            movement.controller = this;
+
             Cursor.lockState = CursorLockMode.Locked;
             _camera = Instantiate(cameraPrefab, cameraHolder).GetComponent<PlayerCamera>();
+            model.SetActive(false);
+
+            movement.controller = this;
             movement.EnableMotor();
+            movement.onGroundSlamLanded.AddListener(() => ShakeCamera(groundSlamCameraShake));
+        }
+
+        public void ShakeCamera(float amplitude)
+        {
+            _cameraShakeMult = amplitude;
         }
 
         private void Update()
         {
             if (!isLocalPlayer) return;
+
+            // CAMERA SHAKE
+            var x = Time.time * cameraShakeFrequency;
+            _cameraShake = new Vector3
+            (
+                noise.snoise(new float2(x)),
+                noise.snoise(new float2(x + 1000f)),
+                noise.snoise(new float2(x - 1000f))
+            ) * _cameraShakeMult;
+            _cameraShakeMult = Mathf.Lerp(_cameraShakeMult, 0f, Time.deltaTime * cameraShakeFalloffSpeed);
 
             // SIDE RUN TILT
             var targetSideRunTilt = movement.inputs.move.normalized.x * maxSideRunTilt;
@@ -91,7 +120,7 @@ namespace Game.Player
                 _cameraBopTilt = Mathf.Sin(_timeSinceRunning * cameraBopFrequency) * cameraBopTiltAmplitude;
             }
 
-            _camera.transform.localPosition = new(0f, _cameraBopHeight, 0f);
+            _camera.transform.localPosition = _cameraShake + Vector3.up * _cameraBopHeight;
 
             // CAMERA ROTATION
             var delta = Input.mousePositionDelta * 0.2f;

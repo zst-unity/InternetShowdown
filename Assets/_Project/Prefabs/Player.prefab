@@ -54,6 +54,7 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   cameraPrefab: {fileID: 293337341705726784, guid: 4cdd146b491d11a4692a32238c4fd696, type: 3}
+  model: {fileID: 7050680160326592069}
   movement: {fileID: 6754057132338759635}
   cameraHolder: {fileID: 9199459176827721078}
   speedRecordSize: 8
@@ -130,6 +131,9 @@ MonoBehaviour:
   cameraBopTiltAmplitude: 0.5
   cameraBopFrequency: 10.5
   cameraBopStopSpeed: 5
+  groundSlamCameraShake: 0.7
+  cameraShakeFrequency: 6
+  cameraShakeFalloffSpeed: 9
 --- !u!136 &241399185085964307
 CapsuleCollider:
   m_ObjectHideFlags: 8
@@ -171,6 +175,9 @@ MonoBehaviour:
   config: {fileID: 11400000, guid: 6557f4f69351e73429465a2a5dfea442, type: 2}
   motor: {fileID: 3085756864833092725}
   orientation: {fileID: 6124577175492389443}
+  onGroundSlamLanded:
+    m_PersistentCalls:
+      m_Calls: []
 --- !u!114 &3085756864833092725
 MonoBehaviour:
   m_ObjectHideFlags: 0

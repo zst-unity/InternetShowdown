@@ -2,6 +2,7 @@ using System;
 using KinematicCharacterController;
 using Mirror;
 using UnityEngine;
+using UnityEngine.Events;
 
 namespace Game.Player
 {
@@ -60,6 +61,8 @@ namespace Game.Player
         public PlayerInputs inputs;
         private Vector3 _additionalVelocity;
         private float _gravityVelocity;
+
+        public UnityEvent onGroundSlamLanded = new();
 
         private void Awake()
         {
@@ -381,7 +384,11 @@ namespace Game.Player
         private void UpdateVelocityOnGround(ref Vector3 currentVelocity, float deltaTime)
         {
             _gravityVelocity = 0f;
-            if (_groundSlamming) _groundSlamming = false;
+            if (_groundSlamming)
+            {
+                _groundSlamming = false;
+                onGroundSlamLanded?.Invoke();
+            }
         }
 
         private void UpdateVelocityInAir(ref Vector3 currentVelocity, float deltaTime)
