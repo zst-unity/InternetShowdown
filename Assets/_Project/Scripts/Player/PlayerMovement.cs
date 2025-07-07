@@ -178,6 +178,12 @@ namespace Game.Player
                 {
                     var relative = inputs.move.sqrMagnitude == 0 ? Vector3.forward : new Vector3(inputs.move.x, 0f, inputs.move.y);
                     _dashDirection = playerViewRot * relative;
+
+                    if (motor.GroundingStatus.IsStableOnGround)
+                    {
+                        var dashDirProjected = Vector3.ProjectOnPlane(_dashDirection, motor.GroundingStatus.GroundNormal);
+                        _dashDirection = (dashDirProjected + Vector3.up * _dashDirection.y).normalized;
+                    }
                 }
 
                 _jumping = false;

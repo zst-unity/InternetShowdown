@@ -127,9 +127,9 @@ Material:
     - _WorkflowMode: 1
     - _XRMotionVectorsPass: 1
     - _ZWrite: 1
-    - _checkerboard_intensity: 0.15
-    - _checkerboard_scroll_speed: 0.02
-    - _checkerboard_size: 60
+    - _checkerboard_intensity: 0.1
+    - _checkerboard_scroll_speed: 0.01
+    - _checkerboard_size: 75
     - _close_quantization: 20.9
     - _far_distance: 32
     - _far_quantization: -2.9
