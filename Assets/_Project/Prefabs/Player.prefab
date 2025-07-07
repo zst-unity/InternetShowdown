@@ -133,7 +133,7 @@ MonoBehaviour:
   cameraBopStopSpeed: 5
   cameraShakeFrequency: 7
   cameraShakeFalloffSpeed: 9
-  groundSlamCameraShakeMultiplier: 0.05
+  groundSlamCameraShakeMultiplier: 0.06
   maxGroundSlamCameraShake: 3
 --- !u!136 &241399185085964307
 CapsuleCollider:

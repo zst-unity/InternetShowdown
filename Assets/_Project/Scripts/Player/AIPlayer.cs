@@ -1,8 +1,6 @@
 using Mirror;
-using Unity.Collections;
 using Unity.Mathematics;
 using UnityEngine;
-using UnityEngine.InputSystem;
 
 namespace Game.Player
 {

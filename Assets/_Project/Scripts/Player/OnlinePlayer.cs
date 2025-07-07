@@ -65,6 +65,7 @@ namespace Game.Player
 
         private Vector3 _cameraShake;
         private float _cameraShakeMult;
+        private float _mouseSens;
 
         protected override void OnValidate()
         {
@@ -79,6 +80,7 @@ namespace Game.Player
             Cursor.lockState = CursorLockMode.Locked;
             _camera = Instantiate(cameraPrefab, cameraHolder).GetComponent<PlayerCamera>();
             model.SetActive(false);
+            _mouseSens = PlayerPrefs.GetFloat("sens");
 
             movement.controller = this;
             movement.EnableMotor();
@@ -93,6 +95,12 @@ namespace Game.Player
         private void Update()
         {
             if (!isLocalPlayer) return;
+
+            if (Input.GetKeyDown(KeyCode.F1))
+            {
+                if (Cursor.lockState == CursorLockMode.Locked) Cursor.lockState = CursorLockMode.None;
+                else Cursor.lockState = CursorLockMode.Locked;
+            }
 
             // CAMERA SHAKE
             var x = Time.time * cameraShakeFrequency;
@@ -126,7 +134,7 @@ namespace Game.Player
             _camera.transform.localPosition = _cameraShake + Vector3.up * _cameraBopHeight;
 
             // CAMERA ROTATION
-            var delta = Input.mousePositionDelta * 0.2f;
+            var delta = Input.mousePositionDelta * 0.2f * _mouseSens;
             movement.orientation.localEulerAngles += new Vector3(0f, delta.x, 0f);
             _cameraRotX -= delta.y;
             _cameraRotX = Mathf.Clamp(_cameraRotX, -90f, 90f);
@@ -180,8 +188,8 @@ namespace Game.Player
             {
                 move = new(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")),
                 wishJumping = Input.GetKey(KeyCode.Space),
-                wishDashing = Input.GetKey(KeyCode.LeftShift),
-                wishGroundSlam = Input.GetKey(KeyCode.LeftControl),
+                wishDashing = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift),
+                wishGroundSlam = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl),
                 orientationX = _cameraRotX,
             };
         }
