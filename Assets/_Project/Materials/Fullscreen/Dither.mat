@@ -141,7 +141,7 @@ Material:
     - _skybox_contrast: 0.5
     - _skybox_dither_intensity: 0.25
     - _skybox_dither_scale: 1
-    - _skybox_pixelization: 100
+    - _skybox_pixelization: 101
     - _skybox_quantization: 24
     - _skybox_ratio: 1
     - _skybox_resolution: 16

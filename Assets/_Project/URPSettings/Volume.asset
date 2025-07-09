@@ -1,33 +1,5 @@
 %YAML 1.1
 %TAG !u! tag:unity3d.com,2011:
---- !u!114 &-8952390849596395933
-MonoBehaviour:
-  m_ObjectHideFlags: 3
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c5e1dc532bcb41949b58bc4f2abfbb7e, type: 3}
-  m_Name: LensDistortion
-  m_EditorClassIdentifier: 
-  active: 1
-  intensity:
-    m_OverrideState: 1
-    m_Value: 0.2
-  xMultiplier:
-    m_OverrideState: 0
-    m_Value: 1
-  yMultiplier:
-    m_OverrideState: 0
-    m_Value: 1
-  center:
-    m_OverrideState: 0
-    m_Value: {x: 0.5, y: 0.5}
-  scale:
-    m_OverrideState: 1
-    m_Value: 1.017
 --- !u!114 &-8755385020611446177
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -58,7 +30,7 @@ MonoBehaviour:
     m_Value: 1
   tint:
     m_OverrideState: 1
-    m_Value: {r: 0.80779827, g: 0.7877358, b: 1, a: 1}
+    m_Value: {r: 1, g: 1, b: 1, a: 1}
   highQualityFiltering:
     m_OverrideState: 0
     m_Value: 0
@@ -90,7 +62,6 @@ MonoBehaviour:
   components:
   - {fileID: -8755385020611446177}
   - {fileID: 1812374243193263228}
-  - {fileID: -8952390849596395933}
 --- !u!114 &1812374243193263228
 MonoBehaviour:
   m_ObjectHideFlags: 3
@@ -115,7 +86,7 @@ MonoBehaviour:
     m_Value: {r: 1, g: 1, b: 1, a: 1}
   hueShift:
     m_OverrideState: 0
-    m_Value: 0
+    m_Value: 2
   saturation:
     m_OverrideState: 1
     m_Value: 50

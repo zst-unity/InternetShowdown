@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using Game.Inputs;
 using Mirror;
 using Unity.Mathematics;
 using UnityEngine;
@@ -67,6 +68,8 @@ namespace Game.Player
         private float _cameraShakeMult;
         private float _mouseSens;
 
+        private PlayerActions _actions;
+
         protected override void OnValidate()
         {
             base.OnValidate();
@@ -81,6 +84,9 @@ namespace Game.Player
             _camera = Instantiate(cameraPrefab, cameraHolder).GetComponent<PlayerCamera>();
             model.SetActive(false);
             _mouseSens = PlayerPrefs.GetFloat("sens");
+
+            _actions = new();
+            _actions.Enable();
 
             movement.controller = this;
             movement.EnableMotor();
@@ -134,7 +140,7 @@ namespace Game.Player
             _camera.transform.localPosition = _cameraShake + Vector3.up * _cameraBopHeight;
 
             // CAMERA ROTATION
-            var delta = Input.mousePositionDelta * 0.2f * _mouseSens;
+            var delta = _actions.Camera.Look.ReadValue<Vector2>() * _mouseSens;
             movement.orientation.localEulerAngles += new Vector3(0f, delta.x, 0f);
             _cameraRotX -= delta.y;
             _cameraRotX = Mathf.Clamp(_cameraRotX, -90f, 90f);
@@ -186,10 +192,10 @@ namespace Game.Player
         {
             return new()
             {
-                move = new(Input.GetAxisRaw("Horizontal"), Input.GetAxisRaw("Vertical")),
-                wishJumping = Input.GetKey(KeyCode.Space),
-                wishDashing = Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift),
-                wishGroundSlam = Input.GetKey(KeyCode.LeftControl) || Input.GetKey(KeyCode.RightControl),
+                move = _actions.Movement.Move.ReadValue<Vector2>(),
+                wishJumping = _actions.Movement.Jump.inProgress,
+                wishDashing = _actions.Movement.Dash.inProgress,
+                wishGroundSlam = _actions.Movement.GroundSlam.inProgress,
                 orientationX = _cameraRotX,
             };
         }

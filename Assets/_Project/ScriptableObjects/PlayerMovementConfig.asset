@@ -12,7 +12,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 056a6447b661a3041aeead5ffbd689f5, type: 3}
   m_Name: PlayerMovementConfig
   m_EditorClassIdentifier: 
-  speed: 7
+  speed: 8.5
   groundMoveSmoothingDuration: 0.17
   airMoveSmoothingDuration: 0.25
   moveSmootingCurve:
@@ -72,7 +72,7 @@ MonoBehaviour:
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  accelerationDuration: 0.6
+  accelerationDuration: 0.7
   deccelerationCurve:
     serializedVersion: 2
     m_Curve:
@@ -107,7 +107,7 @@ MonoBehaviour:
     m_PostInfinity: 2
     m_RotationOrder: 4
   deccelerationDuration: 0.35
-  jumpHeight: 3
+  jumpHeight: 4
   jumpDuration: 0.6
   jumpCurve:
     serializedVersion: 2
@@ -115,25 +115,25 @@ MonoBehaviour:
     - serializedVersion: 3
       time: 0
       value: 0
-      inSlope: 2.2347074
-      outSlope: 2.2347074
+      inSlope: 2
+      outSlope: 2
       tangentMode: 0
       weightedMode: 0
       inWeight: 0
-      outWeight: 0.03918919
+      outWeight: 0
     - serializedVersion: 3
       time: 1
       value: 1
-      inSlope: 0.11593296
-      outSlope: 0.11593296
+      inSlope: 0
+      outSlope: 0
       tangentMode: 0
       weightedMode: 0
-      inWeight: 0.0702703
+      inWeight: 0
       outWeight: 0
     m_PreInfinity: 2
     m_PostInfinity: 2
     m_RotationOrder: 4
-  jumpEndDuration: 0.12
+  jumpEndDuration: 0.15
   jumpEndMultiplier: 0.52
   jumpEndCurve:
     serializedVersion: 2
@@ -186,12 +186,12 @@ MonoBehaviour:
   coyoteTime: 0.2
   bufferTime: 0.2
   dashDistance: 4.5
-  dashDuration: 0.15
-  dashCooldown: 0.35
-  dashBuffer: 0.2
-  minGroundSlamForce: -15
-  maxGroundSlamForce: -60
-  groundSlamForceInterpolationDistance: 25
+  dashDuration: 0.12
+  dashCooldown: 0.5
+  dashBuffer: 0.3
+  minGroundSlamForce: -20
+  maxGroundSlamForce: -80
+  groundSlamForceInterpolationDistance: 20
   wallLayers:
     serializedVersion: 2
     m_Bits: 55
@@ -202,7 +202,7 @@ MonoBehaviour:
   wallJumpSpeed: 15
   higherWallDashDirectionThreshold: 0.27
   lowerWallDashDirectionThreshold: -0.15
-  gravity: -22
+  gravity: -23
   gravityClamp: -40
   groundAdditionalVelocityDrag: 7
-  airAdditionalVelocityDrag: 1.7
+  airAdditionalVelocityDrag: 1.8

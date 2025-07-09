@@ -129,12 +129,12 @@ Material:
     - _ZWrite: 1
     - _depth_normal_threshold: 0.5
     - _depth_normal_threshold_scale: 7
-    - _depth_threshold: 0.03
-    - _normal_threshold: 0.65
-    - _roberts_cross_multiplier: 1
+    - _depth_threshold: 0.1
+    - _normal_threshold: 0.2
+    - _roberts_cross_multiplier: 3
     - _scale: 3
-    - _steep_angle_multiplier: 6
-    - _steep_angle_threshold: 5
+    - _steep_angle_multiplier: 8
+    - _steep_angle_threshold: 6
     - _threshold: 0.4
     m_Colors:
     - _BaseColor: {r: 1, g: 1, b: 1, a: 1}
