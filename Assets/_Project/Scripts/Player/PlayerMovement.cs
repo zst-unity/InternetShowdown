@@ -63,7 +63,11 @@ namespace Game.Player
         private Vector3 _additionalVelocity;
         private float _gravityVelocity;
 
-        public UnityEvent<float> onGroundSlamLanded = new();
+        [HideInInspector] public UnityEvent<float> onGroundSlamLanded = new();
+        [HideInInspector] public UnityEvent onJump = new();
+        [HideInInspector] public UnityEvent<Vector3> onWalled = new();
+        [HideInInspector] public UnityEvent onUnwalled = new();
+        [HideInInspector] public UnityEvent onDash = new();
 
         private void Awake()
         {
@@ -120,7 +124,10 @@ namespace Game.Player
                 _jumping = false;
                 _endingJump = false;
                 _dashing = false;
+                _dashCooldownTimer = 0f;
+                onWalled.Invoke(_wallHitInfo.normal);
             }
+            else if (_prevWalled && !_walled) onUnwalled.Invoke();
         }
 
         public void BeforeCharacterUpdate(float deltaTime)
@@ -192,6 +199,7 @@ namespace Game.Player
                 motor.ForceUnground(config.dashDuration);
 
                 _dashBufferTimer = config.dashBuffer;
+                onDash.Invoke();
             }
 
             if (inputs.wishJumping && !_prevWishJumping)
@@ -273,6 +281,8 @@ namespace Game.Player
             motor.ForceUnground();
             _jumping = true;
             if (!_walled) _jumpingFromGround = true;
+
+            onJump.Invoke();
         }
 
         public bool IsColliderValidForCollisions(Collider coll)
@@ -326,9 +336,10 @@ namespace Game.Player
                 }
             }
 
-            if (_walled && _jumping)
+            if (_walled)
             {
-                _additionalVelocity = _wallHitInfo.normal * config.wallJumpSpeed;
+                if (_jumping) _additionalVelocity = _wallHitInfo.normal * config.wallJumpSpeed;
+                else _additionalVelocity = Vector3.zero;
             }
 
             if (inputs.move != _prevMoveInput)

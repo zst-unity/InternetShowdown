@@ -1,0 +1,25 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: c7b7b056f3dc5f54bb4036b5a32d1660, type: 3}
+  m_Name: PlayerEffectsConfig
+  m_EditorClassIdentifier: 
+  jumpPrimaryAudioSource: {fileID: 4012639299815477404, guid: 4f878bc601b87bb479050c2dc78e3579, type: 3}
+  dashAudioSource: {fileID: 211393314157308291, guid: 095e5c03f87dd0e4ba99cbee2ff1a944, type: 3}
+  groundSlamAudioSource: {fileID: 4364884258345131430, guid: 2176ae32bed177e4ab897f96f1f7f622, type: 3}
+  landAudioSource: {fileID: 2347510166636523531, guid: 5c835a1880f9e9547b2504242e23f455, type: 3}
+  wallSlideAudioSource: {fileID: 8324139311235296118, guid: a611779617f318c4280c0cf18673a80a, type: 3}
+  skidAudioSource: {fileID: 2124894570743102736, guid: 57e5c471618350540b5d69a32e757573, type: 3}
+  wallSlideVolume: 0.35
+  wallSlideVolumeSmoothingSpeed: 9
+  wallSlideVolumeIncreaseRate: 0.4
+  velocityRecordSize: 8
+  skidThreshold: -0.7

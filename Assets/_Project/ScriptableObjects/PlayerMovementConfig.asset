@@ -188,7 +188,7 @@ MonoBehaviour:
   dashDistance: 4.5
   dashDuration: 0.12
   dashCooldown: 0.5
-  dashBuffer: 0.3
+  dashBuffer: 0.25
   minGroundSlamForce: -20
   maxGroundSlamForce: -80
   groundSlamForceInterpolationDistance: 20
@@ -197,9 +197,9 @@ MonoBehaviour:
     m_Bits: 55
   wallDetectionDistance: 0.05
   wallCheckRayCount: 8
-  slidingDownSpeed: 0.5
+  slidingDownSpeed: 1
   wallJumpSmoothing: 0.1
-  wallJumpSpeed: 15
+  wallJumpSpeed: 20
   higherWallDashDirectionThreshold: 0.27
   lowerWallDashDirectionThreshold: -0.15
   gravity: -23

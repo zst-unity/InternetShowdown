@@ -14,9 +14,32 @@ namespace Game.Player
         public GameObject model;
         public PlayerMovement movement;
         public Transform cameraHolder;
+
+        [Space(9)]
         public int speedRecordSize;
 
         private Queue<float> _speedRecord;
+
+        [Header("Sounds")]
+        public AudioSource leftFootstepSource;
+        public AudioSource rightFootstepSource;
+        public AudioSource wallLockSource;
+
+        private float _footstepTimer;
+
+        [Space(9)]
+        public AudioSource jumpSource;
+        public float jumpPitchUpRate;
+        public float jumpPitchDownRate;
+        public AnimationCurve jumpVolumeCurve;
+        public float jumpVolumeMultiplier;
+
+        private float _jumpVolumeTimer;
+
+        [Space(9)]
+        public AudioSource windAudioSource;
+        public float windVolumeSmoothingSpeed;
+        public float windVolumeMultiplier;
 
         [Header("Speedlines")]
         public bool enableSpeedlines;
@@ -76,6 +99,12 @@ namespace Game.Player
             movement = GetComponent<PlayerMovement>();
         }
 
+        private void Start()
+        {
+            windAudioSource.volume = 0f;
+            jumpSource.volume = 0f;
+        }
+
         public override void OnStartLocalPlayer()
         {
             _speedRecord = new(speedRecordSize);
@@ -86,11 +115,24 @@ namespace Game.Player
             _mouseSens = PlayerPrefs.GetFloat("sens");
 
             _actions = new();
-            _actions.Enable();
+
+            movement.onGroundSlamLanded.AddListener((dist) =>
+            {
+                ShakeCamera(Mathf.Min(dist * groundSlamCameraShakeMultiplier, maxGroundSlamCameraShake));
+            });
+
+            movement.onJump.AddListener(() =>
+            {
+                jumpSource.pitch = 0.6f;
+                _jumpVolumeTimer = movement.config.jumpDuration;
+                jumpSource.Play();
+            });
+
+            movement.onWalled.AddListener((_) => wallLockSource.Play());
 
             movement.controller = this;
+            _actions.Enable();
             movement.EnableMotor();
-            movement.onGroundSlamLanded.AddListener((dist) => ShakeCamera(Mathf.Min(dist * groundSlamCameraShakeMultiplier, maxGroundSlamCameraShake)));
         }
 
         public void ShakeCamera(float amplitude)
@@ -123,8 +165,16 @@ namespace Game.Player
             _sideRunTilt = Mathf.Lerp(_sideRunTilt, targetSideRunTilt, Time.deltaTime * sideRunTiltSmoothingSpeed);
 
             // CAMERA BOP
-            if (movement.inputs.move.sqrMagnitude > 0 && movement.motor.GroundingStatus.IsStableOnGround) _timeSinceRunning += Time.deltaTime;
-            else _timeSinceRunning = 0f;
+            if (movement.inputs.move.sqrMagnitude > 0 && movement.motor.GroundingStatus.IsStableOnGround)
+            {
+                _timeSinceRunning += Time.deltaTime;
+                _footstepTimer += Time.deltaTime;
+            }
+            else
+            {
+                _timeSinceRunning = 0f;
+                _footstepTimer = 0f;
+            }
 
             if (_timeSinceRunning == 0f)
             {
@@ -139,6 +189,14 @@ namespace Game.Player
 
             _camera.transform.localPosition = _cameraShake + Vector3.up * _cameraBopHeight;
 
+            // FOOTSTEPS
+            if (_footstepTimer >= Mathf.PI / cameraBopFrequency)
+            {
+                if (_cameraBopTilt < 0f) leftFootstepSource.Play();
+                else rightFootstepSource.Play();
+                _footstepTimer = 0f;
+            }
+
             // CAMERA ROTATION
             var delta = _actions.Camera.Look.ReadValue<Vector2>() * _mouseSens;
             movement.orientation.localEulerAngles += new Vector3(0f, delta.x, 0f);
@@ -152,13 +210,21 @@ namespace Game.Player
             );
 
             // FIND SPEED
-            var vel = transform.position - _prevPosition;
-            var rawSpeed = vel.magnitude / Time.deltaTime;
-            var dir = vel.normalized;
+            var velocity = transform.position - _prevPosition; ;
+            var rawSpeed = velocity.magnitude / Time.deltaTime;
+            var dir = velocity.normalized;
 
             if (_speedRecord.Count == speedRecordSize) _speedRecord.Dequeue();
             _speedRecord.Enqueue(rawSpeed);
             var speed = _speedRecord.ToArray().Average();
+
+            // WIND SOUND
+            windAudioSource.volume = Mathf.Lerp
+            (
+                windAudioSource.volume,
+                speedlinesAlphaCurve.Evaluate((speed - minSpeedlinesSpeed) / maxSpeedlinesSpeed) * windVolumeMultiplier,
+                Time.deltaTime * windVolumeSmoothingSpeed
+            );
 
             // FOV
             if (enableSpeedAffectsFOV)
@@ -184,6 +250,13 @@ namespace Game.Player
                 speedlinesFullscreenMaterial.SetFloat("_alpha", _currentSpeedlinesAlpha);
             }
             else speedlinesFullscreenMaterial.SetFloat("_alpha", 0f);
+
+            // JUMP SOUND
+            var pitchDir = Mathf.Round((transform.position.y - _prevPosition.y) * 20f) / 20f;
+            var pitchFactor = pitchDir > 0 ? jumpPitchUpRate : pitchDir == 0 ? 0f : -jumpPitchDownRate;
+            jumpSource.pitch += pitchFactor * (1f - _jumpVolumeTimer / movement.config.jumpDuration);
+            jumpSource.volume = jumpVolumeCurve.Evaluate(1f - _jumpVolumeTimer / movement.config.jumpDuration) * jumpVolumeMultiplier;
+            _jumpVolumeTimer -= Time.deltaTime;
 
             _prevPosition = transform.position;
         }

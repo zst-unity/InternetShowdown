@@ -1,0 +1,104 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1233149941 &-7505655696430869795
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Land2_{-7505655696430869795}
+  m_AudioClip: {fileID: 8300000, guid: 78344862b24289d4d9f421158b123277, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &-5522518303730936094
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Land7_{-5522518303730936094}
+  m_AudioClip: {fileID: 8300000, guid: 76b7c109b3fef6d44a9df6bbd7983d5e, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &-4384874242488991453
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Land5_{-4384874242488991453}
+  m_AudioClip: {fileID: 8300000, guid: ecaf0fee941627740aa8371c790e556b, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &-2777205907371268529
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Land6_{-2777205907371268529}
+  m_AudioClip: {fileID: 8300000, guid: 7d191ceaca290ba40899c98f6c6d27af, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &2289018996591664711
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Land1_{2289018996591664711}
+  m_AudioClip: {fileID: 8300000, guid: 154cc61f64b0afe4286a569ba9f5fe14, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1233149941 &5754699428084072436
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Land3_{5754699428084072436}
+  m_AudioClip: {fileID: 8300000, guid: f8c8912b28365f44e9ebbb3b7a10eb0f, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
+--- !u!1307931743 &6418180475301049370
+AudioRandomContainer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Land
+  m_Volume: 0
+  m_Pitch: 0
+  m_AutomaticTriggerTime: 0
+  m_LoopCount: 1
+  m_VolumeRandomizationRange: {x: -0.5, y: 0.5}
+  m_PitchRandomizationRange: {x: -100, y: 100}
+  m_AutomaticTriggerTimeRandomizationRange: {x: 0, y: 0}
+  m_LoopCountRandomizationRange: {x: 0, y: 0}
+  m_Elements:
+  - {fileID: 2289018996591664711}
+  - {fileID: -7505655696430869795}
+  - {fileID: 5754699428084072436}
+  - {fileID: 8060362106090796814}
+  - {fileID: -4384874242488991453}
+  - {fileID: -2777205907371268529}
+  - {fileID: -5522518303730936094}
+  m_AvoidRepeatingLast: 1
+  m_PlaybackMode: 2
+  m_TriggerMode: 0
+  m_AutomaticTriggerMode: 1
+  m_LoopMode: 2
+  m_VolumeRandomizationEnabled: 1
+  m_PitchRandomizationEnabled: 1
+  m_AutomaticTriggerTimeRandomizationEnabled: 0
+  m_LoopCountRandomizationEnabled: 0
+--- !u!1233149941 &8060362106090796814
+AudioContainerElement:
+  m_ObjectHideFlags: 1
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Land4_{8060362106090796814}
+  m_AudioClip: {fileID: 8300000, guid: 2cdf349065d3d0e4e9896f84e5824a0d, type: 3}
+  m_Volume: 0
+  m_Enabled: 1
