@@ -1,0 +1,22 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0ce15dac8d66e044cac774326a7a88e0, type: 3}
+  m_Name: TestMap
+  m_EditorClassIdentifier: 
+  sceneName: Assets/_Project/Scenes/TestMap.unity
+  displayName: Test Map
+  soundtracks:
+  - {fileID: 8300000, guid: ed4d50d4c438b3a4597b63ecb6360ec5, type: 3}
+  - {fileID: 8300000, guid: 9b47e430bb5d44b41bf6489c96d82633, type: 3}
+  - {fileID: 8300000, guid: 528ffc2ff8a8c5c42b7bb05b7a14e5ca, type: 3}
+  - {fileID: 8300000, guid: d3e628dca8c117543a5f76d8cb296fa8, type: 3}
+  - {fileID: 8300000, guid: b975891fdf3f45741a9e60a7921453e4, type: 3}

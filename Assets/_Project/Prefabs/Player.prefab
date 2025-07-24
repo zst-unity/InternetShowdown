@@ -318,19 +318,9 @@ MonoBehaviour:
   movement: {fileID: 6754057132338759635}
   cameraHolder: {fileID: 9199459176827721078}
   speedRecordSize: 8
-  velocityRecordSize: 8
   leftFootstepSource: {fileID: 542094216083836975}
   rightFootstepSource: {fileID: 4588855780566652419}
-  groundSlamSource: {fileID: 0}
   wallLockSource: {fileID: 484217615047548163}
-  dashSource: {fileID: 0}
-  skidAudio: {fileID: 0}
-  wallSlideSource: {fileID: 0}
-  wallSlideVolume: 0.35
-  wallSlideVolumeSmoothingSpeed: 9
-  wallSlideVolumeIncreaseRate: 0.4
-  landSource: {fileID: 0}
-  jumpPrimarySource: {fileID: 0}
   jumpSource: {fileID: 2794030002190309072}
   jumpPitchUpRate: 0.01
   jumpPitchDownRate: 0
@@ -448,7 +438,7 @@ MonoBehaviour:
   cameraShakeFalloffSpeed: 9
   groundSlamCameraShakeMultiplier: 0.06
   maxGroundSlamCameraShake: 3
-  threshold: -1
+  map: {fileID: 11400000, guid: b4939a4b702c06848b53436f73a83e51, type: 2}
 --- !u!136 &241399185085964307
 CapsuleCollider:
   m_ObjectHideFlags: 8
@@ -499,6 +489,9 @@ MonoBehaviour:
   onWalled:
     m_PersistentCalls:
       m_Calls: []
+  onUnwalled:
+    m_PersistentCalls:
+      m_Calls: []
   onDash:
     m_PersistentCalls:
       m_Calls: []
@@ -517,6 +510,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
+  serverSide: 0
   config: {fileID: 11400000, guid: 78903821474925b4bb25818b3f68d3a8, type: 2}
   audioSourcesContainer: {fileID: 5212860309231172166}
   movement: {fileID: 6754057132338759635}

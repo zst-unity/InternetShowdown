@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using Game.Inputs;
+using Game.Network.Messages;
 using Mirror;
 using Unity.Mathematics;
 using UnityEngine;
@@ -129,6 +130,11 @@ namespace Game.Player
             });
 
             movement.onWalled.AddListener((_) => wallLockSource.Play());
+            movement.onCollide.AddListener((collider) =>
+            {
+                if (!collider.CompareTag("Portal")) return;
+                NetworkClient.Send<ClientRequestMapLoad>(new());
+            });
 
             movement.controller = this;
             _actions.Enable();
